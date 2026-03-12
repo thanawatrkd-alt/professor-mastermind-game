@@ -107,6 +107,7 @@
             overflow-y: auto;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
+            position: relative;
         }
 
         .story-text {
@@ -208,6 +209,30 @@
 
         .story-text p {
             margin: 0.5rem 0;
+        }
+
+        .story-text::after {
+            content: '';
+        }
+
+        .story-container:hover .story-text {
+            cursor: pointer;
+        }
+
+        .story-container::before {
+            content: '💡 คลิกเพื่อข้ามการพิมพ์';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 0.75rem;
+            color: #ffb74d;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .story-container:hover::before {
+            opacity: 1;
         }
 
         /* Scrollbar Styling */
@@ -1258,17 +1283,30 @@
         }
 
         // Typewriter Effect
-        async function typeWriter(element, text, speed = 30) {
+        async function typeWriter(element, text, speed = 10) {
             state.isTyping = true;
             element.innerHTML = '';
             const parsedText = parseMarkdown(text);
             
+            // Allow skipping by clicking
+            let skipTyping = false;
+            const skipHandler = () => {
+                skipTyping = true;
+                element.removeEventListener('click', skipHandler);
+            };
+            element.addEventListener('click', skipHandler);
+            
             for (let i = 0; i < parsedText.length; i++) {
+                if (skipTyping) {
+                    element.innerHTML = parsedText;
+                    break;
+                }
                 element.innerHTML = parsedText.substring(0, i + 1);
                 scrollToBottom(element.parentElement);
                 await new Promise(resolve => setTimeout(resolve, speed));
             }
             
+            element.removeEventListener('click', skipHandler);
             state.isTyping = false;
             scrollToBottom(element.parentElement);
             
@@ -1307,8 +1345,10 @@
                             }]
                         }],
                         generationConfig: {
-                            temperature: 0.8,
-                            maxOutputTokens: 3000
+                            temperature: 0.7,
+                            maxOutputTokens: 1500,
+                            topP: 0.9,
+                            topK: 40
                         }
                     })
                 });
@@ -1395,8 +1435,10 @@
                             }]
                         }],
                         generationConfig: {
-                            temperature: 0.8,
-                            maxOutputTokens: 3000
+                            temperature: 0.7,
+                            maxOutputTokens: 1500,
+                            topP: 0.9,
+                            topK: 40
                         }
                     })
                 });
