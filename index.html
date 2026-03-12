@@ -512,8 +512,85 @@
             font-weight: bold;
         }
 
+        /* Choice Buttons */
+        .choices-section {
+            display: none;
+            margin-top: 1.5rem;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .choices-section.active {
+            display: block;
+        }
+
+        .choices-label {
+            font-size: 0.9rem;
+            color: #ffb74d;
+            margin-bottom: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .choices-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.3) 0%, rgba(255, 110, 64, 0.3) 100%);
+            color: #e0e0e0;
+            border: 2px solid rgba(255, 23, 68, 0.5);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            backdrop-filter: blur(10px);
+            word-break: break-word;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.5) 0%, rgba(255, 110, 64, 0.5) 100%);
+            border-color: #ff1744;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
+        }
+
+        .choice-btn:active:not(:disabled) {
+            transform: translateX(3px);
+        }
+
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (min-width: 768px) {
+            .choices-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .choices-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         /* Responsive */
         @media (max-width: 640px) {
+            .choices-container {
+                grid-template-columns: 1fr;
+            }
+
+            .choice-btn {
+                padding: 0.85rem 1.25rem;
+                font-size: 0.9rem;
+            }
             .header {
                 margin-bottom: 1rem;
             }
@@ -712,6 +789,12 @@
             <button id="hint-btn" class="help-btn hint-btn">💡 บอกใจความ</button>
         </div>
 
+        <!-- Choices Section -->
+        <div id="choices-section" class="choices-section">
+            <div class="choices-label">📋 เลือกการตัดสินใจของคุณ:</div>
+            <div id="choices-container" class="choices-container"></div>
+        </div>
+
         <!-- Status Text -->
         <p id="status-text" class="status-text"></p>
     </div>
@@ -748,7 +831,8 @@
             accuracy: 25,
             isTyping: false,
             showHelpButtons: false,
-            lastStoryText: ''
+            lastStoryText: '',
+            currentChoices: []
         };
 
         // API Key Management
@@ -842,7 +926,9 @@
             saveBtn: document.getElementById('save-btn'),
             loadBtn: document.getElementById('load-btn'),
             resetBtn: document.getElementById('reset-btn'),
-            apiBtn: document.getElementById('api-btn')
+            apiBtn: document.getElementById('api-btn'),
+            choicesSection: document.getElementById('choices-section'),
+            choicesContainer: document.getElementById('choices-container')
         };
 
         const stagePrompts = {
@@ -1033,6 +1119,36 @@
             }, 0);
         }
 
+        // Show choices
+        function showChoices(choices) {
+            state.currentChoices = choices;
+            elements.choicesContainer.innerHTML = '';
+            
+            choices.forEach((choice, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice.text;
+                btn.onclick = () => selectChoice(choice.value);
+                elements.choicesContainer.appendChild(btn);
+            });
+            
+            elements.choicesSection.classList.add('active');
+            scrollToBottom(elements.choicesSection);
+        }
+
+        // Hide choices
+        function hideChoices() {
+            elements.choicesSection.classList.remove('active');
+            state.currentChoices = [];
+        }
+
+        // Select choice
+        function selectChoice(value) {
+            elements.userInput.value = value;
+            hideChoices();
+            sendMessage();
+        }
+
         // Parse simple Markdown to HTML
         function parseMarkdown(text) {
             let html = text;
@@ -1086,6 +1202,61 @@
             return html;
         }
 
+        // Show default choices based on stage
+        function showDefaultChoices() {
+            const choices = {
+                recruitment: [
+                    { text: '✅ ยอมรับการชักชวน', value: 'ฉันยอมรับการชักชวนของคุณ ฉันพร้อมเข้าร่วมทีมนี้' },
+                    { text: '❓ ถามคำถามเพิ่มเติม', value: 'ฉันมีคำถามเพิ่มเติมเกี่ยวกับแผนการนี้' },
+                    { text: '❌ ปฏิเสธการชักชวน', value: 'ฉันขอปฏิเสธการชักชวนของคุณ' }
+                ],
+                plan: [
+                    { text: '✅ เข้าใจแผนการแล้ว', value: 'ฉันเข้าใจแผนการแล้ว พร้อมเริ่มฝึกอบรม' },
+                    { text: '❓ ถามเพิ่มเติม', value: 'ฉันมีคำถามเกี่ยวกับแผนการ' },
+                    { text: '⚠️ มีความกังวล', value: 'ฉันมีความกังวลเกี่ยวกับแผนการนี้' }
+                ],
+                training: [
+                    { text: '✅ เข้าใจแล้ว', value: 'ฉันเข้าใจเทคนิคจิตวิทยาแล้ว' },
+                    { text: '❓ อธิบายเพิ่มเติม', value: 'ช่วยอธิบายเทคนิคนี้เพิ่มเติมหน่อย' },
+                    { text: '💪 พร้อมต่อไป', value: 'ฉันพร้อมเข้าสู่ขั้นตอนถัดไป' }
+                ],
+                heist_night: [
+                    { text: '💪 พร้อมบุก', value: 'ฉันพร้อมบุกเข้าไป' },
+                    { text: '😰 กังวล', value: 'ฉันกังวลเกี่ยวกับแผนการนี้' },
+                    { text: '💭 ให้ฉันคิด', value: 'ให้ฉันคิดอีกครู่' }
+                ],
+                heist_start: [
+                    { text: '✅ ดำเนินการต่อ', value: 'ดำเนินการต่อตามแผน' },
+                    { text: '⚠️ เปลี่ยนแผน', value: 'ฉันต้องการเปลี่ยนแผน' },
+                    { text: '🚨 ถอนตัว', value: 'ฉันต้องการถอนตัวจากแผนการนี้' }
+                ],
+                heist_negotiation: [
+                    { text: '💬 เจรจาต่อ', value: 'ฉันต้องการเจรจาต่อ' },
+                    { text: '⚔️ ใช้กำลัง', value: 'ฉันต้องการใช้กำลัง' },
+                    { text: '🏳️ ยอมแพ้', value: 'ฉันต้องการยอมแพ้' }
+                ],
+                heist_twist: [
+                    { text: '✅ ดำเนินการต่อ', value: 'ดำเนินการต่อตามแผน' },
+                    { text: '🚨 หนี', value: 'ฉันต้องการหนีออกไป' },
+                    { text: '💪 สู้ต่อ', value: 'ฉันต้องการสู้ต่อ' }
+                ],
+                heist_escape: [
+                    { text: '✅ หนีรอด', value: 'ฉันต้องการหนีรอด' },
+                    { text: '🤝 ยอมแพ้', value: 'ฉันต้องการยอมแพ้' },
+                    { text: '💀 สู้จนตาย', value: 'ฉันต้องการสู้จนตาย' }
+                ],
+                questions: [
+                    { text: '✅ ส่งคำตอบ', value: 'ฉันพร้อมส่งคำตอบ' },
+                    { text: '❓ ถามคำถาม', value: 'ฉันมีคำถาม' },
+                    { text: '💭 ให้ฉันคิด', value: 'ให้ฉันคิดอีกครู่' }
+                ]
+            };
+            
+            if (choices[state.stage]) {
+                showChoices(choices[state.stage]);
+            }
+        }
+
         // Typewriter Effect
         async function typeWriter(element, text, speed = 30) {
             state.isTyping = true;
@@ -1100,6 +1271,9 @@
             
             state.isTyping = false;
             scrollToBottom(element.parentElement);
+            
+            // Show choices based on stage
+            showDefaultChoices();
         }
 
         function updateInputState() {
