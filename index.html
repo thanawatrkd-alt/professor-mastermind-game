@@ -262,6 +262,102 @@
             cursor: not-allowed;
         }
 
+        /* API Key Modal */
+        .api-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .api-modal.active {
+            display: flex;
+        }
+
+        .api-modal-content {
+            background: linear-gradient(135deg, rgba(15, 52, 96, 0.95) 0%, rgba(22, 33, 62, 0.95) 100%);
+            border: 2px solid rgba(255, 23, 68, 0.6);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .api-modal-content h2 {
+            color: #ff6e40;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .api-modal-content p {
+            color: #b0bec5;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .api-modal-content input {
+            width: 100%;
+            background: rgba(22, 33, 62, 0.8);
+            color: #e0e0e0;
+            border: 2px solid rgba(255, 23, 68, 0.4);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .api-modal-content input:focus {
+            outline: none;
+            border-color: #ff1744;
+            box-shadow: 0 0 15px rgba(255, 23, 68, 0.5);
+        }
+
+        .api-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .api-modal-buttons button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .api-modal-buttons .save-btn {
+            background: linear-gradient(135deg, #ff1744 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        .api-modal-buttons .save-btn:hover {
+            background: linear-gradient(135deg, #ff6e40 0%, #ff1744 100%);
+            transform: translateY(-2px);
+        }
+
+        .api-modal-buttons .cancel-btn {
+            background: rgba(255, 23, 68, 0.2);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 23, 68, 0.4);
+        }
+
+        .api-modal-buttons .cancel-btn:hover {
+            background: rgba(255, 23, 68, 0.3);
+        }
+
         /* Animations */
         @keyframes slideDown {
             from {
@@ -340,6 +436,7 @@
                     <p>MASTERMIND v33</p>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
+                    <button id="api-btn" class="header-btn" title="ตั้งค่า API Key">🔑 API</button>
                     <button id="save-btn" class="header-btn" title="บันทึกเกม">💾 บันทึก</button>
                     <button id="load-btn" class="header-btn" title="โหลดเกม">📂 โหลด</button>
                     <button id="reset-btn" class="header-btn" title="เริ่มใหม่">🔄 เริ่มใหม่</button>
@@ -379,9 +476,29 @@
         <p id="status-text" class="status-text"></p>
     </div>
 
+    <!-- API Key Modal -->
+    <div id="api-modal" class="api-modal">
+        <div class="api-modal-content">
+            <h2>🔑 ตั้งค่า API Key</h2>
+            <p>กรุณาป้อน Google Gemini API Key ของคุณ:</p>
+            <p style="font-size: 0.85rem; color: #ff6e40;">สร้าง API Key ได้ที่: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #ff1744; text-decoration: underline;">Google AI Studio</a></p>
+            <input 
+                type="password" 
+                id="api-key-input" 
+                placeholder="ป้อน API Key ของคุณ..." 
+            >
+            <div class="api-modal-buttons">
+                <button class="cancel-btn" onclick="closeApiModal()">ยกเลิก</button>
+                <button class="save-btn" onclick="saveApiKey()">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-        const API_KEY = 'AIzaSyAhOL7Kvuj1ASX1IfZpjGwxS4sIUHcE8g4';
+        
+        // Get API Key from localStorage
+        let API_KEY = localStorage.getItem('professorGameApiKey') || '';
 
         const state = {
             isWaitingForAI: false,
@@ -393,6 +510,31 @@
             showHelpButtons: false,
             lastStoryText: ''
         };
+
+        // API Key Management
+        function openApiModal() {
+            document.getElementById('api-modal').classList.add('active');
+            document.getElementById('api-key-input').value = API_KEY;
+        }
+
+        function closeApiModal() {
+            document.getElementById('api-modal').classList.remove('active');
+        }
+
+        function saveApiKey() {
+            const newApiKey = document.getElementById('api-key-input').value.trim();
+            if (!newApiKey) {
+                alert('กรุณาป้อน API Key');
+                return;
+            }
+            API_KEY = newApiKey;
+            localStorage.setItem('professorGameApiKey', API_KEY);
+            closeApiModal();
+            elements.statusText.textContent = '✅ บันทึก API Key เรียบร้อย!';
+            setTimeout(() => {
+                elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
+            }, 2000);
+        }
 
         // Save/Load Functions
         function saveGame() {
@@ -459,7 +601,8 @@
             hintBtn: document.getElementById('hint-btn'),
             saveBtn: document.getElementById('save-btn'),
             loadBtn: document.getElementById('load-btn'),
-            resetBtn: document.getElementById('reset-btn')
+            resetBtn: document.getElementById('reset-btn'),
+            apiBtn: document.getElementById('api-btn')
         };
 
         const stagePrompts = {
@@ -663,6 +806,12 @@
         }
 
         async function initializeGame() {
+            if (!API_KEY) {
+                elements.statusText.textContent = '⚠️ กรุณาตั้งค่า API Key ก่อน';
+                openApiModal();
+                return;
+            }
+
             state.isWaitingForAI = true;
             state.isProcessing = true;
             updateInputState();
@@ -701,7 +850,7 @@
             } catch (error) {
                 console.error('Error:', error);
                 elements.storyText.innerHTML = `<span style="color: #ff6e40;">❌ เกิดข้อผิดพลาด: ${error.message}</span>`;
-                elements.statusText.textContent = '⚠️ ไม่สามารถติดต่อ AI ได้';
+                elements.statusText.textContent = '⚠️ ไม่สามารถติดต่อ AI ได้ กรุณาตรวจสอบ API Key';
             } finally {
                 state.isWaitingForAI = false;
                 state.isProcessing = false;
@@ -713,6 +862,12 @@
             const message = elements.userInput.value.trim();
             
             if (!message) return;
+
+            if (!API_KEY) {
+                elements.statusText.textContent = '⚠️ กรุณาตั้งค่า API Key ก่อน';
+                openApiModal();
+                return;
+            }
 
             state.isWaitingForAI = true;
             state.isProcessing = true;
@@ -776,17 +931,10 @@
                 const data = await response.json();
                 const aiResponse = data.candidates[0].content.parts[0].text;
 
-                await typeWriter(elements.storyText, aiResponse, 20);
-                elements.stageIndicator.textContent = stageTexts[state.stage];
-
-                // Clear input
                 elements.userInput.value = '';
-                
-                if (state.stage === 'questions') {
-                    elements.statusText.textContent = '💬 ตอบคำถามอาจารย์...';
-                } else {
-                    elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
-                }
+                await typeWriter(elements.storyText, aiResponse, 20);
+                elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
+                elements.stageIndicator.textContent = stageTexts[state.stage];
 
             } catch (error) {
                 console.error('Error:', error);
@@ -799,107 +947,40 @@
             }
         }
 
-        // Help button functions
-        async function handleThinkButton() {
-            state.showHelpButtons = false;
-            elements.helpButtons.style.display = 'none';
-            elements.userInput.focus();
-            elements.statusText.textContent = '💭 ใช้เวลาคิดของคุณ... (ผมจะรอ)';
-        }
-
-        async function handleHintButton() {
-            state.isWaitingForAI = true;
-            state.isProcessing = true;
-            updateInputState();
-            elements.helpButtons.style.display = 'none';
-            elements.statusText.textContent = '💡 กำลังให้คำแนะนำ...';
-
-            try {
-                const hintPrompt = 'คุณคือ "อาจารย์" ให้คำแนะนำแก่ผู้เล่นอย่างเนียนๆ เพื่อให้เขาเข้าใจว่าควรตอบอะไร โดยไม่บอกคำตอบโดยตรง ใช้ Calibrated Question เช่น "คุณคิดว่าทำไมฉันถึงบอกเรื่องนี้?" หรือ "เธอจำแผนการได้ไหม?" ให้ความรู้สึกว่าเรากำลังสอนจิตวิทยา';
-
-                const response = await fetch(`${API_ENDPOINT}?key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: hintPrompt
-                            }]
-                        }],
-                        generationConfig: {
-                            temperature: 0.8,
-                            maxOutputTokens: 1000
-                        }
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const hintResponse = data.candidates[0].content.parts[0].text;
-
-                await typeWriter(elements.storyText, hintResponse, 20);
-                elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
-
-            } catch (error) {
-                console.error('Error:', error);
-                elements.storyText.innerHTML = `<span style="color: #ff6e40;">❌ เกิดข้อผิดพลาด: ${error.message}</span>`;
-            } finally {
-                state.isWaitingForAI = false;
-                state.isProcessing = false;
-                updateInputState();
-            }
-        }
-
-        function showHelpButtons() {
-            state.showHelpButtons = true;
-            elements.helpButtons.style.display = 'flex';
-            elements.statusText.textContent = '🤔 คุณต้องการความช่วยเหลือไหม?';
-        }
-
         // Event Listeners
         elements.sendBtn.addEventListener('click', sendMessage);
         elements.userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !state.isWaitingForAI && !state.isProcessing && !state.isTyping) {
+            if (e.key === 'Enter' && !state.isWaitingForAI) {
                 sendMessage();
             }
         });
 
-        elements.thinkBtn.addEventListener('click', handleThinkButton);
-        elements.hintBtn.addEventListener('click', handleHintButton);
-
-        // Save/Load button listeners
         elements.saveBtn.addEventListener('click', saveGame);
         elements.loadBtn.addEventListener('click', loadGame);
         elements.resetBtn.addEventListener('click', resetGame);
+        elements.apiBtn.addEventListener('click', openApiModal);
 
-        // Show help buttons after 10 seconds of inactivity
-        let inactivityTimer;
-        function resetInactivityTimer() {
-            clearTimeout(inactivityTimer);
-            if (!state.isWaitingForAI && !state.isProcessing && state.stage === 'questions') {
-                inactivityTimer = setTimeout(() => {
-                    if (!state.isWaitingForAI && !state.isProcessing && !state.showHelpButtons) {
-                        showHelpButtons();
-                    }
-                }, 10000);
+        // Close modal when clicking outside
+        document.getElementById('api-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'api-modal') {
+                closeApiModal();
             }
-        }
+        });
 
-        elements.userInput.addEventListener('input', resetInactivityTimer);
-        elements.userInput.addEventListener('focus', resetInactivityTimer);
+        // Allow Enter key in API key input
+        document.getElementById('api-key-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveApiKey();
+            }
+        });
 
-        // Initialize game on load
+        // Initialize game
         window.addEventListener('load', () => {
-            initializeGame();
-            // Check if there's a saved game
-            const savedData = localStorage.getItem('professorGameSave');
-            if (savedData) {
-                elements.statusText.textContent = '💾 มีเกมที่บันทึกไว้ คลิก "โหลด" เพื่อดำเนินการต่อ';
+            if (!API_KEY) {
+                elements.statusText.textContent = '⚠️ กรุณาตั้งค่า API Key ก่อนเริ่มเกม';
+                openApiModal();
+            } else {
+                initializeGame();
             }
         });
     </script>
