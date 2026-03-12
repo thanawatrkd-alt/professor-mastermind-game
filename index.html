@@ -227,6 +227,35 @@
             animation: slideUp 0.8s ease-out 0.8s both;
         }
 
+        /* Header Buttons */
+        .header-btn {
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.2) 0%, rgba(255, 110, 64, 0.2) 100%);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 23, 68, 0.4);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.4) 0%, rgba(255, 110, 64, 0.4) 100%);
+            border-color: #ff1744;
+            transform: translateY(-1px);
+        }
+
+        .header-btn:active {
+            transform: translateY(0);
+        }
+
+        .header-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Help Buttons */
         .help-buttons {
             display: flex;
@@ -337,8 +366,17 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🎭 THE PROFESSOR</h1>
-            <p>MASTERMIND v33</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                    <h1>🎭 THE PROFESSOR</h1>
+                    <p>MASTERMIND v33</p>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button id="save-btn" class="header-btn" title="บันทึกเกม">💾 บันทึก</button>
+                    <button id="load-btn" class="header-btn" title="โหลดเกม">📂 โหลด</button>
+                    <button id="reset-btn" class="header-btn" title="เริ่มใหม่">🔄 เริ่มใหม่</button>
+                </div>
+            </div>
         </div>
 
         <!-- Stage Indicator -->
@@ -395,8 +433,66 @@
             stageStep: 0,
             accuracy: 25,
             isTyping: false,
-            showHelpButtons: false
+            showHelpButtons: false,
+            lastStoryText: ''
         };
+
+        // Save/Load Functions
+        function saveGame() {
+            const gameData = {
+                stage: state.stage,
+                stageStep: state.stageStep,
+                accuracy: state.accuracy,
+                storyText: elements.storyText.innerHTML,
+                timestamp: new Date().toLocaleString('th-TH')
+            };
+            localStorage.setItem('professorGameSave', JSON.stringify(gameData));
+            elements.statusText.textContent = '✅ บันทึกเกมเรียบร้อย!';
+            setTimeout(() => {
+                if (state.stage === 'questions') {
+                    elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
+                } else {
+                    elements.statusText.textContent = '💬 ตอบคำถามอาจารย์...';
+                }
+            }, 2000);
+        }
+
+        function loadGame() {
+            const savedData = localStorage.getItem('professorGameSave');
+            if (!savedData) {
+                elements.statusText.textContent = '❌ ไม่มีเกมที่บันทึกไว้';
+                return;
+            }
+
+            try {
+                const gameData = JSON.parse(savedData);
+                state.stage = gameData.stage;
+                state.stageStep = gameData.stageStep;
+                state.accuracy = gameData.accuracy;
+                elements.storyText.innerHTML = gameData.storyText;
+                elements.accuracyBar.style.width = gameData.accuracy + '%';
+                elements.accuracyText.textContent = gameData.accuracy + '%';
+                elements.stageIndicator.textContent = stageTexts[state.stage];
+                elements.statusText.textContent = `✅ โหลดเกมจาก ${gameData.timestamp}`;
+                setTimeout(() => {
+                    if (state.stage === 'questions') {
+                        elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
+                    } else {
+                        elements.statusText.textContent = '💬 ตอบคำถามอาจารย์...';
+                    }
+                }, 2000);
+            } catch (error) {
+                console.error('Error loading game:', error);
+                elements.statusText.textContent = '❌ เกิดข้อผิดพลาดในการโหลดเกม';
+            }
+        }
+
+        function resetGame() {
+            if (confirm('คุณแน่ใจว่าต้องการเริ่มเกมใหม่ไหม? ข้อมูลเก่าจะหายไป')) {
+                localStorage.removeItem('professorGameSave');
+                location.reload();
+            }
+        }
 
         const elements = {
             userInput: document.getElementById('user-input'),
@@ -408,7 +504,10 @@
             stageIndicator: document.getElementById('stage-text'),
             helpButtons: document.getElementById('help-buttons'),
             thinkBtn: document.getElementById('think-btn'),
-            hintBtn: document.getElementById('hint-btn')
+            hintBtn: document.getElementById('hint-btn'),
+            saveBtn: document.getElementById('save-btn'),
+            loadBtn: document.getElementById('load-btn'),
+            resetBtn: document.getElementById('reset-btn')
         };
 
         const stagePrompts = {
@@ -826,6 +925,11 @@
         elements.thinkBtn.addEventListener('click', handleThinkButton);
         elements.hintBtn.addEventListener('click', handleHintButton);
 
+        // Save/Load button listeners
+        elements.saveBtn.addEventListener('click', saveGame);
+        elements.loadBtn.addEventListener('click', loadGame);
+        elements.resetBtn.addEventListener('click', resetGame);
+
         // Show help buttons after 10 seconds of inactivity
         let inactivityTimer;
         function resetInactivityTimer() {
@@ -843,7 +947,14 @@
         elements.userInput.addEventListener('focus', resetInactivityTimer);
 
         // Initialize game on load
-        window.addEventListener('load', initializeGame);
+        window.addEventListener('load', () => {
+            initializeGame();
+            // Check if there's a saved game
+            const savedData = localStorage.getItem('professorGameSave');
+            if (savedData) {
+                elements.statusText.textContent = '💾 มีเกมที่บันทึกไว้ คลิก "โหลด" เพื่อดำเนินการต่อ';
+            }
+        });
     </script>
 </body>
 </html>
