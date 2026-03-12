@@ -828,13 +828,34 @@
     <div id="api-modal" class="api-modal">
         <div class="api-modal-content">
             <h2>🔑 ตั้งค่า API Key</h2>
-            <p>กรุณาป้อน Google Gemini API Key ของคุณ:</p>
-            <p style="font-size: 0.85rem; color: #ff6e40;">สร้าง API Key ได้ที่: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #ff1744; text-decoration: underline;">Google AI Studio</a></p>
-            <input 
-                type="password" 
-                id="api-key-input" 
-                placeholder="ป้อน API Key ของคุณ..." 
-            >
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">เลือก AI Provider:</label>
+                <select id="api-provider-select" style="width: 100%; padding: 0.5rem; background: #1a2332; color: #e0e0e0; border: 1px solid #ff1744; border-radius: 6px;">
+                    <option value="gemini">🔵 Google Gemini</option>
+                    <option value="deepseek">🟢 DeepSeek</option>
+                </select>
+            </div>
+            
+            <div id="gemini-section">
+                <p>กรุณาป้อน Google Gemini API Key ของคุณ:</p>
+                <p style="font-size: 0.85rem; color: #ff6e40;">สร้าง API Key ได้ที่: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #ff1744; text-decoration: underline;">Google AI Studio</a></p>
+                <input 
+                    type="password" 
+                    id="api-key-input" 
+                    placeholder="ป้อน Gemini API Key..." 
+                >
+            </div>
+            
+            <div id="deepseek-section" style="display: none;">
+                <p>กรุณาป้อน DeepSeek API Key ของคุณ:</p>
+                <p style="font-size: 0.85rem; color: #ff6e40;">สร้าง API Key ได้ที่: <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color: #ff1744; text-decoration: underline;">DeepSeek Platform</a></p>
+                <input 
+                    type="password" 
+                    id="deepseek-key-input" 
+                    placeholder="ป้อน DeepSeek API Key..." 
+                >
+            </div>
+            
             <div class="api-modal-buttons">
                 <button class="cancel-btn" onclick="closeApiModal()">ยกเลิก</button>
                 <button class="save-btn" onclick="saveApiKey()">บันทึก</button>
@@ -843,10 +864,23 @@
     </div>
 
     <script>
-        const API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+        // API Configuration
+        const API_CONFIG = {
+            gemini: {
+                endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+                name: 'Google Gemini'
+            },
+            deepseek: {
+                endpoint: 'https://api.deepseek.com/chat/completions',
+                name: 'DeepSeek'
+            }
+        };
         
-        // Get API Key from localStorage
+        let API_PROVIDER = localStorage.getItem('professorGameApiProvider') || 'gemini';
         let API_KEY = localStorage.getItem('professorGameApiKey') || '';
+        let DEEPSEEK_API_KEY = localStorage.getItem('professorGameDeepseekKey') || '';
+        
+        const API_ENDPOINT = API_CONFIG[API_PROVIDER].endpoint;
 
         const state = {
             isWaitingForAI: false,
@@ -863,7 +897,18 @@
         // API Key Management
         function openApiModal() {
             document.getElementById('api-modal').classList.add('active');
-            document.getElementById('api-key-input').value = API_KEY;
+            document.getElementById('api-provider-select').value = API_PROVIDER;
+            
+            // แสดงหรือซ่อน input ตาม provider
+            if (API_PROVIDER === 'gemini') {
+                document.getElementById('gemini-section').style.display = 'block';
+                document.getElementById('deepseek-section').style.display = 'none';
+                document.getElementById('api-key-input').value = API_KEY;
+            } else {
+                document.getElementById('gemini-section').style.display = 'none';
+                document.getElementById('deepseek-section').style.display = 'block';
+                document.getElementById('deepseek-key-input').value = DEEPSEEK_API_KEY;
+            }
         }
 
         function closeApiModal() {
@@ -871,16 +916,35 @@
         }
 
         function saveApiKey() {
-            const newApiKey = document.getElementById('api-key-input').value.trim();
+            const selectedProvider = document.getElementById('api-provider-select').value;
+            let newApiKey = '';
+            
+            if (selectedProvider === 'gemini') {
+                newApiKey = document.getElementById('api-key-input').value.trim();
+            } else {
+                newApiKey = document.getElementById('deepseek-key-input').value.trim();
+            }
+            
             if (!newApiKey) {
                 alert('กรุณาป้อน API Key');
                 return;
             }
-            console.log('Saving API Key...');
-            API_KEY = newApiKey;
-            localStorage.setItem('professorGameApiKey', API_KEY);
+            
+            console.log(`Saving ${selectedProvider} API Key...`);
+            
+            if (selectedProvider === 'gemini') {
+                API_KEY = newApiKey;
+                localStorage.setItem('professorGameApiKey', API_KEY);
+            } else {
+                DEEPSEEK_API_KEY = newApiKey;
+                localStorage.setItem('professorGameDeepseekKey', DEEPSEEK_API_KEY);
+            }
+            
+            API_PROVIDER = selectedProvider;
+            localStorage.setItem('professorGameApiProvider', API_PROVIDER);
+            
             closeApiModal();
-            elements.statusText.textContent = '✅ บันทึก API Key เรียบร้อย!';
+            elements.statusText.textContent = `✅ บันทึก ${API_CONFIG[selectedProvider].name} API Key เรียบร้อย!`;
             
             // เริ่มเกมทันทีหลังจากบันทึก API Key
             if (elements.storyText.textContent.includes('กำลังเตรียมการ') || elements.storyText.textContent === '') {
@@ -1323,8 +1387,83 @@
             elements.sendBtn.disabled = isDisabled;
         }
 
+        // API Handler Functions
+        async function callDeepSeekAPI(prompt) {
+            const response = await fetch('https://api.deepseek.com/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'deepseek-chat',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'You are a helpful assistant. Respond in Thai language.'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 1500
+                })
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                const errorMsg = data.error ? data.error.message : `Status ${response.status}`;
+                throw new Error(`DeepSeek API Error: ${errorMsg}`);
+            }
+
+            if (!data.choices || data.choices.length === 0) {
+                throw new Error('DeepSeek ไม่ได้ส่งคำตอบกลับมา (Empty Response)');
+            }
+
+            return data.choices[0].message.content;
+        }
+
+        async function callGeminiAPI(prompt) {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        maxOutputTokens: 1500,
+                        topP: 0.9,
+                        topK: 40
+                    }
+                })
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                const errorMsg = data.error ? data.error.message : `Status ${response.status}`;
+                throw new Error(`Gemini API Error: ${errorMsg}`);
+            }
+
+            if (!data.candidates || data.candidates.length === 0) {
+                throw new Error('Gemini ไม่ได้ส่งคำตอบกลับมา (Empty Response)');
+            }
+
+            return data.candidates[0].content.parts[0].text;
+        }
+
         async function initializeGame() {
-            if (!API_KEY) {
+            const apiKey = API_PROVIDER === 'gemini' ? API_KEY : DEEPSEEK_API_KEY;
+            if (!apiKey) {
                 elements.statusText.textContent = '⚠️ กรุณาตั้งค่า API Key ก่อน';
                 openApiModal();
                 return;
@@ -1336,39 +1475,14 @@
             elements.statusText.textContent = '🎬 กำลังเตรียมการ...';
 
             try {
-                console.log('Initializing game with API Key:', API_KEY.substring(0, 5) + '...');
-                const response = await fetch(`${API_ENDPOINT}?key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: stagePrompts.recruitment
-                            }]
-                        }],
-                        generationConfig: {
-                            temperature: 0.7,
-                            maxOutputTokens: 1500,
-                            topP: 0.9,
-                            topK: 40
-                        }
-                    })
-                });
-
-                const data = await response.json();
+                console.log(`Initializing game with ${API_CONFIG[API_PROVIDER].name} API...`);
+                let aiResponse = '';
                 
-                if (!response.ok) {
-                    const errorMsg = data.error ? data.error.message : `Status ${response.status}`;
-                    throw new Error(`API Error: ${errorMsg}`);
+                if (API_PROVIDER === 'gemini') {
+                    aiResponse = await callGeminiAPI(stagePrompts.recruitment);
+                } else if (API_PROVIDER === 'deepseek') {
+                    aiResponse = await callDeepSeekAPI(stagePrompts.recruitment);
                 }
-
-                if (!data.candidates || data.candidates.length === 0) {
-                    throw new Error('AI ไม่ได้ส่งคำตอบกลับมา (Empty Response)');
-                }
-
-                const aiResponse = data.candidates[0].content.parts[0].text;
 
                 await typeWriter(elements.storyText, aiResponse, 10);
                 elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
@@ -1502,8 +1616,25 @@
             }
         });
 
-        // Allow Enter key in API key input
+        // Provider selector change event
+        document.getElementById('api-provider-select').addEventListener('change', (e) => {
+            if (e.target.value === 'gemini') {
+                document.getElementById('gemini-section').style.display = 'block';
+                document.getElementById('deepseek-section').style.display = 'none';
+            } else {
+                document.getElementById('gemini-section').style.display = 'none';
+                document.getElementById('deepseek-section').style.display = 'block';
+            }
+        });
+        
+        // Allow Enter key in API key inputs
         document.getElementById('api-key-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveApiKey();
+            }
+        });
+        
+        document.getElementById('deepseek-key-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 saveApiKey();
             }
