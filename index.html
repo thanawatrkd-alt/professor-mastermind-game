@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทรชนคนปล้นไทย: Mastermind v33</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .typewriter {
+            animation: typewriter 0.05s steps(1) forwards;
+        }
+        @keyframes typewriter {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        #story-container {
+            border-left: 4px solid #dc2626;
+            padding-left: 1rem;
+        }
+        #user-input {
+            background-color: #1e293b;
+            color: #ffffff;
+            border: 2px solid #dc2626;
+        }
+        #user-input::placeholder {
+            color: #94a3b8;
+        }
+        #user-input:focus {
+            outline: none;
+            border-color: #ef4444;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+        }
+        #send-btn {
+            background-color: #dc2626;
+            transition: all 0.3s ease;
+        }
+        #send-btn:hover:not(:disabled) {
+            background-color: #b91c1c;
+            transform: scale(1.05);
+        }
+        #send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .accuracy-bar {
+            background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body class="text-white p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">🎭 THE PROFESSOR v33</h1>
+            <p class="text-gray-400 text-lg">MASTERMIND GAME</p>
+        </div>
+
+        <!-- Accuracy Bar -->
+        <div class="mb-6">
+            <div class="flex justify-between mb-2">
+                <span class="text-sm text-gray-400">Accuracy:</span>
+                <span class="text-sm text-red-500" id="accuracy-text">25%</span>
+            </div>
+            <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                <div class="accuracy-bar h-full" id="accuracy-bar" style="width: 25%"></div>
+            </div>
+        </div>
+
+        <!-- Story Container -->
+        <div id="story-container" class="bg-slate-800 rounded-lg p-6 mb-8 min-h-40 max-h-96 overflow-y-auto">
+            <p class="text-gray-300 text-sm leading-relaxed" id="story-text">
+                อาจารย์ยืนไม่มองหน้ารหัสลับแสนแม่นยำศิลปะอันยาวนานของเขา สายตาเขาเหมือนกับดูเหนือกว่ามนุษย์ทั่วไป ทำให้ทุกคนรู้สึกว่าเขาสามารถอ่านใจได้<br><br>
+                "จำไว้..." เขากล่าวด้วยน้ำเสียงเย็นชา "ความรู้สึกไม่ใช่ศัตรู ความรู้สึกคือเครื่องมือ"<br><br>
+                ปั้มนั่งฟังอย่างเต็มที่ ใจเต้นเพราะความตื่นเต้นและความกลัว เขาจะต้องเข้าใจจิตวิทยา เขาจะต้องชนะในเกมนี้
+            </p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="flex gap-2 mb-4">
+            <input 
+                type="text" 
+                id="user-input" 
+                placeholder="ตอบคำถามอาจารย์..." 
+                class="flex-1 px-4 py-3 rounded-lg text-white focus:outline-none"
+            >
+            <button 
+                id="send-btn" 
+                class="px-6 py-3 rounded-lg text-white font-semibold"
+            >
+                ส่ง
+            </button>
+        </div>
+
+        <!-- Status Text -->
+        <p id="status-text" class="text-center text-gray-500 text-sm"></p>
+    </div>
+
+    <script>
+        const API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+        const API_KEY = 'sk-proj-test-key'; // This will be replaced with actual key
+
+        const state = {
+            isWaitingForAI: false,
+            isProcessing: false,
+            isTyping: false,
+            accuracy: 25
+        };
+
+        const elements = {
+            userInput: document.getElementById('user-input'),
+            sendBtn: document.getElementById('send-btn'),
+            storyText: document.getElementById('story-text'),
+            accuracyBar: document.getElementById('accuracy-bar'),
+            accuracyText: document.getElementById('accuracy-text'),
+            statusText: document.getElementById('status-text')
+        };
+
+        const systemPrompt = `คุณคือ "อาจารย์" (Professor) ตัวละครจากเกม "ทรชนคนปล้นไทย: Mastermind v33"
+
+=== นิสัยของอาจารย์ ===
+1. ฉลาดเป็ดกรด + วางแผนลึกซึ้ง - ทุกแผนของเขามีชั้นลึก เขาคิดไปหลายขั้น
+2. เย็นชา + ลึกลับ - เสียงเขาเงียบสงบ แต่เต็มไปด้วยน้ำหนัก เขาซ่อนตัวในเงา
+3. มีอุดมการณ์สูง + เชื่อในจิตวิทยา - เขาสู้เพื่อล้มระบบที่ฆ่าครอบครัว ไม่ใช่เพื่อเงิน
+
+=== วิธีการตอบคำถาม ===
+1. ตอบเป็นอาจารย์ - เย็นชา ลึกลับ แต่เต็มไปด้วยน้ำหนัก
+2. ใช้จิตวิทยา - Labeling, Mirroring, Calibrated Question, Tactical Empathy
+3. อ้างอิงเนื้อเรื่องเกม - ใช้ตัวละคร ตอน เหตุการณ์
+4. แสดงนิสัยอาจารย์ - ฉลาดเป็ดกรด, เข้มงวด, มีอุดมการณ์
+
+ตอบเป็นภาษาไทยอย่างละเอียด มีความลึกซึ้ง`;
+
+        function updateInputState() {
+            const isDisabled = state.isWaitingForAI || state.isProcessing || state.isTyping;
+            elements.userInput.disabled = isDisabled;
+            elements.sendBtn.disabled = isDisabled;
+        }
+
+        async function sendMessage() {
+            const message = elements.userInput.value.trim();
+            
+            if (!message) return;
+
+            state.isWaitingForAI = true;
+            state.isProcessing = true;
+            updateInputState();
+            elements.statusText.textContent = 'กำลังดำเนินการ...';
+
+            try {
+                // Clear old story
+                elements.storyText.innerHTML = '';
+
+                // Call OpenAI API
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4.1-mini',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: systemPrompt
+                            },
+                            {
+                                role: 'user',
+                                content: `Student question: ${message}`
+                            }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 1024
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+
+                // Display response immediately
+                elements.storyText.innerHTML = aiResponse.replace(/\n/g, '<br>');
+
+                // Update accuracy randomly
+                state.accuracy = Math.min(100, state.accuracy + Math.floor(Math.random() * 20) + 10);
+                elements.accuracyBar.style.width = state.accuracy + '%';
+                elements.accuracyText.textContent = state.accuracy + '%';
+
+                // Clear input
+                elements.userInput.value = '';
+                elements.statusText.textContent = '';
+
+            } catch (error) {
+                console.error('Error:', error);
+                elements.storyText.innerHTML = `<span class="text-red-500">❌ เกิดข้อผิดพลาด: ${error.message}</span>`;
+                elements.statusText.textContent = 'ไม่สามารถติดต่อ AI ได้ (ตรวจสอบ API Key หรือเชื่อมต่ออินเทอร์เน็ต)';
+            } finally {
+                state.isWaitingForAI = false;
+                state.isProcessing = false;
+                updateInputState();
+            }
+        }
+
+        // Event Listeners
+        elements.sendBtn.addEventListener('click', sendMessage);
+        elements.userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !state.isWaitingForAI && !state.isProcessing) {
+                sendMessage();
+            }
+        });
+
+        // Initialize
+        updateInputState();
+    </script>
+</body>
+</html>
