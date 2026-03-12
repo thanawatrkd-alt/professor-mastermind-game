@@ -227,6 +227,44 @@
             animation: slideUp 0.8s ease-out 0.8s both;
         }
 
+        /* Help Buttons */
+        .help-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            animation: slideUp 0.8s ease-out both;
+        }
+
+        .help-btn {
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.3) 0%, rgba(255, 110, 64, 0.3) 100%);
+            color: #e0e0e0;
+            border: 2px solid rgba(255, 23, 68, 0.5);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .help-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.5) 0%, rgba(255, 110, 64, 0.5) 100%);
+            border-color: #ff1744;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
+        }
+
+        .help-btn:active {
+            transform: translateY(0);
+        }
+
+        .help-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Animations */
         @keyframes slideDown {
             from {
@@ -336,6 +374,12 @@
             <button id="send-btn">ส่ง</button>
         </div>
 
+        <!-- Help Buttons -->
+        <div id="help-buttons" class="help-buttons" style="display: none;">
+            <button id="think-btn" class="help-btn think-btn">💭 ให้ฉันคิด</button>
+            <button id="hint-btn" class="help-btn hint-btn">💡 บอกใจความ</button>
+        </div>
+
         <!-- Status Text -->
         <p id="status-text" class="status-text"></p>
     </div>
@@ -350,7 +394,8 @@
             stage: 'recruitment',
             stageStep: 0,
             accuracy: 25,
-            isTyping: false
+            isTyping: false,
+            showHelpButtons: false
         };
 
         const elements = {
@@ -360,7 +405,10 @@
             accuracyBar: document.getElementById('accuracy-bar'),
             accuracyText: document.getElementById('accuracy-text'),
             statusText: document.getElementById('status-text'),
-            stageIndicator: document.getElementById('stage-text')
+            stageIndicator: document.getElementById('stage-text'),
+            helpButtons: document.getElementById('help-buttons'),
+            thinkBtn: document.getElementById('think-btn'),
+            hintBtn: document.getElementById('hint-btn')
         };
 
         const stagePrompts = {
@@ -705,6 +753,68 @@
             }
         }
 
+        // Help button functions
+        async function handleThinkButton() {
+            state.showHelpButtons = false;
+            elements.helpButtons.style.display = 'none';
+            elements.userInput.focus();
+            elements.statusText.textContent = '💭 ใช้เวลาคิดของคุณ... (ผมจะรอ)';
+        }
+
+        async function handleHintButton() {
+            state.isWaitingForAI = true;
+            state.isProcessing = true;
+            updateInputState();
+            elements.helpButtons.style.display = 'none';
+            elements.statusText.textContent = '💡 กำลังให้คำแนะนำ...';
+
+            try {
+                const hintPrompt = 'คุณคือ "อาจารย์" ให้คำแนะนำแก่ผู้เล่นอย่างเนียนๆ เพื่อให้เขาเข้าใจว่าควรตอบอะไร โดยไม่บอกคำตอบโดยตรง ใช้ Calibrated Question เช่น "คุณคิดว่าทำไมฉันถึงบอกเรื่องนี้?" หรือ "เธอจำแผนการได้ไหม?" ให้ความรู้สึกว่าเรากำลังสอนจิตวิทยา';
+
+                const response = await fetch(`${API_ENDPOINT}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: hintPrompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.8,
+                            maxOutputTokens: 1000
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const hintResponse = data.candidates[0].content.parts[0].text;
+
+                await typeWriter(elements.storyText, hintResponse, 20);
+                elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
+
+            } catch (error) {
+                console.error('Error:', error);
+                elements.storyText.innerHTML = `<span style="color: #ff6e40;">❌ เกิดข้อผิดพลาด: ${error.message}</span>`;
+            } finally {
+                state.isWaitingForAI = false;
+                state.isProcessing = false;
+                updateInputState();
+            }
+        }
+
+        function showHelpButtons() {
+            state.showHelpButtons = true;
+            elements.helpButtons.style.display = 'flex';
+            elements.statusText.textContent = '🤔 คุณต้องการความช่วยเหลือไหม?';
+        }
+
         // Event Listeners
         elements.sendBtn.addEventListener('click', sendMessage);
         elements.userInput.addEventListener('keypress', (e) => {
@@ -712,6 +822,25 @@
                 sendMessage();
             }
         });
+
+        elements.thinkBtn.addEventListener('click', handleThinkButton);
+        elements.hintBtn.addEventListener('click', handleHintButton);
+
+        // Show help buttons after 10 seconds of inactivity
+        let inactivityTimer;
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            if (!state.isWaitingForAI && !state.isProcessing && state.stage === 'questions') {
+                inactivityTimer = setTimeout(() => {
+                    if (!state.isWaitingForAI && !state.isProcessing && !state.showHelpButtons) {
+                        showHelpButtons();
+                    }
+                }, 10000);
+            }
+        }
+
+        elements.userInput.addEventListener('input', resetInactivityTimer);
+        elements.userInput.addEventListener('focus', resetInactivityTimer);
 
         // Initialize game on load
         window.addEventListener('load', initializeGame);
