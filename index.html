@@ -111,16 +111,103 @@
 
         .story-text {
             font-size: 1.05rem;
-            line-height: 1.8;
+            line-height: 2;
             color: #e0e0e0;
             letter-spacing: 0.5px;
             word-spacing: 2px;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
 
         .story-text::first-letter {
             font-size: 1.2rem;
             font-weight: bold;
             color: #ff6e40;
+        }
+
+        /* Markdown-like styling */
+        .story-text strong,
+        .story-text b {
+            color: #ff6e40;
+            font-weight: bold;
+        }
+
+        .story-text em,
+        .story-text i {
+            color: #ffb74d;
+            font-style: italic;
+        }
+
+        .story-text code {
+            background: rgba(255, 23, 68, 0.2);
+            color: #ff6e40;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .story-text pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+            border-left: 3px solid #ff1744;
+        }
+
+        .story-text pre code {
+            background: none;
+            color: #ffb74d;
+            padding: 0;
+        }
+
+        .story-text h1,
+        .story-text h2,
+        .story-text h3,
+        .story-text h4,
+        .story-text h5,
+        .story-text h6 {
+            color: #ff6e40;
+            font-weight: bold;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .story-text h1 { font-size: 1.4rem; }
+        .story-text h2 { font-size: 1.3rem; }
+        .story-text h3 { font-size: 1.2rem; }
+        .story-text h4 { font-size: 1.1rem; }
+        .story-text h5 { font-size: 1rem; }
+        .story-text h6 { font-size: 0.95rem; }
+
+        .story-text ul,
+        .story-text ol {
+            margin: 0.5rem 0 0.5rem 1.5rem;
+            padding: 0;
+        }
+
+        .story-text li {
+            margin: 0.3rem 0;
+            color: #e0e0e0;
+        }
+
+        .story-text blockquote {
+            border-left: 4px solid #ff1744;
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: #ffb74d;
+            font-style: italic;
+        }
+
+        .story-text hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff1744, transparent);
+            margin: 1rem 0;
+        }
+
+        .story-text p {
+            margin: 0.5rem 0;
         }
 
         /* Scrollbar Styling */
@@ -462,8 +549,15 @@
 
             .story-text {
                 font-size: 0.95rem;
-                line-height: 1.6;
+                line-height: 1.8;
             }
+
+            .story-text h1 { font-size: 1.2rem; }
+            .story-text h2 { font-size: 1.1rem; }
+            .story-text h3 { font-size: 1rem; }
+            .story-text h4 { font-size: 0.95rem; }
+            .story-text h5 { font-size: 0.9rem; }
+            .story-text h6 { font-size: 0.85rem; }
 
             .input-section {
                 flex-direction: column;
@@ -939,13 +1033,67 @@
             }, 0);
         }
 
+        // Parse simple Markdown to HTML
+        function parseMarkdown(text) {
+            let html = text;
+            
+            // Escape HTML special characters first
+            html = html.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;');
+            
+            // Headers
+            html = html.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+            html = html.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
+            
+            // Bold
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+            
+            // Italic
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html = html.replace(/_(.*?)_/g, '<em>$1</em>');
+            
+            // Code
+            html = html.replace(/`(.*?)`/g, '<code>$1</code>');
+            
+            // Blockquote
+            html = html.replace(/^&gt; (.*?)$/gm, '<blockquote>$1</blockquote>');
+            
+            // Unordered list
+            html = html.replace(/^\* (.*?)$/gm, '<li>$1</li>');
+            html = html.replace(/^- (.*?)$/gm, '<li>$1</li>');
+            html = html.replace(/(<li>.*?<\/li>)/s, '<ul>$1</ul>');
+            html = html.replace(/<\/ul>\s*<ul>/g, '');
+            
+            // Ordered list
+            html = html.replace(/^\d+\. (.*?)$/gm, '<li>$1</li>');
+            
+            // Horizontal rule
+            html = html.replace(/^---$/gm, '<hr>');
+            html = html.replace(/^\*\*\*$/gm, '<hr>');
+            html = html.replace(/^___$/gm, '<hr>');
+            
+            // Paragraphs
+            html = html.split('\n\n').map(p => {
+                if (!p.match(/^<[^>]+>/)) {
+                    p = '<p>' + p + '</p>';
+                }
+                return p;
+            }).join('');
+            
+            return html;
+        }
+
         // Typewriter Effect
         async function typeWriter(element, text, speed = 30) {
             state.isTyping = true;
             element.innerHTML = '';
+            const parsedText = parseMarkdown(text);
             
-            for (let i = 0; i < text.length; i++) {
-                element.innerHTML += text[i];
+            for (let i = 0; i < parsedText.length; i++) {
+                element.innerHTML = parsedText.substring(0, i + 1);
                 scrollToBottom(element.parentElement);
                 await new Promise(resolve => setTimeout(resolve, speed));
             }
