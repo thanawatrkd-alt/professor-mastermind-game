@@ -108,8 +108,8 @@
     </div>
 
     <script>
-        const API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-        const API_KEY = 'sk-proj-test-key'; // This will be replaced with actual key
+        const API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+        const API_KEY = 'AIzaSyAtfRpMUePIpycoZ-QR8hdya5DJ8W23hLE';
 
         const state = {
             isWaitingForAI: false,
@@ -162,27 +162,22 @@
                 // Clear old story
                 elements.storyText.innerHTML = '';
 
-                // Call OpenAI API
-                const response = await fetch(API_ENDPOINT, {
+                // Call Google Gemini API
+                const response = await fetch(`${API_ENDPOINT}?key=${API_KEY}`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4.1-mini',
-                        messages: [
-                            {
-                                role: 'system',
-                                content: systemPrompt
-                            },
-                            {
-                                role: 'user',
-                                content: `Student question: ${message}`
-                            }
-                        ],
-                        temperature: 0.7,
-                        max_tokens: 1024
+                        contents: [{
+                            parts: [{
+                                text: `${systemPrompt}\n\nStudent question: ${message}`
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 1024
+                        }
                     })
                 });
 
@@ -191,7 +186,7 @@
                 }
 
                 const data = await response.json();
-                const aiResponse = data.choices[0].message.content;
+                const aiResponse = data.candidates[0].content.parts[0].text;
 
                 // Display response immediately
                 elements.storyText.innerHTML = aiResponse.replace(/\n/g, '<br>');
