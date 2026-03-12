@@ -1357,16 +1357,22 @@
                     })
                 });
 
+                const data = await response.json();
+                
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
+                    const errorMsg = data.error ? data.error.message : `Status ${response.status}`;
+                    throw new Error(`API Error: ${errorMsg}`);
                 }
 
-                const data = await response.json();
+                if (!data.candidates || data.candidates.length === 0) {
+                    throw new Error('AI ไม่ได้ส่งคำตอบกลับมา (Empty Response)');
+                }
+
                 const aiResponse = data.candidates[0].content.parts[0].text;
 
-                await typeWriter(elements.storyText, aiResponse, 20);
+                await typeWriter(elements.storyText, aiResponse, 10);
                 elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
-                elements.stageIndicator.textContent = stageTexts.recruitment;
+                elements.stageIndicator.textContent = stageTexts[state.stage];
 
             } catch (error) {
                 console.error('Error:', error);
@@ -1447,15 +1453,21 @@
                     })
                 });
 
+                const data = await response.json();
+                
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
+                    const errorMsg = data.error ? data.error.message : `Status ${response.status}`;
+                    throw new Error(`API Error: ${errorMsg}`);
                 }
 
-                const data = await response.json();
+                if (!data.candidates || data.candidates.length === 0) {
+                    throw new Error('AI ไม่ได้ส่งคำตอบกลับมา (Empty Response)');
+                }
+
                 const aiResponse = data.candidates[0].content.parts[0].text;
 
                 elements.userInput.value = '';
-                await typeWriter(elements.storyText, aiResponse, 20);
+                await typeWriter(elements.storyText, aiResponse, 10);
                 elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
                 elements.stageIndicator.textContent = stageTexts[state.stage];
 
