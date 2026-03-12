@@ -876,13 +876,16 @@
                 alert('กรุณาป้อน API Key');
                 return;
             }
+            console.log('Saving API Key...');
             API_KEY = newApiKey;
             localStorage.setItem('professorGameApiKey', API_KEY);
             closeApiModal();
             elements.statusText.textContent = '✅ บันทึก API Key เรียบร้อย!';
-            setTimeout(() => {
-                elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
-            }, 2000);
+            
+            // เริ่มเกมทันทีหลังจากบันทึก API Key
+            if (elements.storyText.textContent.includes('กำลังเตรียมการ') || elements.storyText.textContent === '') {
+                initializeGame();
+            }
         }
 
         // Save/Load Functions
@@ -1333,6 +1336,7 @@
             elements.statusText.textContent = '🎬 กำลังเตรียมการ...';
 
             try {
+                console.log('Initializing game with API Key:', API_KEY.substring(0, 5) + '...');
                 const response = await fetch(`${API_ENDPOINT}?key=${API_KEY}`, {
                     method: 'POST',
                     headers: {
