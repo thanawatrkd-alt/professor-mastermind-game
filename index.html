@@ -953,39 +953,19 @@
         }
 
         // Save/Load Functions
-        function saveGame() {
+        function saveGame(isAutoSave = false) {
             const gameData = {
                 stage: state.stage,
                 stageStep: state.stageStep,
                 accuracy: state.accuracy,
                 storyText: elements.storyText.innerHTML,
-                timestamp: new Date().toLocaleString('th-TH')
+                timestamp: new Date().toLocaleString('th-TH'),
+                isAutoSave: isAutoSave
             };
             localStorage.setItem('professorGameSave', JSON.stringify(gameData));
-            elements.statusText.textContent = '✅ บันทึกเกมเรียบร้อย!';
-            setTimeout(() => {
-                if (state.stage === 'questions') {
-                    elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
-                } else {
-                    elements.statusText.textContent = '💬 ตอบคำถามอาจารย์...';
-                }
-            }, 2000);
-        }
-
-        function loadGame() {
-            const savedData = localStorage.getItem('professorGameSave');
-            if (!savedData) {
-                elements.statusText.textContent = '❌ ไม่มีเกมที่บันทึกไว้';
-                return;
-            }
-
-            try {
-                const gameData = JSON.parse(savedData);
-                state.stage = gameData.stage;
-                state.stageStep = gameData.stageStep;
-                elements.storyText.innerHTML = gameData.storyText;
-                elements.stageIndicator.textContent = stageTexts[state.stage];
-                elements.statusText.textContent = `✅ โหลดเกมจาก ${gameData.timestamp}`;
+            
+            if (!isAutoSave) {
+                elements.statusText.textContent = '✅ บันทึกเกมเรียบร้อย!';
                 setTimeout(() => {
                     if (state.stage === 'questions') {
                         elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
@@ -993,18 +973,51 @@
                         elements.statusText.textContent = '💬 ตอบคำถามอาจารย์...';
                     }
                 }, 2000);
-            } catch (error) {
-                console.error('Error loading game:', error);
-                elements.statusText.textContent = '❌ เกิดข้อผิดพลาดในการโหลดเกม';
+            } else {
+                console.log('Auto-save: Game saved at', gameData.timestamp);
             }
         }
 
-        function resetGame() {
-            if (confirm('คุณแน่ใจว่าต้องการเริ่มเกมใหม่ไหม? ข้อมูลเก่าจะหายไป')) {
-                localStorage.removeItem('professorGameSave');
-                location.reload();
+        function loadGame(showMessage = true) {
+            const savedData = localStorage.getItem('professorGameSave');
+            if (!savedData) {
+                if (showMessage) {
+                    console.log('No saved game found');
+                }
+                return false;
+            }
+
+            try {
+                const gameData = JSON.parse(savedData);
+                state.stage = gameData.stage;
+                state.stageStep = gameData.stageStep;
+                state.accuracy = gameData.accuracy || 0;
+                elements.storyText.innerHTML = gameData.storyText;
+                elements.stageIndicator.textContent = stageTexts[state.stage];
+                
+                if (showMessage) {
+                    elements.statusText.textContent = `✅ โหลดเกมจาก ${gameData.timestamp}`;
+                    setTimeout(() => {
+                        if (state.stage === 'questions') {
+                            elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
+                        } else {
+                            elements.statusText.textContent = '💬 ตอบคำถามอาจารย์...';
+                        }
+                    }, 2000);
+                }
+                
+                console.log('Game loaded from:', gameData.timestamp);
+                return true;
+            } catch (error) {
+                console.error('Error loading game:', error);
+                if (showMessage) {
+                    elements.statusText.textContent = '❌ เกิดข้อผิดพลาดในการโหลดเกม';
+                }
+                return false;
             }
         }
+        
+
 
         const elements = {
             userInput: document.getElementById('user-input'),
@@ -1487,6 +1500,9 @@
                 await typeWriter(elements.storyText, aiResponse, 10);
                 elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
                 elements.stageIndicator.textContent = stageTexts[state.stage];
+                
+                // Auto-save game progress
+                saveGame(true);
 
             } catch (error) {
                 console.error('Error:', error);
@@ -1584,6 +1600,9 @@
                 await typeWriter(elements.storyText, aiResponse, 10);
                 elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
                 elements.stageIndicator.textContent = stageTexts[state.stage];
+                
+                // Auto-save game progress
+                saveGame(true);
 
             } catch (error) {
                 console.error('Error:', error);
@@ -1640,13 +1659,22 @@
             }
         });
 
-        // Initialize game
+        // Initialize game with Auto-load support
         window.addEventListener('load', () => {
-            if (!API_KEY) {
+            const apiKey = API_PROVIDER === 'gemini' ? API_KEY : DEEPSEEK_API_KEY;
+            if (!apiKey) {
                 elements.statusText.textContent = '⚠️ กรุณาตั้งค่า API Key ก่อนเริ่มเกม';
                 openApiModal();
             } else {
-                initializeGame();
+                // Try to load saved game first
+                const hasSavedGame = loadGame(false);
+                if (!hasSavedGame) {
+                    // No saved game, start new game
+                    initializeGame();
+                } else {
+                    // Game loaded successfully
+                    elements.statusText.textContent = '🎮 เริ่มเกมจากการบันทึกเดิม';
+                }
             }
         });
     </script>
