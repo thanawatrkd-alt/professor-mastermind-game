@@ -1839,45 +1839,41 @@
                 let aiResponse = '';
 
                 if (API_PROVIDER === 'gemini') {
-                    const response = await fetch(`${API_ENDPOINT}?key=${API_KEY}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [{
-                                    text: `${currentPrompt}\n\nStudent: ${message}`
-                                }]
-                            }],
-                            generationConfig: {
-                                temperature: 0.7,
-                                maxOutputTokens: 1500,
-                                topP: 0.9,
-                                topK: 40
-                            }
-                        })
-                    });
-
-                    const data = await response.json();
-                    
-                    if (!response.ok) {
-                        const errorMsg = data.error ? data.error.message : `Status ${response.status}`;
-                        throw new Error(`API Error: ${errorMsg}`);
-                    }
-
-                    if (!data.candidates || data.candidates.length === 0) {
-                        throw new Error('AI ไม่ได้ส่งคำตอบกลับมา (Empty Response)');
-                    }
-
-                    aiResponse = data.candidates[0].content.parts[0].text;
+                    // Use streaming for Gemini
                     elements.userInput.value = '';
-                    await typeWriter(elements.storyText, aiResponse, 10);
+                    elements.storyText.innerHTML = '';
+                    await callGeminiAPIStreaming(`${currentPrompt}\n\nStudent: ${message}`, (chunk) => {
+                        aiResponse += chunk;
+                        elements.storyText.innerHTML += chunk;
+                        scrollToBottom(elements.storyText.parentElement);
+                    });
                 } else if (API_PROVIDER === 'deepseek') {
                     // Use streaming for DeepSeek
                     elements.userInput.value = '';
                     elements.storyText.innerHTML = '';
                     await callDeepSeekAPIStreaming(`${currentPrompt}\n\nStudent: ${message}`, (chunk) => {
+                        aiResponse += chunk;
+                        elements.storyText.innerHTML += chunk;
+                        scrollToBottom(elements.storyText.parentElement);
+                    });
+                } else if (API_PROVIDER === 'claude') {
+                    // Use streaming for Claude
+                    elements.userInput.value = '';
+                    elements.storyText.innerHTML = '';
+                    try {
+                        await callClaudeAPIStreaming(`${currentPrompt}\n\nStudent: ${message}`, (chunk) => {
+                            aiResponse += chunk;
+                            elements.storyText.innerHTML += chunk;
+                            scrollToBottom(elements.storyText.parentElement);
+                        });
+                    } catch (e) {
+                        elements.storyText.innerHTML = '<span style="color: #ff6e40;">⚠️ Claude API อาจมีปัญหา CORS ลองใช้ Groq หรือ DeepSeek แทน</span>';
+                    }
+                } else if (API_PROVIDER === 'groq') {
+                    // Use streaming for Groq
+                    elements.userInput.value = '';
+                    elements.storyText.innerHTML = '';
+                    await callGroqAPIStreaming(`${currentPrompt}\n\nStudent: ${message}`, (chunk) => {
                         aiResponse += chunk;
                         elements.storyText.innerHTML += chunk;
                         scrollToBottom(elements.storyText.parentElement);
