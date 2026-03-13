@@ -992,9 +992,9 @@
             
             console.log('Final newApiKey:', newApiKey);
             
-            if (!newApiKey) {
+            if (!newApiKey || newApiKey.length === 0) {
                 console.log('ERROR: API Key is empty!');
-                alert('กรุณาป้อน API Key');
+                alert('กรุณาป้อน API Key ให้ครบถ้วน');
                 return;
             }
             
@@ -1003,27 +1003,34 @@
             if (selectedProvider === 'gemini') {
                 API_KEY = newApiKey;
                 localStorage.setItem('professorGameApiKey', API_KEY);
+                console.log('Gemini Key saved:', localStorage.getItem('professorGameApiKey'));
             } else if (selectedProvider === 'deepseek') {
                 DEEPSEEK_API_KEY = newApiKey;
                 localStorage.setItem('professorGameDeepseekKey', DEEPSEEK_API_KEY);
+                console.log('DeepSeek Key saved:', localStorage.getItem('professorGameDeepseekKey'));
             } else if (selectedProvider === 'claude') {
                 CLAUDE_API_KEY = newApiKey;
                 localStorage.setItem('professorGameClaudeKey', CLAUDE_API_KEY);
+                console.log('Claude Key saved:', localStorage.getItem('professorGameClaudeKey'));
             } else if (selectedProvider === 'groq') {
                 GROQ_API_KEY = newApiKey;
                 localStorage.setItem('professorGameGroqKey', GROQ_API_KEY);
+                console.log('Groq Key saved:', localStorage.getItem('professorGameGroqKey'));
             }
             
             API_PROVIDER = selectedProvider;
             localStorage.setItem('professorGameApiProvider', API_PROVIDER);
+            console.log('API Provider set to:', API_PROVIDER);
             
             closeApiModal();
             elements.statusText.textContent = `✅ บันทึก ${API_CONFIG[selectedProvider].name} API Key เรียบร้อย!`;
             
             // เริ่มเกมทันทีหลังจากบันทึก API Key
-            if (elements.storyText.textContent.includes('กำลังเตรียมการ') || elements.storyText.textContent === '') {
-                initializeGame();
-            }
+            setTimeout(() => {
+                if (elements.storyText.textContent.includes('กำลังเตรียมการ') || elements.storyText.textContent === '') {
+                    initializeGame();
+                }
+            }, 500);
         }
 
         // Save/Load Functions
