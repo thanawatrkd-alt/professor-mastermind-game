@@ -992,9 +992,9 @@
             
             console.log('Final newApiKey:', newApiKey);
             
-            if (!newApiKey || newApiKey.length === 0) {
-                console.log('ERROR: API Key is empty!');
-                alert('กรุณาป้อน API Key ให้ครบถ้วน');
+            if (!newApiKey || newApiKey.length < 5) {
+                console.log('ERROR: API Key is empty or too short!');
+                alert('กรุณาป้อน API Key ให้ครบถ้วน (API Key อย่างน้อย 5 ตัวอักษร)');
                 return;
             }
             
