@@ -1739,7 +1739,12 @@
         }
 
         async function initializeGame() {
-            const apiKey = API_PROVIDER === 'gemini' ? API_KEY : DEEPSEEK_API_KEY;
+            let apiKey = '';
+            if (API_PROVIDER === 'gemini') apiKey = API_KEY;
+            else if (API_PROVIDER === 'deepseek') apiKey = DEEPSEEK_API_KEY;
+            else if (API_PROVIDER === 'claude') apiKey = CLAUDE_API_KEY;
+            else if (API_PROVIDER === 'groq') apiKey = GROQ_API_KEY;
+            
             if (!apiKey) {
                 elements.statusText.textContent = '⚠️ กรุณาตั้งค่า API Key ก่อน';
                 openApiModal();
