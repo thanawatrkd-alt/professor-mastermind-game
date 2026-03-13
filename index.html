@@ -328,16 +328,18 @@
 
         /* Header Buttons */
         .header-btn {
-            background: linear-gradient(135deg, rgba(255, 23, 68, 0.2) 0%, rgba(255, 110, 64, 0.2) 100%);
-            color: #e0e0e0;
-            border: 1px solid rgba(255, 23, 68, 0.4);
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
+            background: linear-gradient(135deg, #ff1744 0%, #d32f2f 100%);
+            color: white;
+            border: 2px solid rgba(255, 23, 68, 0.6);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
+            position: relative;
+            z-index: 100;
         }
 
         .header-btn:hover {
@@ -402,7 +404,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
+            z-index: 9999;
             justify-content: center;
             align-items: center;
             animation: fadeIn 0.3s ease-in;
@@ -778,7 +780,7 @@
                     <p>MASTERMIND v33</p>
                 </div>
                 <div>
-                    <button id="api-btn" class="header-btn" title="ตั้งค่า API Key">🔑 API</button>
+                    <button id="api-btn" class="header-btn" title="ตั้งค่า API Key" onclick="openApiModal()">🔑 API</button>
                     <button id="save-btn" class="header-btn" title="บันทึกเกม">💾 บันทึก</button>
                     <button id="load-btn" class="header-btn" title="โหลดเกม">📂 โหลด</button>
                     <button id="reset-btn" class="header-btn" title="เริ่มใหม่">🔄 เริ่มใหม่</button>
