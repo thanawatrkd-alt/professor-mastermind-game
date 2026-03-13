@@ -822,6 +822,12 @@
             <div id="choices-container" class="choices-container"></div>
         </div>
 
+        <!-- Suggestions Section -->
+        <div id="suggestions-section" class="suggestions-section" style="display: none;">
+            <div class="choices-label">💡 ลองถามเรื่องนี้:</div>
+            <div id="suggestions-container" class="suggestions-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem;"></div>
+        </div>
+
         <!-- Status Text -->
         <p id="status-text" class="status-text"></p>
     </div>
@@ -1053,7 +1059,9 @@
             resetBtn: document.getElementById('reset-btn'),
             apiBtn: document.getElementById('api-btn'),
             choicesSection: document.getElementById('choices-section'),
-            choicesContainer: document.getElementById('choices-container')
+            choicesContainer: document.getElementById('choices-container'),
+            suggestionsSection: document.getElementById('suggestions-section'),
+            suggestionsContainer: document.getElementById('suggestions-container')
         };
 
         const stagePrompts = {
@@ -1259,6 +1267,36 @@
             
             elements.choicesSection.classList.add('active');
             scrollToBottom(elements.choicesSection);
+        }
+
+        // Show suggestions
+        function showSuggestions(suggestions) {
+            if (!suggestions || suggestions.length === 0) {
+                elements.suggestionsSection.style.display = 'none';
+                return;
+            }
+            
+            elements.suggestionsContainer.innerHTML = '';
+            suggestions.slice(0, 3).forEach((suggestion) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.style.fontSize = '0.9rem';
+                btn.style.padding = '0.5rem 1rem';
+                btn.textContent = suggestion;
+                btn.onclick = () => {
+                    elements.userInput.value = suggestion;
+                    elements.sendBtn.click();
+                };
+                elements.suggestionsContainer.appendChild(btn);
+            });
+            
+            elements.suggestionsSection.style.display = 'block';
+            scrollToBottom(elements.suggestionsSection);
+        }
+        
+        // Hide suggestions
+        function hideSuggestions() {
+            elements.suggestionsSection.style.display = 'none';
         }
 
         // Hide choices
@@ -1725,10 +1763,14 @@
                 } else if (API_PROVIDER === 'groq') {
                     // Use streaming for Groq
                     elements.storyText.innerHTML = '';
-                    await callGroqAPIStreaming(stagePrompts.recruitment, (chunk) => {
+                    let displayedText = '';
+                    await callGroqAPIStreaming(stagePrompts.recruitment, async (chunk) => {
                         aiResponse += chunk;
-                        elements.storyText.innerHTML += chunk;
+                        displayedText += chunk;
+                        // Add typewriter effect with 20ms delay per character
+                        elements.storyText.innerHTML = displayedText;
                         scrollToBottom(elements.storyText.parentElement);
+                        await new Promise(resolve => setTimeout(resolve, 20));
                     });
                 }
                 elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
@@ -1838,12 +1880,25 @@
                     // Use streaming for Groq
                     elements.userInput.value = '';
                     elements.storyText.innerHTML = '';
-                    await callGroqAPIStreaming(`${currentPrompt}\n\nStudent: ${message}`, (chunk) => {
+                    let displayedText = '';
+                    await callGroqAPIStreaming(`${currentPrompt}\n\nStudent: ${message}`, async (chunk) => {
                         aiResponse += chunk;
-                        elements.storyText.innerHTML += chunk;
+                        displayedText += chunk;
+                        // Add typewriter effect with 20ms delay per character
+                        elements.storyText.innerHTML = displayedText;
                         scrollToBottom(elements.storyText.parentElement);
+                        await new Promise(resolve => setTimeout(resolve, 20));
                     });
                 }
+                
+                // Show suggestions for next questions
+                const suggestions = [
+                    'ช่วยให้ฉันคิดเชิงกลยุทธ์',
+                    'ตรวจสอบแผนของฉัน',
+                    'ให้คำแนะนำเพิ่มเติม'
+                ];
+                showSuggestions(suggestions);
+                
                 elements.statusText.textContent = '💬 พิมพ์คำตอบของคุณ...';
                 elements.stageIndicator.textContent = stageTexts[state.stage];
                 
