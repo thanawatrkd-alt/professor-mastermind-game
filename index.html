@@ -1813,34 +1813,25 @@
             elements.statusText.textContent = '⏳ กำลังดำเนินการ...';
 
             try {
-                // Progress through stages
-                if (state.stage === 'recruitment' && state.stageStep === 0) {
+                // Progress through stages - Simplified
+                if (state.stage === 'recruitment') {
                     state.stage = 'plan';
-                    state.stageStep = 0;
-                } else if (state.stage === 'plan' && state.stageStep === 0) {
+                } else if (state.stage === 'plan') {
                     state.stage = 'training';
-                    state.stageStep = 0;
-                } else if (state.stage === 'training' && state.stageStep < 2) {
-                    state.stageStep++;
-                    if (state.stageStep >= 2) {
-                        state.stage = 'heist_night';
-                    }
-                } else if (state.stage === 'heist_night' && state.stageStep === 0) {
+                } else if (state.stage === 'training') {
+                    state.stage = 'heist_night';
+                } else if (state.stage === 'heist_night') {
                     state.stage = 'heist_start';
-                    state.stageStep = 0;
-                } else if (state.stage === 'heist_start' && state.stageStep === 0) {
+                } else if (state.stage === 'heist_start') {
                     state.stage = 'heist_negotiation';
-                    state.stageStep = 0;
-                } else if (state.stage === 'heist_negotiation' && state.stageStep === 0) {
+                } else if (state.stage === 'heist_negotiation') {
                     state.stage = 'heist_twist';
-                    state.stageStep = 0;
-                } else if (state.stage === 'heist_twist' && state.stageStep === 0) {
+                } else if (state.stage === 'heist_twist') {
                     state.stage = 'heist_escape';
-                    state.stageStep = 0;
-                } else if (state.stage === 'heist_escape' && state.stageStep === 0) {
+                } else if (state.stage === 'heist_escape') {
                     state.stage = 'questions';
-                    state.stageStep = 0;
                 }
+                state.stageStep = 0;
 
                 const currentPrompt = stagePrompts[state.stage];
                 let aiResponse = ''; // Reset aiResponse to prevent text looping
