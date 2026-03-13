@@ -840,46 +840,13 @@
                 </select>
             </div>
             
-            <div id="gemini-section">
-                <p>กรุณาป้อน Google Gemini API Key ของคุณ:</p>
-                <p style="font-size: 0.85rem; color: #ff6e40;">สร้าง API Key ได้ที่: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #ff1744; text-decoration: underline;">Google AI Studio</a></p>
+            <div id="provider-info">
+                <p id="provider-description">กรุณาป้อน API Key ของคุณ:</p>
+                <p id="provider-link" style="font-size: 0.85rem; color: #ff6e40;"></p>
                 <input 
                     type="text" 
-                    id="api-key-input" 
-                    placeholder="ป้อน Gemini API Key..." 
-                    style="width: 100%; padding: 0.75rem; background: #1a2332; color: #e0e0e0; border: 1px solid #ff1744; border-radius: 6px; margin-top: 0.5rem;"
-                >
-            </div>
-            
-            <div id="deepseek-section" style="display: none;">
-                <p>กรุณาป้อน DeepSeek API Key ของคุณ:</p>
-                <p style="font-size: 0.85rem; color: #ff6e40;">สร้าง API Key ได้ที่: <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color: #ff1744; text-decoration: underline;">DeepSeek Platform</a></p>
-                <input 
-                    type="text" 
-                    id="deepseek-key-input" 
-                    placeholder="ป้อน DeepSeek API Key..." 
-                    style="width: 100%; padding: 0.75rem; background: #1a2332; color: #e0e0e0; border: 1px solid #ff1744; border-radius: 6px; margin-top: 0.5rem;"
-                >
-            </div>
-            
-            <div id="claude-section" style="display: none;">
-                <p>กรุณาป้อน Anthropic Claude API Key ของคุณ:</p>
-                <p style="font-size: 0.85rem; color: #ff6e40;">สร้าง API Key ได้ที่: <a href="https://console.anthropic.com/account/keys" target="_blank" style="color: #ff1744; text-decoration: underline;">Anthropic Console</a></p>
-                <input 
-                    type="text" 
-                    id="claude-key-input" 
-                    placeholder="ป้อน Claude API Key..." 
-                    style="width: 100%; padding: 0.75rem; background: #1a2332; color: #e0e0e0; border: 1px solid #ff1744; border-radius: 6px; margin-top: 0.5rem;"
-                >
-            </div>
-            
-            <div id="groq-section" style="display: none;">
-                <p>กรุณาป้อน Groq API Key ของคุณ:</p>
-                <p style="font-size: 0.85rem; color: #ff6e40;">สร้าง API Key ได้ที่: <a href="https://console.groq.com/keys" target="_blank" style="color: #ff1744; text-decoration: underline;">Groq Console</a> (ฟรี ไม่ต้องใส่บัตรเครดิต)</p>
-                <input 
-                    type="text" 
-                    id="groq-key-input" 
-                    placeholder="ป้อน Groq API Key..." 
+                    id="unified-api-key-input" 
+                    placeholder="ป้อน API Key..." 
                     style="width: 100%; padding: 0.75rem; background: #1a2332; color: #e0e0e0; border: 1px solid #ff1744; border-radius: 6px; margin-top: 0.5rem;"
                 >
             </div>
@@ -936,33 +903,27 @@
         function openApiModal() {
             document.getElementById('api-modal').classList.add('active');
             document.getElementById('api-provider-select').value = API_PROVIDER;
+            updateProviderInfo();
             
-            // แสดงหรือซ่อน input ตาม provider
-            if (API_PROVIDER === 'gemini') {
-                document.getElementById('gemini-section').style.display = 'block';
-                document.getElementById('deepseek-section').style.display = 'none';
-                document.getElementById('claude-section').style.display = 'none';
-                document.getElementById('groq-section').style.display = 'none';
-                document.getElementById('api-key-input').value = API_KEY;
-            } else if (API_PROVIDER === 'deepseek') {
-                document.getElementById('gemini-section').style.display = 'none';
-                document.getElementById('deepseek-section').style.display = 'block';
-                document.getElementById('claude-section').style.display = 'none';
-                document.getElementById('groq-section').style.display = 'none';
-                document.getElementById('deepseek-key-input').value = DEEPSEEK_API_KEY;
-            } else if (API_PROVIDER === 'claude') {
-                document.getElementById('gemini-section').style.display = 'none';
-                document.getElementById('deepseek-section').style.display = 'none';
-                document.getElementById('claude-section').style.display = 'block';
-                document.getElementById('groq-section').style.display = 'none';
-                document.getElementById('claude-key-input').value = CLAUDE_API_KEY;
-            } else if (API_PROVIDER === 'groq') {
-                document.getElementById('gemini-section').style.display = 'none';
-                document.getElementById('deepseek-section').style.display = 'none';
-                document.getElementById('claude-section').style.display = 'none';
-                document.getElementById('groq-section').style.display = 'block';
-                document.getElementById('groq-key-input').value = GROQ_API_KEY;
-            }
+            let currentKey = '';
+            if (API_PROVIDER === 'gemini') currentKey = API_KEY;
+            else if (API_PROVIDER === 'deepseek') currentKey = DEEPSEEK_API_KEY;
+            else if (API_PROVIDER === 'claude') currentKey = CLAUDE_API_KEY;
+            else if (API_PROVIDER === 'groq') currentKey = GROQ_API_KEY;
+            
+            document.getElementById('unified-api-key-input').value = currentKey;
+        }
+        
+        function updateProviderInfo() {
+            const selectedProvider = document.getElementById('api-provider-select').value;
+            const providerLinks = {
+                gemini: 'สร้าง API Key ได้ที่: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #ff1744; text-decoration: underline;">Google AI Studio</a>',
+                deepseek: 'สร้าง API Key ได้ที่: <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color: #ff1744; text-decoration: underline;">DeepSeek Platform</a>',
+                claude: 'สร้าง API Key ได้ที่: <a href="https://console.anthropic.com/account/keys" target="_blank" style="color: #ff1744; text-decoration: underline;">Anthropic Console</a>',
+                groq: 'สร้าง API Key ได้ที่: <a href="https://console.groq.com/keys" target="_blank" style="color: #ff1744; text-decoration: underline;">Groq Console</a> (ฟรี ไม่ต้องใส่บัตรเครดิต)'
+            };
+            document.getElementById('provider-link').innerHTML = providerLinks[selectedProvider] || '';
+            document.getElementById('unified-api-key-input').placeholder = 'ป้อน ' + (API_CONFIG[selectedProvider] ? API_CONFIG[selectedProvider].name : '') + ' API Key...';
         }
 
         function closeApiModal() {
@@ -971,56 +932,34 @@
 
         function saveApiKey() {
             const selectedProvider = document.getElementById('api-provider-select').value;
-            let newApiKey = '';
+            const newApiKey = document.getElementById('unified-api-key-input').value.trim();
             
             console.log('=== DEBUG saveApiKey ===');
             console.log('Selected Provider:', selectedProvider);
+            console.log('API Key:', newApiKey);
             
-            if (selectedProvider === 'gemini') {
-                newApiKey = document.getElementById('api-key-input').value.trim();
-                console.log('Gemini Key:', newApiKey);
-            } else if (selectedProvider === 'deepseek') {
-                newApiKey = document.getElementById('deepseek-key-input').value.trim();
-                console.log('DeepSeek Key:', newApiKey);
-            } else if (selectedProvider === 'claude') {
-                newApiKey = document.getElementById('claude-key-input').value.trim();
-                console.log('Claude Key:', newApiKey);
-            } else if (selectedProvider === 'groq') {
-                newApiKey = document.getElementById('groq-key-input').value.trim();
-                console.log('Groq Key:', newApiKey);
-            }
-            
-            console.log('Final newApiKey:', newApiKey);
-            
-            if (!newApiKey || newApiKey.length < 5) {
-                console.log('ERROR: API Key is empty or too short!');
-                alert('กรุณาป้อน API Key ให้ครบถ้วน (API Key อย่างน้อย 5 ตัวอักษร)');
+            if (!newApiKey) {
+                alert('กรุณาป้อน API Key');
                 return;
             }
             
-            console.log(`Saving ${selectedProvider} API Key...`);
-            
+            // บันทึก API Key ตาม Provider ที่เลือก
             if (selectedProvider === 'gemini') {
                 API_KEY = newApiKey;
                 localStorage.setItem('professorGameApiKey', API_KEY);
-                console.log('Gemini Key saved:', localStorage.getItem('professorGameApiKey'));
             } else if (selectedProvider === 'deepseek') {
                 DEEPSEEK_API_KEY = newApiKey;
                 localStorage.setItem('professorGameDeepseekKey', DEEPSEEK_API_KEY);
-                console.log('DeepSeek Key saved:', localStorage.getItem('professorGameDeepseekKey'));
             } else if (selectedProvider === 'claude') {
                 CLAUDE_API_KEY = newApiKey;
                 localStorage.setItem('professorGameClaudeKey', CLAUDE_API_KEY);
-                console.log('Claude Key saved:', localStorage.getItem('professorGameClaudeKey'));
             } else if (selectedProvider === 'groq') {
                 GROQ_API_KEY = newApiKey;
                 localStorage.setItem('professorGameGroqKey', GROQ_API_KEY);
-                console.log('Groq Key saved:', localStorage.getItem('professorGameGroqKey'));
             }
             
             API_PROVIDER = selectedProvider;
             localStorage.setItem('professorGameApiProvider', API_PROVIDER);
-            console.log('API Provider set to:', API_PROVIDER);
             
             closeApiModal();
             elements.statusText.textContent = `✅ บันทึก ${API_CONFIG[selectedProvider].name} API Key เรียบร้อย!`;
@@ -1944,11 +1883,7 @@
 
         // Provider selector change event
         document.getElementById('api-provider-select').addEventListener('change', (e) => {
-            const provider = e.target.value;
-            document.getElementById('gemini-section').style.display = provider === 'gemini' ? 'block' : 'none';
-            document.getElementById('deepseek-section').style.display = provider === 'deepseek' ? 'block' : 'none';
-            document.getElementById('claude-section').style.display = provider === 'claude' ? 'block' : 'none';
-            document.getElementById('groq-section').style.display = provider === 'groq' ? 'block' : 'none';
+            updateProviderInfo();
         });
         
         // Allow Enter key in API key inputs
