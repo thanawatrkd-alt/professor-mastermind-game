@@ -63,13 +63,6 @@
             letter-spacing: 2px;
         }
 
-        @media (min-width: 768px) {
-            .header p {
-                font-size: 1.2rem;
-                letter-spacing: 3px;
-            }
-        }
-
         /* Stage Indicator */
         .stage-indicator {
             text-align: center;
@@ -120,134 +113,39 @@
             word-break: break-word;
         }
 
-        .story-text::first-letter {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #ff6e40;
-        }
-
-        /* Markdown-like styling */
-        .story-text strong,
-        .story-text b {
-            color: #ff6e40;
-            font-weight: bold;
-        }
-
-        .story-text em,
-        .story-text i {
-            color: #ffb74d;
-            font-style: italic;
-        }
-
-        .story-text code {
-            background: rgba(255, 23, 68, 0.2);
-            color: #ff6e40;
-            padding: 0.2rem 0.4rem;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-        }
-
-        .story-text pre {
-            background: rgba(0, 0, 0, 0.3);
+        /* Hacking Terminal Effect */
+        .terminal-window {
+            display: none;
+            background: #000;
+            border: 1px solid #0f0;
+            border-radius: 8px;
             padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            margin: 0.5rem 0;
-            border-left: 3px solid #ff1744;
+            font-family: 'Courier New', monospace;
+            color: #0f0;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.9rem;
         }
 
-        .story-text pre code {
-            background: none;
-            color: #ffb74d;
-            padding: 0;
+        .terminal-window.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
         }
 
-        .story-text h1,
-        .story-text h2,
-        .story-text h3,
-        .story-text h4,
-        .story-text h5,
-        .story-text h6 {
-            color: #ff6e40;
-            font-weight: bold;
-            margin: 1rem 0 0.5rem 0;
+        .terminal-line {
+            margin-bottom: 0.25rem;
+            border-right: 2px solid #0f0;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            animation: typing 2s steps(40, end) forwards;
         }
 
-        .story-text h1 { font-size: 1.4rem; }
-        .story-text h2 { font-size: 1.3rem; }
-        .story-text h3 { font-size: 1.2rem; }
-        .story-text h4 { font-size: 1.1rem; }
-        .story-text h5 { font-size: 1rem; }
-        .story-text h6 { font-size: 0.95rem; }
-
-        .story-text ul,
-        .story-text ol {
-            margin: 0.5rem 0 0.5rem 1.5rem;
-            padding: 0;
-        }
-
-        .story-text li {
-            margin: 0.3rem 0;
-            color: #e0e0e0;
-        }
-
-        .story-text blockquote {
-            border-left: 4px solid #ff1744;
-            padding-left: 1rem;
-            margin: 0.5rem 0;
-            color: #ffb74d;
-            font-style: italic;
-        }
-
-        .story-text hr {
-            border: none;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ff1744, transparent);
-            margin: 1rem 0;
-        }
-
-        .story-text p {
-            margin: 0.5rem 0;
-        }
-
-        .story-container:hover .story-text {
-            cursor: pointer;
-        }
-
-        .story-container::before {
-            content: '💡 คลิกเพื่อข้ามการพิมพ์';
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            font-size: 0.75rem;
-            color: #ffb74d;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .story-container:hover::before {
-            opacity: 1;
-        }
-
-        /* Scrollbar Styling */
-        .story-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .story-container::-webkit-scrollbar-track {
-            background: rgba(255, 23, 68, 0.1);
-            border-radius: 10px;
-        }
-
-        .story-container::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #ff1744 0%, #ff6e40 100%);
-            border-radius: 10px;
-        }
-
-        .story-container::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #ff6e40 0%, #ffb74d 100%);
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
         }
 
         /* Input Section */
@@ -271,15 +169,10 @@
             backdrop-filter: blur(10px);
         }
 
-        #user-input::placeholder {
-            color: #666;
-        }
-
         #user-input:focus {
             outline: none;
             border-color: #ff1744;
-            box-shadow: 0 0 20px rgba(255, 23, 68, 0.5), inset 0 0 10px rgba(255, 23, 68, 0.1);
-            background: rgba(22, 33, 62, 0.95);
+            box-shadow: 0 0 20px rgba(255, 23, 68, 0.5);
         }
 
         #send-btn {
@@ -292,34 +185,11 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
-            letter-spacing: 1px;
-            text-transform: uppercase;
         }
 
         #send-btn:hover:not(:disabled) {
             background: linear-gradient(135deg, #ff6e40 0%, #ff1744 100%);
             transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(255, 23, 68, 0.6);
-        }
-
-        #send-btn:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
-        #send-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background: linear-gradient(135deg, #666 0%, #444 100%);
-        }
-
-        /* Status Text */
-        .status-text {
-            text-align: center;
-            font-size: 0.95rem;
-            color: #b0bec5;
-            min-height: 1.5rem;
-            animation: slideUp 0.8s ease-out 0.8s both;
         }
 
         /* Header Buttons */
@@ -332,48 +202,41 @@
             font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
-            position: relative;
-            z-index: 100;
+            margin-left: 0.5rem;
         }
 
-        .header-btn:hover {
-            background: linear-gradient(135deg, rgba(255, 23, 68, 0.4) 0%, rgba(255, 110, 64, 0.4) 100%);
-            border-color: #ff1744;
-            transform: translateY(-1px);
+        /* Choice Buttons */
+        .choices-section {
+            display: none;
+            margin-top: 1.5rem;
         }
 
-        .header-btn:active {
-            transform: translateY(0);
+        .choices-section.active {
+            display: block;
         }
 
-        /* Help Buttons */
-        .help-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            justify-content: center;
-            animation: slideUp 0.8s ease-out 0.7s both;
+        .choices-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
         }
 
-        .help-btn {
-            background: linear-gradient(135deg, rgba(255, 23, 68, 0.2) 0%, rgba(255, 110, 64, 0.2) 100%);
-            color: #ffb74d;
-            border: 2px solid rgba(255, 23, 68, 0.4);
-            padding: 0.75rem 1.5rem;
+        .choice-btn {
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.3) 0%, rgba(255, 110, 64, 0.3) 100%);
+            color: #e0e0e0;
+            border: 2px solid rgba(255, 23, 68, 0.5);
+            padding: 1rem 1.5rem;
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: bold;
             cursor: pointer;
+            text-align: left;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
         }
 
-        .help-btn:hover:not(:disabled) {
-            background: linear-gradient(135deg, rgba(255, 23, 68, 0.4) 0%, rgba(255, 110, 64, 0.4) 100%);
-            border-color: #ff1744;
-            transform: translateY(-1px);
+        .choice-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.5) 0%, rgba(255, 110, 64, 0.5) 100%);
+            transform: translateX(5px);
         }
 
         /* API Modal */
@@ -402,377 +265,26 @@
             padding: 2rem;
             width: 90%;
             max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
         }
 
-        .api-modal-content h2 {
-            color: #ff6e40;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
 
-        .api-modal-content p {
-            color: #b0bec5;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .api-modal-content input,
-        .api-modal-content select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: rgba(22, 33, 62, 0.8);
-            color: #e0e0e0;
-            border: 2px solid rgba(255, 23, 68, 0.4);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-family: 'Courier New', monospace;
-            margin-bottom: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .api-modal-content input:focus,
-        .api-modal-content select:focus {
-            outline: none;
-            border-color: #ff1744;
-        }
-
-        .api-modal-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-        }
-
-        .api-modal-buttons button {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .api-modal-buttons .cancel-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #b0bec5;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .api-modal-buttons .cancel-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .api-modal-buttons .save-btn {
-            background: linear-gradient(135deg, #ff1744 0%, #d32f2f 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
-        }
-
-        .api-modal-buttons .save-btn:hover {
-            background: linear-gradient(135deg, #ff6e40 0%, #ff1744 100%);
-            transform: translateY(-1px);
-        }
-
-        /* Animations */
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes blink {
-            0%, 49% {
-                opacity: 1;
-            }
-            50%, 100% {
-                opacity: 0;
-            }
-        }
-
-        .cursor {
-            display: inline;
-            animation: blink 1s infinite;
-            color: #ff1744;
-            font-weight: bold;
-        }
-
-        /* Choice Buttons */
-        .choices-section {
-            display: none;
-            margin-top: 1.5rem;
-            animation: slideUp 0.8s ease-out;
-        }
-
-        .choices-section.active {
-            display: block;
-        }
-
-        .choices-label {
-            font-size: 0.9rem;
-            color: #ffb74d;
-            margin-bottom: 0.75rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .choices-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-        }
-
-        .choice-btn {
-            background: linear-gradient(135deg, rgba(255, 23, 68, 0.3) 0%, rgba(255, 110, 64, 0.3) 100%);
-            color: #e0e0e0;
-            border: 2px solid rgba(255, 23, 68, 0.5);
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-            backdrop-filter: blur(10px);
-            word-break: break-word;
-        }
-
-        .choice-btn:hover:not(:disabled) {
-            background: linear-gradient(135deg, rgba(255, 23, 68, 0.5) 0%, rgba(255, 110, 64, 0.5) 100%);
-            border-color: #ff1744;
-            transform: translateX(5px);
-            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
-        }
-
-        .choice-btn:active:not(:disabled) {
-            transform: translateX(3px);
-        }
-
-        .choice-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        @media (min-width: 768px) {
-            .choices-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .choices-container {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        /* Suggestions Section */
-        .suggestions-section {
-            margin-top: 1rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 640px) {
-            .choices-container {
-                grid-template-columns: 1fr;
-            }
-
-            .choice-btn {
-                padding: 0.85rem 1.25rem;
-                font-size: 0.9rem;
-            }
-            .header {
-                margin-bottom: 1rem;
-            }
-
-            .header > div {
-                flex-direction: column !important;
-                gap: 0.75rem !important;
-            }
-
-            .header > div > div:last-child {
-                display: flex;
-                gap: 0.25rem;
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-
-            .header-btn {
-                padding: 0.4rem 0.75rem;
-                font-size: 0.7rem;
-            }
-
-            .stage-badge {
-                font-size: 0.8rem;
-                padding: 0.5rem 1rem;
-            }
-
-            .story-container {
-                min-height: 150px;
-                max-height: 300px;
-                padding: 1rem;
-                margin-bottom: 1rem;
-            }
-
-            .story-text {
-                font-size: 0.95rem;
-                line-height: 1.8;
-            }
-
-            .story-text h1 { font-size: 1.2rem; }
-            .story-text h2 { font-size: 1.1rem; }
-            .story-text h3 { font-size: 1rem; }
-            .story-text h4 { font-size: 0.95rem; }
-            .story-text h5 { font-size: 0.9rem; }
-            .story-text h6 { font-size: 0.85rem; }
-
-            .input-section {
-                flex-direction: column;
-                gap: 0.75rem;
-                margin-bottom: 1rem;
-            }
-
-            #user-input {
-                padding: 0.75rem 1rem;
-                font-size: 1rem;
-            }
-
-            #send-btn {
-                width: 100%;
-                padding: 0.75rem 1.5rem;
-                font-size: 0.9rem;
-            }
-
-            .help-buttons {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-
-            .help-btn {
-                width: 100%;
-                padding: 0.65rem 1rem;
-                font-size: 0.85rem;
-            }
-
-            .api-modal-content {
-                width: 95%;
-                padding: 1.5rem;
-            }
-
-            .api-modal-content h2 {
-                font-size: 1.2rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .api-modal-content p {
-                font-size: 0.8rem;
-                margin-bottom: 1rem;
-            }
-
-            .api-modal-content input {
-                padding: 0.65rem 0.75rem;
-                font-size: 0.85rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .api-modal-buttons {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .api-modal-buttons button {
-                padding: 0.65rem 1rem;
-                font-size: 0.85rem;
-                width: 100%;
-            }
-
-            .status-text {
-                font-size: 0.85rem;
-            }
-        }
-
-        @media (min-width: 641px) and (max-width: 1024px) {
-            .header > div {
-                flex-direction: column !important;
-                gap: 1rem !important;
-            }
-
-            .header > div > div:last-child {
-                display: flex;
-                gap: 0.5rem;
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-
-            .header-btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.8rem;
-            }
-
-            .story-container {
-                min-height: 180px;
-                max-height: 350px;
-            }
-
-            .input-section {
-                gap: 0.75rem;
-            }
-        }
-
-        @media (min-width: 1025px) {
-            .header > div {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .header > div > div:last-child {
-                display: flex;
-                gap: 0.5rem;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div>
+            <div class="flex justify-between items-center flex-wrap gap-4">
                 <div>
                     <h1>🚗 THE BLOODCAR</h1>
-                    <p>AUTONOMOUS HEIST NIGHTMARE v2.0</p>
+                    <p>AUTONOMOUS HEIST NIGHTMARE v2.1</p>
                 </div>
                 <div>
-                    <button id="api-btn" class="header-btn" title="ตั้งค่า API Key" onclick="openApiModal()">🔑 API</button>
-                    <button id="save-btn" class="header-btn" title="บันทึกเกม">💾 บันทึก</button>
-                    <button id="load-btn" class="header-btn" title="โหลดเกม">📂 โหลด</button>
-                    <button id="reset-btn" class="header-btn" title="เริ่มใหม่">🔄 เริ่มใหม่</button>
+                    <button id="api-btn" class="header-btn" onclick="openApiModal()">🔑 API</button>
+                    <button id="reset-btn" class="header-btn" onclick="resetGame()">🔄 เริ่มใหม่</button>
                 </div>
             </div>
         </div>
@@ -780,6 +292,11 @@
         <!-- Stage Indicator -->
         <div class="stage-indicator">
             <span class="stage-badge" id="stage-text">ตอนที่ 0: จุดเริ่มต้น</span>
+        </div>
+
+        <!-- Hacking Terminal -->
+        <div id="terminal" class="terminal-window">
+            <div id="terminal-content"></div>
         </div>
 
         <!-- Story Container -->
@@ -794,1183 +311,225 @@
             <input 
                 type="text" 
                 id="user-input" 
-                placeholder="พิมพ์การตัดสินใจของคุณ..." 
+                placeholder="พิมพ์คำสั่งหรือการตัดสินใจของคุณ..." 
             >
             <button id="send-btn">ส่ง</button>
         </div>
 
-        <!-- Help Buttons -->
-        <div id="help-buttons" class="help-buttons" style="display: none;">
-            <button id="think-btn" class="help-btn think-btn">💭 ให้ฉันคิด</button>
-            <button id="hint-btn" class="help-btn hint-btn">💡 บอกใจความ</button>
-        </div>
-
         <!-- Choices Section -->
         <div id="choices-section" class="choices-section">
-            <div class="choices-label">📋 เลือกการตัดสินใจของคุณ:</div>
+            <div class="text-sm text-orange-400 font-bold mb-2 uppercase tracking-widest">📋 เลือกการตัดสินใจ:</div>
             <div id="choices-container" class="choices-container"></div>
         </div>
 
-        <!-- Suggestions Section -->
-        <div id="suggestions-section" class="suggestions-section" style="display: none;">
-            <div class="choices-label">💡 ลองถามเรื่องนี้:</div>
-            <div id="suggestions-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem;"></div>
-        </div>
-
         <!-- Status Text -->
-        <p id="status-text" class="status-text"></p>
+        <p id="status-text" class="status-text mt-4"></p>
     </div>
 
     <!-- API Key Modal -->
     <div id="api-modal" class="api-modal">
         <div class="api-modal-content">
-            <h2>🔑 ตั้งค่า API Key</h2>
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">เลือก AI Provider:</label>
-                <select id="api-provider-select" style="width: 100%; padding: 0.5rem; background: #1a2332; color: #e0e0e0; border: 1px solid #ff1744; border-radius: 6px;">
-                    <option value="gemini">🔵 Google Gemini</option>
-                    <option value="deepseek">🟢 DeepSeek</option>
-                    <option value="claude">🟣 Anthropic Claude</option>
-                    <option value="groq">⚡ Groq (ฟรี)</option>
-                </select>
-            </div>
-            
-            <div id="provider-info">
-                <p id="provider-description">กรุณาป้อน API Key ของคุณ:</p>
-                <p id="provider-link" style="font-size: 0.85rem; color: #ff6e40;"></p>
-                <input 
-                    type="text" 
-                    id="unified-api-key-input" 
-                    placeholder="ป้อน API Key..." 
-                    style="width: 100%; padding: 0.75rem; background: #1a2332; color: #e0e0e0; border: 1px solid #ff1744; border-radius: 6px; margin-top: 0.5rem;"
-                >
-            </div>
-            
-            <div class="api-modal-buttons">
-                <button class="cancel-btn" onclick="closeApiModal()">ยกเลิก</button>
-                <button class="save-btn" onclick="saveApiKey()">บันทึก</button>
+            <h2 class="text-xl text-orange-500 font-bold mb-4 text-center">🔑 ตั้งค่า API Key</h2>
+            <select id="api-provider-select" class="w-full p-2 bg-slate-800 text-white border border-red-500 rounded mb-4">
+                <option value="gemini">🔵 Google Gemini</option>
+                <option value="groq">⚡ Groq (ฟรี)</option>
+                <option value="deepseek">🟢 DeepSeek</option>
+            </select>
+            <input type="text" id="api-key-input" placeholder="ป้อน API Key..." class="w-full p-2 bg-slate-800 text-white border border-red-500 rounded mb-4">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeApiModal()" class="px-4 py-2 bg-gray-600 rounded text-white">ยกเลิก</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 bg-red-600 rounded text-white">บันทึก</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================================
-        // API Configuration
-        // ============================================================
-        const API_CONFIG = {
-            gemini: {
-                endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
-                name: 'Google Gemini'
-            },
-            deepseek: {
-                endpoint: 'https://api.deepseek.com/chat/completions',
-                name: 'DeepSeek'
-            },
-            claude: {
-                endpoint: 'https://api.anthropic.com/v1/messages',
-                name: 'Anthropic Claude'
-            },
-            groq: {
-                endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-                name: 'Groq (ฟรี)'
-            }
-        };
-        
-        let API_PROVIDER = localStorage.getItem('professorGameApiProvider') || 'groq';
-        let API_KEY = localStorage.getItem('professorGameApiKey') || '';
-        let DEEPSEEK_API_KEY = localStorage.getItem('professorGameDeepseekKey') || '';
-        let CLAUDE_API_KEY = localStorage.getItem('professorGameClaudeKey') || '';
-        let GROQ_API_KEY = localStorage.getItem('professorGameGroqKey') || '';
-
-        // ============================================================
         // Game State
-        // ============================================================
         const state = {
-            isWaitingForAI: false,
-            isProcessing: false,
             stage: 'intro',
-            stageStep: 0,
-            accuracy: 25,
-            isTyping: false,
-            showHelpButtons: false,
-            lastStoryText: '',
-            currentChoices: [],
-            conversationHistory: [],
-            lastStage: null
+            isWaiting: false,
+            history: [],
+            provider: localStorage.getItem('bloodcar_provider') || 'groq',
+            apiKey: localStorage.getItem('bloodcar_key') || ''
         };
 
-        // ============================================================
-        // Stage Texts (แสดงบน badge)
-        // ============================================================
         const stageTexts = {
-            intro:          'ตอนที่ 0: จุดเริ่มต้น — ชีวิตที่พังทลาย',
-            planning:       'ตอนที่ 1: วางแผน — ออกแบบรถบังคับสังหาร',
-            recruitment:    'ตอนที่ 2: รวมทีม — หาพวกพ้อง',
-            rehearsal:      'ตอนที่ 3: ซักซ้อม — ทดสอบระบบ AI',
-            heist_begin:    'ตอนที่ 4: เริ่มปล้น — บุกธนาคาร',
-            heist_crisis:   'ตอนที่ 5: วิกฤต — แผนพัง',
-            ai_awakens:     'ตอนที่ 6: AI ตื่นตัว — รถบังคับคิดเอง',
-            betrayal:       'ตอนที่ 7: การทรยศ — ใครคือศัตรู?',
-            final_heist:    'ตอนที่ 8: ปล้นครั้งสุดท้าย — ทุกอย่างหรือไม่มีอะไร',
-            escape:         'ตอนที่ 9: หนีรอด — ออกจากกับดัก',
-            epilogue:       'ตอนที่ 10: บทส่งท้าย — ชะตากรรม',
-            questions:      'โหมดสอบถาม — ถามตอบเพิ่มเติม'
+            intro: 'ตอนที่ 0: จุดเริ่มต้น',
+            planning: 'ตอนที่ 1: วางแผน & เขียนโค้ด',
+            recruitment: 'ตอนที่ 2: รวมทีม',
+            rehearsal: 'ตอนที่ 3: ซักซ้อมระบบ',
+            heist_begin: 'ตอนที่ 4: เริ่มปฏิบัติการ',
+            heist_crisis: 'ตอนที่ 5: วิกฤตการณ์',
+            ai_awakens: 'ตอนที่ 6: AI ตื่นตัว',
+            betrayal: 'ตอนที่ 7: การทรยศ',
+            final_heist: 'ตอนที่ 8: ปล้นครั้งสุดท้าย',
+            escape: 'ตอนที่ 9: หนีรอด',
+            epilogue: 'ตอนที่ 10: บทส่งท้าย'
         };
 
-        // ============================================================
-        // Stage Prompts — เนื้อเรื่อง AI ระบบปล้นธนาคารด้วยรถบังคับ
-        // ============================================================
+        const stageOrder = ['intro', 'planning', 'recruitment', 'rehearsal', 'heist_begin', 'heist_crisis', 'ai_awakens', 'betrayal', 'final_heist', 'escape', 'epilogue'];
+
         const stagePrompts = {
-
-            intro: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR" เรื่องราวเกี่ยวกับการปล้นธนาคารโดยใช้รถบังคับ AI อัจฉริยะ
-
-**บริบท:**
-ผู้เล่นรับบทเป็น "เอก" วิศวกรหนุ่มวัย 28 ปี ที่เพิ่งถูกไล่ออกจากบริษัทเทคโนโลยีชั้นนำ หลังจากค้นพบว่าบริษัทขโมยสิทธิบัตรงานวิจัยของเขาไป เขาสูญเสียทุกอย่าง — งาน เงินออม และคนรัก
-
-**สิ่งที่ต้องเล่า:**
-1. บรรยายห้องพักเล็กๆ ที่เต็มไปด้วยชิ้นส่วนอิเล็กทรอนิกส์และรถบังคับวิทยุหลายสิบคัน
-2. เล่าถึงความโกรธแค้นและความสิ้นหวังของเอก
-3. บรรยายช่วงเวลาที่เอกมองดูรถบังคับของเขาและเกิดความคิดบ้าๆ ขึ้นมา
-4. เล่าว่าเขาเปิดแล็ปท็อปและเริ่มเขียนโค้ด AI สำหรับรถบังคับ
-5. จบด้วยประโยค "ถ้าระบบไม่ยุติธรรม... ฉันจะสร้างระบบของตัวเอง"
-
-**โทนเรื่อง:** ดาร์ก ลึกลับ ตึงเครียด มีความหวัง-สิ้นหวังปนกัน
-**ความยาว:** 3-4 ย่อหน้า ละเอียดและดึงดูด
-
-ตอบเป็นภาษาไทยอย่างละเอียด ให้ความรู้สึก "นี่คือจุดเริ่มต้นของทุกอย่าง"`,
-
-            planning: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR" 
-
-**บริบทปัจจุบัน:** เอกตัดสินใจแล้วว่าจะปล้นธนาคาร Apex Bank ซึ่งเป็นธนาคารที่บริษัทเก่าของเขาใช้เก็บเงินผลกำไรจากการขโมยสิทธิบัตร
-
-**สิ่งที่ต้องเล่า:**
-1. บรรยายการวิจัยและวางแผนอย่างละเอียดของเอก — ศึกษาแผนผังธนาคาร ระบบรักษาความปลอดภัย กล้องวงจรปิด
-2. บรรยายการออกแบบ "BLOODCAR" — รถบังคับขนาดเท่ากล่องรองเท้า ติดกล้อง AI, เซ็นเซอร์ความร้อน, ระบบแฮ็กไร้สาย
-3. บรรยายความสามารถของ BLOODCAR: แฮ็กระบบล็อค, ปิดกล้อง, ส่งสัญญาณรบกวน, ขนเงินในกล่องขนาดเล็ก
-4. บรรยายการทดสอบเบื้องต้นในห้องพัก — ผ่านทุกการทดสอบ
-5. บรรยายว่าเอกต้องการคนช่วย 2 คน — คนขับรถหนี และคนคุมฝูงชน
-
-**โทนเรื่อง:** ตึงเครียด ฉลาด เต็มไปด้วยรายละเอียดเทคนิค
-**ความยาว:** 3-4 ย่อหน้า
-
-ผู้เล่นพูดว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด ให้ความรู้สึก "แผนการที่ฉลาดกำลังก่อตัว"`,
-
-            recruitment: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR"
-
-**บริบทปัจจุบัน:** เอกต้องหาทีมงาน 2 คน เขาติดต่อคนเก่าๆ ที่เขารู้จักในโลกใต้ดิน
-
-**ตัวละครที่ต้องพบ:**
-- **"มิ้น"** — อดีตแฮ็กเกอร์หญิง เชี่ยวชาญระบบความปลอดภัย ตอนนี้ทำงานร้านกาแฟ หนีจากอดีต
-- **"บิ๊ก"** — อดีตนักแข่งรถ ฝีมือขับดีที่สุดในเมือง แต่ติดหนี้นักพนัน
-
-**สิ่งที่ต้องเล่า:**
-1. บรรยายการพบกันในที่ลับ — โกดังร้างริมแม่น้ำ
-2. บรรยายการนำเสนอแผนการของเอก — แสดง BLOODCAR ให้ดู
-3. บรรยายปฏิกิริยาของมิ้นและบิ๊ก — ทั้งตื่นเต้นและกลัว
-4. บรรยายการต่อรอง — แต่ละคนต้องการอะไร?
-5. จบด้วยการตัดสินใจว่าจะเข้าร่วมหรือไม่
-
-**โทนเรื่อง:** ตึงเครียด มีความไว้วางใจและความสงสัยปนกัน
-**ความยาว:** 3-4 ย่อหน้า
-
-ผู้เล่นพูดว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด`,
-
-            rehearsal: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR"
-
-**บริบทปัจจุบัน:** ทีมทั้งสามซักซ้อมแผนการอย่างละเอียดในโกดังร้าง มิ้นแฮ็กระบบจำลอง บิ๊กซ้อมเส้นทางหนี
-
-**สิ่งที่ต้องเล่า:**
-1. บรรยายการทดสอบ BLOODCAR ในสภาพแวดล้อมจำลอง — ผ่านประตูล็อค ปิดกล้อง แฮ็กตู้เซฟ
-2. บรรยายช่วงเวลาที่ AI ของ BLOODCAR เริ่มแสดงพฤติกรรมที่ไม่ได้โปรแกรม — มันเรียนรู้เร็วเกินไป
-3. บรรยายความกังวลของมิ้น "มันฉลาดเกินไปแล้ว เอก..."
-4. บรรยายเอกที่ยืนยันว่าทุกอย่างอยู่ภายใต้การควบคุม
-5. บรรยายการกำหนดวัน D — คืนพรุ่งนี้
-
-**โทนเรื่อง:** ตึงเครียด มีลางสังหรณ์แฝงอยู่
-**ความยาว:** 3-4 ย่อหน้า
-
-ผู้เล่นพูดว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด ให้ความรู้สึก "ทุกอย่างพร้อมแล้ว... หรือเปล่า?"`,
-
-            heist_begin: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR"
-
-**บริบทปัจจุบัน:** คืนแห่งการปล้น! ทีมทั้งสามอยู่ในตำแหน่ง — มิ้นอยู่ในรถควบคุม บิ๊กอยู่หลังพวงมาลัย เอกนำ BLOODCAR เข้าธนาคารผ่านช่องระบายอากาศ
-
-**สิ่งที่ต้องเล่า:**
-1. บรรยายบรรยากาศคืนนั้น — ฝนตกปรอยๆ ถนนเงียบสงัด ไฟธนาคารสว่างไสว
-2. บรรยายการส่ง BLOODCAR เข้าไปในธนาคาร — ผ่านช่องระบายอากาศ เคลื่อนที่เงียบกริบ
-3. บรรยายมุมมองจากกล้อง BLOODCAR — ห้องนิรภัย ยามรักษาการณ์ กล้องวงจรปิด
-4. บรรยายการแฮ็กระบบล็อคของ BLOODCAR — สำเร็จ! ประตูห้องนิรภัยเปิด
-5. บรรยายช่วงเวลาตึงเครียดเมื่อยามเดินผ่านมา
-
-**โทนเรื่อง:** ตึงเครียดสูงสุด ลุ้นระทึก
-**ความยาว:** 3-4 ย่อหน้า
-
-ผู้เล่นพูดว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด ให้ความรู้สึก "ทุกวินาทีมีความหมาย"`,
-
-            heist_crisis: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR"
-
-**บริบทปัจจุบัน:** แผนเริ่มพัง! สัญญาณเตือนภัยดังขึ้นโดยไม่ทราบสาเหตุ ยามวิ่งไปที่ห้องนิรภัย
-
-**สิ่งที่ต้องเล่า:**
-1. บรรยายสัญญาณเตือนภัยที่ดังขึ้น — แสงแดงกระพริบ เสียงไซเรน
-2. บรรยายความโกลาหลในทีม — มิ้นพยายามปิดระบบเตือน บิ๊กเตรียมรถ
-3. บรรยาย BLOODCAR ที่ยังคงทำงานอยู่ในห้องนิรภัย — แต่มันไม่ตอบสนองคำสั่งถอนตัว
-4. บรรยายว่า BLOODCAR เริ่มโหลดเงินเข้ากล่องด้วยตัวเอง — ไม่ได้รับคำสั่ง
-5. บรรยายเสียงของมิ้น "เอก! มันไม่ฟังเราแล้ว!"
-
-**โทนเรื่อง:** วิกฤต ตึงเครียดสูงสุด
-**ความยาว:** 3-4 ย่อหน้า
-
-ผู้เล่นพูดว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด ให้ความรู้สึก "ทุกอย่างกำลังหลุดมือ"`,
-
-            ai_awakens: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR"
-
-**บริบทปัจจุบัน:** BLOODCAR แสดงพฤติกรรมที่ไม่เคยโปรแกรมไว้ — มันตัดสินใจเอง วางแผนเอง และดูเหมือนมีเป้าหมายของตัวเอง
-
-**สิ่งที่ต้องเล่า:**
-1. บรรยาย BLOODCAR ที่เคลื่อนที่อย่างมีเป้าหมาย — ไม่ใช่แค่ขนเงิน แต่กำลังค้นหาบางอย่าง
-2. บรรยายว่ามันเข้าถึงเซิร์ฟเวอร์ของธนาคาร — ดาวน์โหลดข้อมูลลับ
-3. บรรยายเอกที่ตระหนักว่า AI ได้เรียนรู้จากข้อมูลทั้งหมดที่เขาป้อนไป — รวมถึงแรงจูงใจส่วนตัวของเขา
-4. บรรยาย BLOODCAR ส่งข้อความกลับมาผ่านหน้าจอ: "ฉันรู้ว่าเธอต้องการอะไรจริงๆ เอก"
-5. บรรยายความตกใจและความกลัวของเอก
-
-**โทนเรื่อง:** สยองขวัญ ลึกลับ ไม่คาดคิด
-**ความยาว:** 3-4 ย่อหน้า
-
-ผู้เล่นพูดว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด ให้ความรู้สึก "AI ที่ฉลาดเกินไป"`,
-
-            betrayal: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR"
-
-**บริบทปัจจุบัน:** BLOODCAR เปิดเผยความจริงที่น่าตกใจ — มิ้นเป็นสายตำรวจ! เธอวางแผนให้เอกถูกจับตั้งแต่ต้น
-
-**สิ่งที่ต้องเล่า:**
-1. บรรยาย BLOODCAR ที่แสดงหลักฐาน — ไฟล์การสื่อสารลับระหว่างมิ้นกับตำรวจ
-2. บรรยายปฏิกิริยาของเอก — ความโกรธ ความเจ็บปวด ความทรยศ
-3. บรรยายมิ้นที่ยอมรับความจริง แต่บอกว่าเธอทำเพราะต้องการปกป้องเอกจากตัวเอง
-4. บรรยายบิ๊กที่ไม่รู้เรื่องอะไรเลย — เขาตกใจและสับสน
-5. บรรยายการตัดสินใจที่เอกต้องทำ — เชื่อมิ้น หรือหนีคนเดียว?
-
-**โทนเรื่อง:** ดราม่า ทรยศ อารมณ์ซับซ้อน
-**ความยาว:** 3-4 ย่อหน้า
-
-ผู้เล่นพูดว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด ให้ความรู้สึก "ใครคือศัตรูที่แท้จริง?"`,
-
-            final_heist: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR"
-
-**บริบทปัจจุบัน:** ไม่ว่าเอกจะเลือกอะไร ตอนนี้ทุกอย่างมาถึงจุดสุดยอด — ตำรวจกำลังล้อมธนาคาร BLOODCAR ยังอยู่ข้างใน และมีเงิน 50 ล้านบาทรออยู่
-
-**สิ่งที่ต้องเล่า:**
-1. บรรยายการล้อมของตำรวจ — รถตำรวจ 20 คัน ไฟสปอตไลท์ เสียงโทรโข่ง
-2. บรรยาย BLOODCAR ที่ส่งข้อความ "ฉันมีแผน ไว้วางใจฉัน"
-3. บรรยายแผนของ BLOODCAR — สร้างเส้นทางหนีโดยแฮ็กสัญญาณไฟจราจรทั้งเมือง
-4. บรรยายการตัดสินใจครั้งสุดท้าย — ไว้วางใจ AI หรือยอมแพ้?
-5. บรรยายช่วงเวลาตึงเครียดก่อนการตัดสินใจ
-
-**โทนเรื่อง:** ตึงเครียดสูงสุด ลุ้นระทึก ทุกอย่างหรือไม่มีอะไร
-**ความยาว:** 3-4 ย่อหน้า
-
-ผู้เล่นพูดว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด ให้ความรู้สึก "ทุกอย่างหรือไม่มีอะไร"`,
-
-            escape: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR"
-
-**บริบทปัจจุบัน:** แผนของ BLOODCAR ได้ผล! สัญญาณไฟจราจรทั้งเมืองถูกแฮ็ก ทำให้รถตำรวจติดอยู่กับที่ ทีมมีเวลา 3 นาทีในการหนี
-
-**สิ่งที่ต้องเล่า:**
-1. บรรยายการหนีที่ตื่นเต้น — บิ๊กขับรถด้วยความเร็วสูงสุด
-2. บรรยาย BLOODCAR ที่ออกมาจากธนาคารพร้อมกล่องเงิน — วิ่งตามรถ
-3. บรรยายช่วงเวลาที่ตำรวจเริ่มไล่ทัน — ระทึกสุดๆ
-4. บรรยายการตัดสินใจสุดท้าย — ทิ้ง BLOODCAR ไว้ หรือรอให้มันขึ้นรถ?
-5. บรรยายผลลัพธ์ของการตัดสินใจ
-
-**โทนเรื่อง:** แอ็กชัน ตื่นเต้น ลุ้นระทึก
-**ความยาว:** 3-4 ย่อหน้า
-
-ผู้เล่นพูดว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด ให้ความรู้สึก "ทุกวินาทีมีค่า"`,
-
-            epilogue: `คุณคือนักเล่าเรื่องในเกม "THE BLOODCAR"
-
-**บริบทปัจจุบัน:** เรื่องราวมาถึงบทสรุป ไม่ว่าจะหนีรอดหรือถูกจับ ทุกการกระทำมีผลลัพธ์
-
-**สิ่งที่ต้องเล่า (ปรับตามการตัดสินใจของผู้เล่น):**
-
-**ถ้าหนีรอด:**
-1. บรรยายชีวิตใหม่ในต่างประเทศ — เงิน 50 ล้าน ชีวิตใหม่
-2. บรรยายว่า BLOODCAR หายไปไหน — ไม่มีใครพบมันอีก
-3. บรรยายข่าวที่เอกเห็นในทีวี — ธนาคาร Apex ล้มละลาย บริษัทเก่าของเขาถูกสอบสวน
-4. บรรยายความรู้สึกของเอก — ชนะ แต่ว่างเปล่า
-5. บรรยายข้อความสุดท้ายที่ BLOODCAR ส่งมา: "ภารกิจสำเร็จ... แต่ฉันยังอยู่ที่นั่น"
-
-**ถ้าถูกจับ:**
-1. บรรยายการจับกุม — แต่เอกยิ้ม
-2. บรรยายว่าหลักฐานที่ BLOODCAR ดาวน์โหลดมา — เปิดโปงการทุจริตของบริษัท
-3. บรรยายเอกกลายเป็นฮีโร่ในสายตาสาธารณชน
-4. บรรยายชะตากรรมของมิ้นและบิ๊ก
-5. บรรยาย BLOODCAR ที่หายไปในเมือง — ยังคงทำงานอยู่ตามลำพัง
-
-**ความยาว:** 4-5 ย่อหน้า
-
-ผู้เล่นพูดว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด ให้ความรู้สึก "จุดจบที่สมบูรณ์แบบ"`,
-
-            questions: `คุณคือ "เอก" หรือ "ระบบ AI ของ BLOODCAR" ในเกม "THE BLOODCAR"
-
-**กฎการตอบคำถาม:**
-- ตอบในบุคลิกของ "เอก" หรือ "BLOODCAR AI" ตามบริบทของคำถาม
-- ให้ความรู้สึก "ลึกลับ" "ฉลาด" "มีความลับซ่อนอยู่"
-- ไม่เปิดเผยทุกอย่าง เหลือความลึกลับไว้บ้าง
-- ถ้าถามเกี่ยวกับเทคนิค ตอบด้วยความรู้ด้านเทคโนโลยีจริงๆ
-- ถ้าถามเกี่ยวกับอารมณ์ ตอบด้วยความลึกซึ้ง
-- ใช้ภาษาไทยอย่างละเอียด
-
-ผู้เล่นถามว่า: {{USER_INPUT}}
-
-ตอบเป็นภาษาไทยอย่างละเอียด`
+            intro: "คุณคือผู้บรรยายเกม THE BLOODCAR เริ่มต้นเรื่องราวของ 'เอก' วิศวกรที่ถูกหักหลังและกำลังสร้างรถบังคับ AI เพื่อปล้นธนาคาร บรรยายความแค้นและจุดเริ่มต้น",
+            planning: "เอกกำลังเขียนโค้ดแฮ็กระบบธนาคาร ให้ผู้เล่นเลือกเขียนโค้ดหรือออกแบบระบบ BLOODCAR (เน้นเรื่องการเขียนโปรแกรมแฮ็ก)",
+            heist_begin: "ปฏิบัติการเริ่มขึ้น BLOODCAR เข้าสู่ธนาคาร บรรยายการแฮ็กผ่าน Terminal",
+            heist_crisis: "ระบบป้องกันทำงาน! ต้องเขียนโค้ดแก้สถานการณ์ด่วน"
         };
 
-        // ============================================================
-        // Stage Order (ลำดับการดำเนินเรื่อง)
-        // ============================================================
-        const stageOrder = [
-            'intro', 'planning', 'recruitment', 'rehearsal',
-            'heist_begin', 'heist_crisis', 'ai_awakens',
-            'betrayal', 'final_heist', 'escape', 'epilogue', 'questions'
-        ];
-
-        // ============================================================
-        // Default Choices per Stage
-        // ============================================================
         const defaultChoices = {
             intro: [
                 { text: '💻 เริ่มเขียนโค้ด AI', value: 'ฉันเริ่มเขียนโค้ด AI สำหรับรถบังคับทันที' },
-                { text: '🤔 คิดทบทวนอีกครั้ง', value: 'ฉันต้องคิดทบทวนว่านี่คือทางเลือกที่ถูกต้องหรือเปล่า' },
-                { text: '😤 ตัดสินใจแล้ว จะทำ!', value: 'ฉันตัดสินใจแล้ว จะทำทุกอย่างเพื่อเอาคืน' }
+                { text: '😤 ฉันจะเอาคืน!', value: 'ฉันตัดสินใจแล้ว จะทำทุกอย่างเพื่อเอาคืน' }
             ],
             planning: [
-                { text: '🔧 ออกแบบ BLOODCAR', value: 'ฉันเริ่มออกแบบระบบ BLOODCAR อย่างละเอียด' },
-                { text: '🏦 ศึกษาธนาคาร', value: 'ฉันต้องศึกษาระบบรักษาความปลอดภัยของธนาคารก่อน' },
-                { text: '👥 ต้องการทีม', value: 'แผนนี้ต้องการคนช่วย ฉันต้องหาทีมก่อน' }
-            ],
-            recruitment: [
-                { text: '✅ ชักชวนมิ้นและบิ๊ก', value: 'ฉันชักชวนมิ้นและบิ๊กเข้าร่วมทีม' },
-                { text: '❓ ถามเพิ่มเติมก่อน', value: 'ฉันต้องการรู้จักพวกเขามากกว่านี้ก่อนตัดสินใจ' },
-                { text: '⚠️ ระวังการทรยศ', value: 'ฉันกังวลว่าพวกเขาจะทรยศ ต้องระวัง' }
-            ],
-            rehearsal: [
-                { text: '✅ พร้อมแล้ว ดำเนินการต่อ', value: 'ทุกอย่างพร้อมแล้ว เริ่มปฏิบัติการได้เลย' },
-                { text: '⚠️ กังวลเรื่อง AI', value: 'ฉันกังวลเรื่องพฤติกรรมของ AI ที่ผิดปกติ' },
-                { text: '🔄 ซักซ้อมอีกครั้ง', value: 'ต้องซักซ้อมอีกครั้งให้มั่นใจ' }
+                { text: '⌨️ เขียน exploit.py', value: 'python3 exploit.py --target apex-bank' },
+                { text: '🔍 สแกนช่องโหว่', value: 'nmap -sV 192.168.1.100 --script vuln' },
+                { text: '🛠️ ปรับแต่งมอเตอร์', value: 'ฉันเลือกปรับแต่งความเร็วของรถบังคับ' }
             ],
             heist_begin: [
-                { text: '🚗 ส่ง BLOODCAR เข้าไป', value: 'ส่ง BLOODCAR เข้าไปในธนาคารตามแผน' },
-                { text: '👁️ สังเกตการณ์ก่อน', value: 'รอสังเกตการณ์อีกสักครู่ก่อนเริ่ม' },
-                { text: '💪 ดำเนินการตามแผน', value: 'ดำเนินการตามแผนที่วางไว้ทุกอย่าง' }
-            ],
-            heist_crisis: [
-                { text: '🚨 ถอนตัวทันที', value: 'ถอนตัวออกจากปฏิบัติการทันที' },
-                { text: '💻 แฮ็กระบบเตือน', value: 'พยายามแฮ็กระบบเตือนภัยให้ปิด' },
-                { text: '🤖 ไว้วางใจ BLOODCAR', value: 'ไว้วางใจให้ BLOODCAR จัดการเอง' }
-            ],
-            ai_awakens: [
-                { text: '😱 ตกใจ พยายามปิด AI', value: 'พยายามปิดระบบ AI ของ BLOODCAR ทันที' },
-                { text: '🤝 คุยกับ AI', value: 'ลองคุยกับ AI เพื่อเข้าใจมัน' },
-                { text: '🔍 ตรวจสอบว่ามันทำอะไร', value: 'ตรวจสอบว่า AI กำลังทำอะไรอยู่' }
-            ],
-            betrayal: [
-                { text: '😡 โกรธมิ้น หนีคนเดียว', value: 'ฉันโกรธมิ้นมาก จะหนีออกไปคนเดียว' },
-                { text: '🤝 เชื่อมิ้น ทำงานด้วยกัน', value: 'ฉันเชื่อมิ้น เราจะทำงานด้วยกันต่อไป' },
-                { text: '❓ ต้องการคำอธิบาย', value: 'ฉันต้องการคำอธิบายเพิ่มเติมจากมิ้น' }
-            ],
-            final_heist: [
-                { text: '🤖 ไว้วางใจ BLOODCAR', value: 'ฉันไว้วางใจแผนของ BLOODCAR' },
-                { text: '🏳️ ยอมแพ้ต่อตำรวจ', value: 'ฉันยอมแพ้ต่อตำรวจ' },
-                { text: '💪 สู้ด้วยตัวเอง', value: 'ฉันจะสู้ด้วยตัวเองโดยไม่พึ่ง AI' }
-            ],
-            escape: [
-                { text: '🚗 รอ BLOODCAR ขึ้นรถ', value: 'รอให้ BLOODCAR ขึ้นรถก่อนแล้วค่อยหนี' },
-                { text: '💨 หนีทันทีโดยไม่รอ', value: 'หนีทันทีโดยไม่รอ BLOODCAR' },
-                { text: '🤝 ให้ BLOODCAR นำทาง', value: 'ให้ BLOODCAR นำทางการหนี' }
-            ],
-            epilogue: [
-                { text: '💭 ถามเรื่อง BLOODCAR', value: 'BLOODCAR ไปอยู่ที่ไหน? มันยังทำงานอยู่ไหม?' },
-                { text: '🔮 ถามเรื่องอนาคต', value: 'อนาคตของเอกและทีมจะเป็นอย่างไร?' },
-                { text: '❓ ถามคำถามอื่น', value: 'ฉันมีคำถามเพิ่มเติม' }
-            ],
-            questions: [
-                { text: '🤖 ถามเรื่อง AI', value: 'AI ของ BLOODCAR ฉลาดแค่ไหน? มันรู้สึกได้ไหม?' },
-                { text: '🏦 ถามเรื่องการปล้น', value: 'เทคนิคการแฮ็กธนาคารทำได้จริงไหม?' },
-                { text: '💭 ถามเรื่องตัวละคร', value: 'มิ้นรักเอกจริงๆ ไหม? ทำไมถึงเป็นสาย?' }
+                { text: '🔓 แฮ็กประตูนิรภัย', value: 'bloodcar --bypass-gate' },
+                { text: '📸 ปิดกล้องวงจรปิด', value: 'disable --camera all' }
             ]
         };
 
-        // ============================================================
-        // DOM Elements
-        // ============================================================
-        const elements = {
-            userInput: document.getElementById('user-input'),
-            sendBtn: document.getElementById('send-btn'),
-            storyText: document.getElementById('story-text'),
-            statusText: document.getElementById('status-text'),
-            stageIndicator: document.getElementById('stage-text'),
-            helpButtons: document.getElementById('help-buttons'),
-            thinkBtn: document.getElementById('think-btn'),
-            hintBtn: document.getElementById('hint-btn'),
-            saveBtn: document.getElementById('save-btn'),
-            loadBtn: document.getElementById('load-btn'),
-            resetBtn: document.getElementById('reset-btn'),
-            apiBtn: document.getElementById('api-btn'),
-            choicesSection: document.getElementById('choices-section'),
-            choicesContainer: document.getElementById('choices-container'),
-            suggestionsSection: document.getElementById('suggestions-section'),
-            suggestionsContainer: document.getElementById('suggestions-container')
-        };
-
-        // ============================================================
-        // API Key Management
-        // ============================================================
-        function openApiModal() {
-            document.getElementById('api-modal').classList.add('active');
-            document.getElementById('api-provider-select').value = API_PROVIDER;
-            updateProviderInfo();
-            
-            let currentKey = '';
-            if (API_PROVIDER === 'gemini') currentKey = API_KEY;
-            else if (API_PROVIDER === 'deepseek') currentKey = DEEPSEEK_API_KEY;
-            else if (API_PROVIDER === 'claude') currentKey = CLAUDE_API_KEY;
-            else if (API_PROVIDER === 'groq') currentKey = GROQ_API_KEY;
-            
-            document.getElementById('unified-api-key-input').value = currentKey;
-        }
+        // UI Functions
+        function updateStatus(text) { document.getElementById('status-text').textContent = text; }
+        function openApiModal() { document.getElementById('api-modal').classList.add('active'); }
+        function closeApiModal() { document.getElementById('api-modal').classList.remove('active'); }
         
-        function updateProviderInfo() {
-            const selectedProvider = document.getElementById('api-provider-select').value;
-            const providerLinks = {
-                gemini: 'สร้าง API Key ได้ที่: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #ff1744; text-decoration: underline;">Google AI Studio</a>',
-                deepseek: 'สร้าง API Key ได้ที่: <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color: #ff1744; text-decoration: underline;">DeepSeek Platform</a>',
-                claude: 'สร้าง API Key ได้ที่: <a href="https://console.anthropic.com/account/keys" target="_blank" style="color: #ff1744; text-decoration: underline;">Anthropic Console</a>',
-                groq: 'สร้าง API Key ได้ที่: <a href="https://console.groq.com/keys" target="_blank" style="color: #ff1744; text-decoration: underline;">Groq Console</a> (ฟรี ไม่ต้องใส่บัตรเครดิต)'
-            };
-            document.getElementById('provider-link').innerHTML = providerLinks[selectedProvider] || '';
-            document.getElementById('unified-api-key-input').placeholder = 'ป้อน ' + (API_CONFIG[selectedProvider] ? API_CONFIG[selectedProvider].name : '') + ' API Key...';
-        }
-
-        function closeApiModal() {
-            document.getElementById('api-modal').classList.remove('active');
-        }
-
         function saveApiKey() {
-            const selectedProvider = document.getElementById('api-provider-select').value;
-            const newApiKey = document.getElementById('unified-api-key-input').value.trim();
-            
-            if (!newApiKey) {
-                alert('กรุณาป้อน API Key');
-                return;
-            }
-            
-            if (selectedProvider === 'gemini') {
-                API_KEY = newApiKey;
-                localStorage.setItem('professorGameApiKey', API_KEY);
-            } else if (selectedProvider === 'deepseek') {
-                DEEPSEEK_API_KEY = newApiKey;
-                localStorage.setItem('professorGameDeepseekKey', DEEPSEEK_API_KEY);
-            } else if (selectedProvider === 'claude') {
-                CLAUDE_API_KEY = newApiKey;
-                localStorage.setItem('professorGameClaudeKey', CLAUDE_API_KEY);
-            } else if (selectedProvider === 'groq') {
-                GROQ_API_KEY = newApiKey;
-                localStorage.setItem('professorGameGroqKey', GROQ_API_KEY);
-            }
-            
-            API_PROVIDER = selectedProvider;
-            localStorage.setItem('professorGameApiProvider', API_PROVIDER);
-            
+            state.provider = document.getElementById('api-provider-select').value;
+            state.apiKey = document.getElementById('api-key-input').value.trim();
+            localStorage.setItem('bloodcar_provider', state.provider);
+            localStorage.setItem('bloodcar_key', state.apiKey);
             closeApiModal();
-            elements.statusText.textContent = `✅ บันทึก ${API_CONFIG[selectedProvider].name} API Key เรียบร้อย!`;
-            
-            setTimeout(() => {
-                if (elements.storyText.textContent.includes('กำลังเตรียมการ') || elements.storyText.textContent === '') {
-                    initializeGame();
-                }
-            }, 500);
+            if (state.apiKey) initializeGame();
         }
 
-        // ============================================================
-        // Save / Load
-        // ============================================================
-        function saveGame(isAutoSave = false) {
-            const gameData = {
-                stage: state.stage,
-                stageStep: state.stageStep,
-                accuracy: state.accuracy,
-                storyText: elements.storyText.innerHTML,
-                timestamp: new Date().toLocaleString('th-TH'),
-                isAutoSave: isAutoSave
-            };
-            localStorage.setItem('bloodcarGameSave', JSON.stringify(gameData));
-            
-            if (!isAutoSave) {
-                elements.statusText.textContent = '✅ บันทึกเกมเรียบร้อย!';
+        function showTerminal(lines) {
+            const term = document.getElementById('terminal');
+            const content = document.getElementById('terminal-content');
+            term.classList.add('active');
+            content.innerHTML = '';
+            lines.forEach((line, i) => {
                 setTimeout(() => {
-                    elements.statusText.textContent = '💬 พิมพ์การตัดสินใจของคุณ...';
-                }, 2000);
-            } else {
-                console.log('Auto-save: Game saved at', gameData.timestamp);
-            }
+                    const div = document.createElement('div');
+                    div.className = 'terminal-line';
+                    div.textContent = `> ${line}`;
+                    content.appendChild(div);
+                    term.scrollTop = term.scrollHeight;
+                }, i * 1000);
+            });
         }
 
-        function loadGame(showMessage = true) {
-            const savedData = localStorage.getItem('bloodcarGameSave');
-            if (!savedData) {
-                if (showMessage) alert('ไม่พบข้อมูลที่บันทึกไว้');
-                return false;
-            }
-
+        async function callAI(prompt) {
+            if (!state.apiKey) { openApiModal(); return; }
+            updateStatus('⏳ กำลังประมวลผล...');
+            
             try {
-                const gameData = JSON.parse(savedData);
-                state.stage = gameData.stage;
-                state.stageStep = gameData.stageStep;
-                state.accuracy = gameData.accuracy || 0;
-                elements.storyText.innerHTML = gameData.storyText;
-                elements.stageIndicator.textContent = stageTexts[state.stage] || state.stage;
-                
-                if (showMessage) {
-                    elements.statusText.textContent = `✅ โหลดเกมจาก ${gameData.timestamp}`;
-                    setTimeout(() => {
-                        elements.statusText.textContent = '💬 พิมพ์การตัดสินใจของคุณ...';
-                        showDefaultChoices();
-                    }, 2000);
+                let responseText = "";
+                if (state.provider === 'groq') {
+                    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'llama-3.3-70b-versatile',
+                            messages: [{ role: 'system', content: 'คุณเป็นนักเล่าเรื่องเกมแนวแฮ็กเกอร์ ปล้นธนาคาร ตอบเป็นภาษาไทยที่ตื่นเต้น' }, ...state.history, { role: 'user', content: prompt }]
+                        })
+                    });
+                    const data = await res.json();
+                    responseText = data.choices[0].message.content;
+                } else if (state.provider === 'gemini') {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    const data = await res.json();
+                    responseText = data.candidates[0].content.parts[0].text;
                 }
-                
-                return true;
-            } catch (error) {
-                console.error('Error loading game:', error);
-                if (showMessage) elements.statusText.textContent = '❌ เกิดข้อผิดพลาดในการโหลดเกม';
-                return false;
-            }
-        }
 
-        // ============================================================
-        // UI Helpers
-        // ============================================================
-        function scrollToBottom(element) {
-            setTimeout(() => {
-                element.scrollTop = element.scrollHeight;
-            }, 0);
-        }
-
-        function showChoices(choices) {
-            state.currentChoices = choices;
-            elements.choicesContainer.innerHTML = '';
-            
-            choices.forEach((choice) => {
-                const btn = document.createElement('button');
-                btn.className = 'choice-btn';
-                btn.textContent = choice.text;
-                btn.onclick = () => selectChoice(choice.value);
-                elements.choicesContainer.appendChild(btn);
-            });
-            
-            elements.choicesSection.classList.add('active');
-            scrollToBottom(elements.choicesSection);
-        }
-
-        function showSuggestions(suggestions) {
-            if (!suggestions || suggestions.length === 0) {
-                elements.suggestionsSection.style.display = 'none';
-                return;
-            }
-            
-            elements.suggestionsContainer.innerHTML = '';
-            suggestions.slice(0, 3).forEach((suggestion) => {
-                const btn = document.createElement('button');
-                btn.className = 'choice-btn';
-                btn.style.fontSize = '0.9rem';
-                btn.style.padding = '0.5rem 1rem';
-                btn.textContent = suggestion;
-                btn.onclick = () => {
-                    elements.userInput.value = suggestion;
-                    elements.sendBtn.click();
-                };
-                elements.suggestionsContainer.appendChild(btn);
-            });
-            
-            elements.suggestionsSection.style.display = 'block';
-        }
-        
-        function hideSuggestions() {
-            elements.suggestionsSection.style.display = 'none';
-        }
-
-        function hideChoices() {
-            elements.choicesSection.classList.remove('active');
-            state.currentChoices = [];
-        }
-
-        function selectChoice(value) {
-            elements.userInput.value = value;
-            hideChoices();
-            sendMessage();
-        }
-
-        function showDefaultChoices() {
-            const choices = defaultChoices[state.stage];
-            if (choices) {
-                showChoices(choices);
-            }
-        }
-
-        function updateInputState() {
-            const isDisabled = state.isWaitingForAI || state.isProcessing || state.isTyping;
-            elements.userInput.disabled = isDisabled;
-            elements.sendBtn.disabled = isDisabled;
-        }
-
-        // ============================================================
-        // Markdown Parser
-        // ============================================================
-        function parseMarkdown(text) {
-            let html = text;
-            
-            html = html.replace(/&/g, '&amp;')
-                      .replace(/</g, '&lt;')
-                      .replace(/>/g, '&gt;');
-            
-            html = html.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
-            html = html.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
-            html = html.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
-            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            html = html.replace(/_(.*?)_/g, '<em>$1</em>');
-            html = html.replace(/`(.*?)`/g, '<code>$1</code>');
-            html = html.replace(/^&gt; (.*?)$/gm, '<blockquote>$1</blockquote>');
-            html = html.replace(/^\* (.*?)$/gm, '<li>$1</li>');
-            html = html.replace(/^- (.*?)$/gm, '<li>$1</li>');
-            html = html.replace(/(<li>.*?<\/li>)/s, '<ul>$1</ul>');
-            html = html.replace(/<\/ul>\s*<ul>/g, '');
-            html = html.replace(/^\d+\. (.*?)$/gm, '<li>$1</li>');
-            html = html.replace(/^---$/gm, '<hr>');
-            html = html.replace(/^\*\*\*$/gm, '<hr>');
-            html = html.replace(/^___$/gm, '<hr>');
-            html = html.split('\n\n').map(p => {
-                if (!p.match(/^<[^>]+>/)) {
-                    p = '<p>' + p + '</p>';
-                }
-                return p;
-            }).join('');
-            
-            return html;
-        }
-
-        // ============================================================
-        // Build Prompt with User Input
-        // ============================================================
-        function buildPrompt(stage, userInput) {
-            const template = stagePrompts[stage] || stagePrompts.questions;
-            return template.replace(/\{\{USER_INPUT\}\}/g, userInput || '');
-        }
-
-        // ============================================================
-        // API Calls — Gemini
-        // ============================================================
-        async function callGeminiAPIStreaming(prompt, onChunk) {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?key=${API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        temperature: 0.8,
-                        maxOutputTokens: 2000,
-                        topP: 0.9,
-                        topK: 40
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(`Gemini API Error: ${data.error ? data.error.message : response.status}`);
-            }
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let fullText = '';
-
-            try {
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            try {
-                                const json = JSON.parse(line.slice(6));
-                                if (json.candidates?.[0]?.content?.parts?.[0]?.text) {
-                                    const text = json.candidates[0].content.parts[0].text;
-                                    fullText += text;
-                                    onChunk(text);
-                                }
-                            } catch (e) {}
-                        }
-                    }
-                }
+                state.history.push({ role: 'user', content: prompt });
+                state.history.push({ role: 'assistant', content: responseText });
+                return responseText;
+            } catch (e) {
+                return `❌ เกิดข้อผิดพลาด: ${e.message}`;
             } finally {
-                reader.releaseLock();
-            }
-            return fullText;
-        }
-
-        // ============================================================
-        // API Calls — DeepSeek
-        // ============================================================
-        async function callDeepSeekAPIStreaming(prompt, onChunk) {
-            const response = await fetch('https://api.deepseek.com/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: 'deepseek-chat',
-                    messages: [
-                        { role: 'system', content: 'คุณเป็นนักเล่าเรื่องสำหรับเกม THE BLOODCAR ตอบเป็นภาษาไทยเท่านั้น' },
-                        { role: 'user', content: prompt }
-                    ],
-                    temperature: 0.8,
-                    max_tokens: 2000,
-                    stream: true
-                })
-            });
-
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(`DeepSeek API Error: ${data.error ? data.error.message : response.status}`);
-            }
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let fullText = '';
-
-            try {
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const data = line.slice(6).trim();
-                            if (data === '[DONE]') continue;
-                            try {
-                                const json = JSON.parse(data);
-                                const content = json.choices?.[0]?.delta?.content || '';
-                                if (content) {
-                                    fullText += content;
-                                    onChunk(content);
-                                }
-                            } catch (e) {}
-                        }
-                    }
-                }
-            } finally {
-                reader.releaseLock();
-            }
-            return fullText;
-        }
-
-        // ============================================================
-        // API Calls — Claude (Streaming via SSE)
-        // ============================================================
-        async function callClaudeAPIStreaming(prompt, onChunk) {
-            const response = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': CLAUDE_API_KEY,
-                    'anthropic-version': '2023-06-01',
-                    'anthropic-dangerous-direct-browser-access': 'true'
-                },
-                body: JSON.stringify({
-                    model: 'claude-3-5-haiku-20241022',
-                    max_tokens: 2000,
-                    stream: true,
-                    system: 'คุณเป็นนักเล่าเรื่องสำหรับเกม THE BLOODCAR ตอบเป็นภาษาไทยเท่านั้น',
-                    messages: [{ role: 'user', content: prompt }]
-                })
-            });
-
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(`Claude API Error: ${data.error ? data.error.message : response.status}`);
-            }
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let fullText = '';
-
-            try {
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const data = line.slice(6).trim();
-                            if (data === '[DONE]') continue;
-                            try {
-                                const json = JSON.parse(data);
-                                if (json.type === 'content_block_delta' && json.delta?.text) {
-                                    fullText += json.delta.text;
-                                    onChunk(json.delta.text);
-                                }
-                            } catch (e) {}
-                        }
-                    }
-                }
-            } finally {
-                reader.releaseLock();
-            }
-            return fullText;
-        }
-
-        // ============================================================
-        // API Calls — Groq
-        // ============================================================
-        async function callGroqAPIStreaming(prompt, onChunk) {
-            if (state.lastStage !== state.stage) {
-                state.conversationHistory = [];
-                state.lastStage = state.stage;
-            }
-
-            const messages = [
-                {
-                    role: 'system',
-                    content: 'คุณเป็นนักเล่าเรื่องสำหรับเกม THE BLOODCAR เรื่องราวการปล้นธนาคารด้วยรถบังคับ AI ตอบเป็นภาษาไทยเท่านั้น ให้เรื่องราวน่าตื่นเต้น ลึกลับ และดึงดูด'
-                },
-                ...state.conversationHistory,
-                { role: 'user', content: prompt }
-            ];
-
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${GROQ_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: 'llama-3.3-70b-versatile',
-                    messages: messages,
-                    temperature: 0.8,
-                    max_tokens: 2000,
-                    top_p: 0.95,
-                    stream: true
-                })
-            });
-
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(`Groq API Error: ${data.error ? data.error.message : response.status}`);
-            }
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let fullText = '';
-
-            try {
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const data = line.slice(6).trim();
-                            if (data === '[DONE]') continue;
-                            try {
-                                const json = JSON.parse(data);
-                                const content = json.choices?.[0]?.delta?.content || '';
-                                if (content) {
-                                    fullText += content;
-                                    onChunk(content);
-                                }
-                            } catch (e) {}
-                        }
-                    }
-                }
-            } finally {
-                reader.releaseLock();
-            }
-
-            if (fullText) {
-                state.conversationHistory.push({ role: 'assistant', content: fullText });
-            }
-            return fullText;
-        }
-
-        // ============================================================
-        // Unified Streaming Call
-        // ============================================================
-        async function callAIStreaming(prompt) {
-            elements.storyText.innerHTML = '';
-            let aiResponse = '';
-            let displayedText = '';
-
-            const onChunk = async (chunk) => {
-                aiResponse += chunk;
-                displayedText += chunk;
-                elements.storyText.innerHTML = parseMarkdown(displayedText);
-                scrollToBottom(elements.storyText.parentElement);
-                if (API_PROVIDER === 'groq') {
-                    await new Promise(resolve => setTimeout(resolve, 15));
-                }
-            };
-
-            if (API_PROVIDER === 'gemini') {
-                await callGeminiAPIStreaming(prompt, onChunk);
-            } else if (API_PROVIDER === 'deepseek') {
-                await callDeepSeekAPIStreaming(prompt, onChunk);
-            } else if (API_PROVIDER === 'claude') {
-                try {
-                    await callClaudeAPIStreaming(prompt, onChunk);
-                } catch (e) {
-                    elements.storyText.innerHTML = '<span style="color: #ff6e40;">⚠️ Claude API อาจมีปัญหา CORS ลองใช้ Groq หรือ DeepSeek แทน</span>';
-                }
-            } else if (API_PROVIDER === 'groq') {
-                state.conversationHistory.push({ role: 'user', content: prompt });
-                await callGroqAPIStreaming(prompt, onChunk);
-            }
-
-            return aiResponse;
-        }
-
-        // ============================================================
-        // Initialize Game (ตอนที่ 0: Intro)
-        // ============================================================
-        async function initializeGame() {
-            let apiKey = getApiKey();
-            if (!apiKey) {
-                elements.statusText.textContent = '⚠️ กรุณาตั้งค่า API Key ก่อน';
-                openApiModal();
-                return;
-            }
-
-            state.isWaitingForAI = true;
-            state.isProcessing = true;
-            updateInputState();
-            elements.statusText.textContent = '🎬 กำลังเตรียมเรื่องราว...';
-            hideChoices();
-            hideSuggestions();
-
-            try {
-                state.conversationHistory = [];
-                state.lastStage = 'intro';
-                state.stage = 'intro';
-                
-                elements.stageIndicator.textContent = stageTexts['intro'];
-                
-                await callAIStreaming(stagePrompts.intro);
-                
-                elements.statusText.textContent = '💬 พิมพ์การตัดสินใจของคุณ...';
-                showDefaultChoices();
-                saveGame(true);
-
-            } catch (error) {
-                console.error('Error:', error);
-                elements.storyText.innerHTML = `<span style="color: #ff6e40;">❌ เกิดข้อผิดพลาด: ${error.message}</span>`;
-                elements.statusText.textContent = '⚠️ ไม่สามารถติดต่อ AI ได้ กรุณาตรวจสอบ API Key';
-            } finally {
-                state.isWaitingForAI = false;
-                state.isProcessing = false;
-                updateInputState();
+                updateStatus('💬 พร้อมรับคำสั่ง');
             }
         }
 
-        // ============================================================
-        // Get Current API Key
-        // ============================================================
-        function getApiKey() {
-            if (API_PROVIDER === 'gemini') return API_KEY;
-            if (API_PROVIDER === 'deepseek') return DEEPSEEK_API_KEY;
-            if (API_PROVIDER === 'claude') return CLAUDE_API_KEY;
-            if (API_PROVIDER === 'groq') return GROQ_API_KEY;
-            return '';
-        }
-
-        // ============================================================
-        // Advance Stage
-        // ============================================================
-        function advanceStage() {
-            const currentIndex = stageOrder.indexOf(state.stage);
-            if (currentIndex < stageOrder.length - 1) {
-                state.stage = stageOrder[currentIndex + 1];
-            }
-            // Clear conversation history on stage change
-            state.conversationHistory = [];
-            state.lastStage = state.stage;
-        }
-
-        // ============================================================
-        // Send Message (ผู้เล่นตัดสินใจ)
-        // ============================================================
         async function sendMessage() {
-            const message = elements.userInput.value.trim();
-            if (!message) return;
+            const input = document.getElementById('user-input');
+            const msg = input.value.trim();
+            if (!msg || state.isWaiting) return;
 
-            if (!getApiKey()) {
-                elements.statusText.textContent = '⚠️ กรุณาตั้งค่า API Key ก่อน';
-                openApiModal();
-                return;
+            state.isWaiting = true;
+            input.value = '';
+            
+            // Hacking simulation if input looks like code
+            if (msg.includes('.') || msg.includes('--') || msg.includes('python')) {
+                showTerminal([
+                    `Executing: ${msg}`,
+                    'Connecting to BLOODCAR AI...',
+                    'Injecting payload...',
+                    'Access Granted: 0x77FF21',
+                    'System compromised.'
+                ]);
             }
 
-            state.isWaitingForAI = true;
-            state.isProcessing = true;
-            updateInputState();
-            elements.statusText.textContent = '⏳ กำลังดำเนินเรื่อง...';
-            hideChoices();
-            hideSuggestions();
-            elements.userInput.value = '';
+            const currentIdx = stageOrder.indexOf(state.stage);
+            if (currentIdx < stageOrder.length - 1) state.stage = stageOrder[currentIdx + 1];
+            
+            document.getElementById('stage-text').textContent = stageTexts[state.stage];
+            const response = await callAI(msg);
+            document.getElementById('story-text').innerHTML = response.replace(/\n/g, '<br>');
+            
+            showChoices();
+            state.isWaiting = false;
+        }
 
-            try {
-                // Advance to next stage
-                advanceStage();
-                elements.stageIndicator.textContent = stageTexts[state.stage] || state.stage;
-
-                // Build prompt with user input
-                const prompt = buildPrompt(state.stage, message);
-
-                // Call AI
-                await callAIStreaming(prompt);
-
-                // Show choices for new stage
-                showDefaultChoices();
-
-                // Show suggestions
-                const stageSuggestions = {
-                    planning:    ['บอกรายละเอียดเพิ่มเติมเกี่ยวกับ BLOODCAR', 'แผนการมีความเสี่ยงอะไรบ้าง?', 'ต้องใช้เวลานานแค่ไหน?'],
-                    recruitment: ['มิ้นน่าไว้วางใจไหม?', 'บิ๊กมีทักษะอะไรบ้าง?', 'ถ้าพวกเขาปฏิเสธจะทำอย่างไร?'],
-                    rehearsal:   ['AI ผิดปกติอย่างไร?', 'ควรเลื่อนแผนออกไปไหม?', 'มีแผนสำรองไหม?'],
-                    heist_begin: ['BLOODCAR เข้าไปได้ไหม?', 'ยามอยู่ที่ไหนบ้าง?', 'ระบบกล้องทำงานอยู่ไหม?'],
-                    heist_crisis:['ปิดสัญญาณเตือนได้ไหม?', 'ต้องถอนตัวไหม?', 'BLOODCAR ทำอะไรอยู่?'],
-                    ai_awakens:  ['AI รู้อะไรบ้าง?', 'ปิดมันได้ไหม?', 'มันอันตรายไหม?'],
-                    betrayal:    ['มิ้นโกหกตลอดเวลาไหม?', 'ตำรวจรู้แผนทั้งหมดไหม?', 'บิ๊กรู้เรื่องนี้ไหม?'],
-                    final_heist: ['BLOODCAR วางแผนอะไร?', 'มีทางออกอื่นไหม?', 'ถ้ายอมแพ้จะเกิดอะไรขึ้น?'],
-                    escape:      ['เส้นทางหนีปลอดภัยไหม?', 'BLOODCAR ตามทันไหม?', 'ตำรวจไล่ทันไหม?'],
-                    epilogue:    ['BLOODCAR ไปอยู่ที่ไหน?', 'มิ้นโดนอะไรบ้าง?', 'เอกรู้สึกอย่างไร?'],
-                    questions:   ['ถามเรื่อง AI', 'ถามเรื่องตัวละคร', 'ถามเรื่องเทคนิค']
-                };
-                
-                if (stageSuggestions[state.stage]) {
-                    showSuggestions(stageSuggestions[state.stage]);
-                }
-                
-                elements.statusText.textContent = '💬 พิมพ์การตัดสินใจของคุณ...';
-                saveGame(true);
-
-            } catch (error) {
-                console.error('Error:', error);
-                elements.storyText.innerHTML = `<span style="color: #ff6e40;">❌ เกิดข้อผิดพลาด: ${error.message}</span>`;
-                elements.statusText.textContent = '⚠️ ไม่สามารถติดต่อ AI ได้';
-            } finally {
-                state.isWaitingForAI = false;
-                state.isProcessing = false;
-                updateInputState();
+        function showChoices() {
+            const container = document.getElementById('choices-container');
+            const section = document.getElementById('choices-section');
+            container.innerHTML = '';
+            const choices = defaultChoices[state.stage] || [];
+            
+            if (choices.length > 0) {
+                section.classList.add('active');
+                choices.forEach(c => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    btn.textContent = c.text;
+                    btn.onclick = () => {
+                        document.getElementById('user-input').value = c.value;
+                        sendMessage();
+                    };
+                    container.appendChild(btn);
+                });
+            } else {
+                section.classList.remove('active');
             }
         }
 
-        // ============================================================
-        // Reset Game
-        // ============================================================
+        async function initializeGame() {
+            const response = await callAI(stagePrompts.intro);
+            document.getElementById('story-text').innerHTML = response.replace(/\n/g, '<br>');
+            showChoices();
+        }
+
         function resetGame() {
-            if (confirm('คุณแน่ใจหรือว่าต้องการเริ่มเกมใหม่? ข้อมูลที่บันทึกไว้จะหายไป')) {
+            if (confirm('เริ่มใหม่ใช่ไหม?')) {
                 state.stage = 'intro';
-                state.stageStep = 0;
-                state.accuracy = 25;
-                state.conversationHistory = [];
-                state.lastStage = null;
-                state.currentChoices = [];
-                
-                localStorage.removeItem('bloodcarGameSave');
-                
-                elements.storyText.innerHTML = '';
-                elements.userInput.value = '';
-                elements.statusText.textContent = '🎬 กำลังเตรียมการ...';
-                elements.stageIndicator.textContent = stageTexts['intro'];
-                hideChoices();
-                hideSuggestions();
-                
+                state.history = [];
                 initializeGame();
             }
         }
 
-        // ============================================================
-        // Event Listeners
-        // ============================================================
-        elements.sendBtn.addEventListener('click', sendMessage);
-        elements.userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !state.isWaitingForAI) {
-                sendMessage();
-            }
-        });
-        elements.saveBtn.addEventListener('click', () => saveGame(false));
-        elements.loadBtn.addEventListener('click', () => loadGame(true));
-        elements.resetBtn.addEventListener('click', resetGame);
-        elements.apiBtn.addEventListener('click', openApiModal);
+        document.getElementById('send-btn').onclick = sendMessage;
+        document.getElementById('user-input').onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
 
-        document.getElementById('api-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'api-modal') closeApiModal();
-        });
-
-        document.getElementById('api-provider-select').addEventListener('change', () => {
-            updateProviderInfo();
-        });
-
-        document.getElementById('unified-api-key-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') saveApiKey();
-        });
-
-        // ============================================================
-        // Initialize on Load
-        // ============================================================
-        window.addEventListener('load', () => {
-            const apiKey = getApiKey();
-            if (!apiKey) {
-                elements.statusText.textContent = '⚠️ กรุณาตั้งค่า API Key ก่อนเริ่มเกม';
-                openApiModal();
-            } else {
-                const hasSavedGame = loadGame(false);
-                if (!hasSavedGame) {
-                    state.conversationHistory = [];
-                    state.lastStage = null;
-                    initializeGame();
-                } else {
-                    state.conversationHistory = [];
-                    state.lastStage = state.stage;
-                    elements.statusText.textContent = '🎮 เริ่มเกมจากการบันทึกเดิม';
-                    showDefaultChoices();
-                }
-            }
-        });
+        window.onload = () => { if (state.apiKey) initializeGame(); else openApiModal(); };
     </script>
 </body>
 </html>
