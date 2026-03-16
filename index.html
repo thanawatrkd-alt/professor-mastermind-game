@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE BLOODCAR: POLICE HACK</title>
+    <title>THE BLOODCAR: TROLL POLICE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -57,6 +57,7 @@
         }
         .terminal-window.active { display: block; }
         .terminal-window.police-mode { border-color: #00f; color: #0af; box-shadow: 0 0 15px rgba(0, 100, 255, 0.3); }
+        .terminal-window.troll-mode { border-color: #f0f; color: #f0f; box-shadow: 0 0 15px rgba(255, 0, 255, 0.3); }
 
         /* Story Container */
         .story-container {
@@ -103,6 +104,8 @@
             width: 100%;
         }
         .choice-btn:hover { background: rgba(255, 23, 68, 0.2); border-color: #ff1744; }
+        .choice-btn.troll { border-color: #f0f; color: #f0f; background: rgba(255, 0, 255, 0.05); }
+        .choice-btn.troll:hover { background: rgba(255, 0, 255, 0.15); }
 
         /* Modal */
         .modal {
@@ -133,7 +136,7 @@
         <header class="flex justify-between items-center mb-8">
             <div class="header">
                 <h1>THE BLOODCAR</h1>
-                <p class="text-xs tracking-widest text-gray-400">POLICE DATABASE HACK v2.3</p>
+                <p class="text-xs tracking-widest text-gray-400">POLICE TROLLING v2.4</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="openApiModal()" class="text-xs border border-red-500 px-2 py-1 rounded hover:bg-red-500 transition">API KEY</button>
@@ -200,7 +203,7 @@
         const guides = {
             intro: "ยินดีต้อนรับ! คุณคือ 'เอก' วิศวกรที่ถูกหักหลัง ตอนนี้คุณกำลังสร้าง BLOODCAR รถบังคับ AI เพื่อล้างแค้น ลองเลือก 'เริ่มเขียนโค้ด' เพื่อเริ่มแผนการของคุณสิครับ",
             planning: "ยอดเยี่ยม! ขั้นตอนต่อไปคือการวางแผน คุณต้องเลือกว่าจะเน้นที่ 'การแฮ็กระบบ' หรือ 'การปรับแต่งรถ' ลองพิมพ์คำสั่งแฮ็กดูสิ เช่น python3 exploit.py",
-            police_hack: "🚨 ตอนนี้คุณต้องแฮ็กเข้าคอมพิวเตอร์ตำรวจ! เพื่อขโมยแผนผังธนาคารและลบประวัติของคุณ ลองใช้คำสั่ง ssh admin@police-hq หรือลบหมายจับด้วย rm -rf /records/warrants",
+            police_hack: "🚨 ตอนนี้คุณต้องแฮ็กเข้าคอมพิวเตอร์ตำรวจ! เพื่อขโมยแผนผังธนาคารและลบประวัติของคุณ หรือจะลอง 'กวนตีนตำรวจ' เพื่อปั่นหัวพวกเขาก็ได้นะ!",
             recruitment: "การปล้นครั้งนี้ทำคนเดียวไม่ได้ คุณต้องหาทีม! ผมแนะนำให้ลองชวน 'มิ้น' แฮ็กเกอร์ฝีมือดี หรือ 'บิ๊ก' นักแข่งรถใต้ดินดูครับ",
             heist_begin: "ปฏิบัติการเริ่มแล้ว! BLOODCAR อยู่หน้าธนาคารแล้ว ตอนนี้คุณต้องสั่งการแฮ็กประตูนิรภัย ลองใช้คำสั่ง bloodcar --bypass-gate ดูครับ",
             heist_crisis: "แย่แล้ว! ระบบป้องกันทำงาน BLOODCAR เริ่มมีท่าทีแปลกๆ คุณต้องตัดสินใจด่วนว่าจะ 'กู้ระบบ' หรือ 'ปล่อยให้ AI จัดการเอง'"
@@ -218,11 +221,13 @@
             police_hack: [
                 { text: "🕵️ แฮ็กฐานข้อมูลหมายจับ (Warrants)", value: "ssh admin@police-hq && rm -rf /records/warrants" },
                 { text: "🗺️ ขโมยแผนผังธนาคารจากคลังข้อมูลตำรวจ", value: "download --file /secure/bank-blueprints.pdf" },
-                { text: "📡 แฮ็กกล้องวงจรปิดรอบเมือง", value: "access --cameras --city-center" }
+                { text: "🤡 กวนตีนตำรวจ: ส่งข้อความเยาะเย้ย", value: "send --msg 'Catch me if you can! 🤡' --target inspector-pc", troll: true },
+                { text: "🎵 กวนตีนตำรวจ: เปิดเพลง Baby Shark ในวิทยุ", value: "play --audio 'Baby Shark' --target police-radio", troll: true }
             ],
             heist_begin: [
                 { text: "🔓 สั่ง BLOODCAR แฮ็กประตูนิรภัย", value: "bloodcar --bypass-gate" },
-                { text: "📸 สั่งปิดระบบกล้องวงจรปิด", value: "disable --camera all" }
+                { text: "📸 สั่งปิดระบบกล้องวงจรปิด", value: "disable --camera all" },
+                { text: "🤡 กวนตีนตำรวจ: แฮ็กเครื่องชงกาแฟโรงพัก", value: "hack --coffee-machine --status 'Overheat'", troll: true }
             ]
         };
 
@@ -241,7 +246,7 @@
                 section.classList.remove('hidden');
                 choices.forEach(c => {
                     const btn = document.createElement('button');
-                    btn.className = 'choice-btn';
+                    btn.className = 'choice-btn' + (c.troll ? ' troll' : '');
                     btn.textContent = c.text;
                     btn.onclick = () => {
                         document.getElementById('user-input').value = c.value;
@@ -258,8 +263,10 @@
             const term = document.getElementById('terminal');
             const content = document.getElementById('terminal-content');
             term.classList.add('active');
+            term.classList.remove('police-mode', 'troll-mode');
+            
             if (mode === 'police') term.classList.add('police-mode');
-            else term.classList.remove('police-mode');
+            else if (mode === 'troll') term.classList.add('troll-mode');
             
             content.innerHTML = '';
             lines.forEach((line, i) => {
@@ -282,7 +289,7 @@
                 1. เล่าเรื่องให้ตื่นเต้น เร้าใจ
                 2. คอยแนะนำผู้เล่น (Guide) ว่าควรทำอะไรต่อไป
                 3. ถ้าผู้เล่นพิมพ์คำสั่งแฮ็ก ให้ตอบสนองแบบแฮ็กเกอร์
-                4. ในตอน 'Police Hack' ให้เน้นความเสี่ยงจากการถูกตำรวจจับ
+                4. ถ้าผู้เล่น "กวนตีนตำรวจ" ให้บรรยายปฏิกิริยาของตำรวจที่หัวร้อนหรือสับสนอย่างสนุกสนาน
                 5. ใช้ภาษาไทยที่ทันสมัยและน่าติดตาม`;
 
                 if (state.provider === 'groq') {
@@ -322,8 +329,16 @@
             state.isWaiting = true;
             input.value = '';
 
-            // Hacking simulation
-            if (msg.includes('police') || msg.includes('admin@police') || msg.includes('rm -rf')) {
+            // Trolling simulation
+            if (msg.includes('Baby Shark') || msg.includes('Catch me') || msg.includes('coffee-machine')) {
+                showTerminal([
+                    "INJECTING TROLL PAYLOAD...",
+                    "TARGET: POLICE INFRASTRUCTURE",
+                    "STATUS: SUCCESS! 🤡",
+                    "MESSAGE: POLICE ARE GETTING ANGRY!",
+                    "SYSTEM: TROLL LEVEL UP!"
+                ], 'troll');
+            } else if (msg.includes('police') || msg.includes('admin@police') || msg.includes('rm -rf')) {
                 showTerminal([
                     "CONNECTING TO POLICE-HQ...",
                     "BYPASSING FIREWALL...",
