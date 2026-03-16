@@ -3,15 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รถบังคับสีเลือด</title>
+    <title>THE BLOODCAR: AI HEIST</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
             font-family: 'Courier New', monospace;
@@ -19,474 +14,215 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-
-        @media (min-width: 768px) {
-            .container {
-                padding: 2rem;
-            }
-        }
-
+        .container { max-width: 900px; margin: 0 auto; padding: 1rem; }
+        
         /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-            animation: slideDown 0.8s ease-out;
-        }
-
         .header h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 900;
             background: linear-gradient(135deg, #ff1744 0%, #ff6e40 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 30px rgba(255, 23, 68, 0.5);
-            margin-bottom: 0.5rem;
-            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255, 23, 68, 0.3);
         }
 
-        @media (min-width: 768px) {
-            .header h1 {
-                font-size: 3.5rem;
-            }
-        }
-
-        .header p {
-            font-size: 0.85rem;
-            color: #b0bec5;
-            letter-spacing: 2px;
-        }
-
-        /* Stage Indicator */
-        .stage-indicator {
-            text-align: center;
+        /* Guide Box */
+        .guide-box {
+            background: rgba(255, 110, 64, 0.1);
+            border: 1px dashed #ff6e40;
+            border-radius: 8px;
+            padding: 1rem;
             margin-bottom: 1.5rem;
-            animation: fadeIn 0.6s ease-in;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            animation: fadeIn 1s ease-in;
         }
+        .guide-icon { font-size: 1.5rem; }
+        .guide-text { font-size: 0.9rem; color: #ffb74d; line-height: 1.4; }
 
-        .stage-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #ff1744 0%, #d32f2f 100%);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
-            border: 2px solid rgba(255, 23, 68, 0.6);
-        }
-
-        /* Story Container */
-        .story-section {
-            margin-bottom: 2rem;
-            animation: slideUp 0.8s ease-out 0.4s both;
-        }
-
-        .story-container {
-            background: linear-gradient(135deg, rgba(15, 52, 96, 0.8) 0%, rgba(22, 33, 62, 0.9) 100%);
-            border: 2px solid rgba(255, 23, 68, 0.4);
-            border-left: 6px solid #ff1744;
-            border-radius: 12px;
-            padding: 2rem;
-            min-height: 200px;
-            max-height: 400px;
-            overflow-y: auto;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            position: relative;
-        }
-
-        .story-text {
-            font-size: 1.05rem;
-            line-height: 2;
-            color: #e0e0e0;
-            letter-spacing: 0.5px;
-            word-spacing: 2px;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        /* Hacking Terminal Effect */
+        /* Terminal */
         .terminal-window {
             display: none;
             background: #000;
             border: 1px solid #0f0;
             border-radius: 8px;
             padding: 1rem;
-            font-family: 'Courier New', monospace;
             color: #0f0;
             margin-bottom: 1.5rem;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-            max-height: 200px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
+            max-height: 150px;
             overflow-y: auto;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
+        .terminal-window.active { display: block; }
 
-        .terminal-window.active {
-            display: block;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        .terminal-line {
-            margin-bottom: 0.25rem;
-            border-right: 2px solid #0f0;
-            white-space: nowrap;
-            overflow: hidden;
-            width: 0;
-            animation: typing 2s steps(40, end) forwards;
-        }
-
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-
-        /* Input Section */
-        .input-section {
-            display: flex;
-            gap: 1rem;
+        /* Story Container */
+        .story-container {
+            background: rgba(22, 33, 62, 0.7);
+            border-left: 4px solid #ff1744;
+            border-radius: 8px;
+            padding: 1.5rem;
+            min-height: 150px;
+            max-height: 350px;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
             margin-bottom: 1.5rem;
-            animation: slideUp 0.8s ease-out 0.6s both;
         }
+        .story-text { line-height: 1.8; white-space: pre-wrap; }
 
+        /* Input & Buttons */
         #user-input {
             flex: 1;
-            background: rgba(22, 33, 62, 0.8);
-            color: #e0e0e0;
-            border: 2px solid rgba(255, 23, 68, 0.4);
-            border-radius: 8px;
-            padding: 1rem 1.5rem;
-            font-size: 1rem;
-            font-family: 'Courier New', monospace;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            background: rgba(10, 14, 39, 0.8);
+            border: 1px solid #ff1744;
+            border-radius: 4px;
+            padding: 0.8rem;
+            color: #fff;
         }
-
-        #user-input:focus {
-            outline: none;
-            border-color: #ff1744;
-            box-shadow: 0 0 20px rgba(255, 23, 68, 0.5);
-        }
-
-        #send-btn {
-            background: linear-gradient(135deg, #ff1744 0%, #d32f2f 100%);
-            color: white;
-            border: none;
-            padding: 1rem 2.5rem;
-            border-radius: 8px;
-            font-size: 1rem;
+        .btn-primary {
+            background: #ff1744;
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
             font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            transition: 0.3s;
         }
+        .btn-primary:hover { background: #d32f2f; transform: scale(1.05); }
 
-        #send-btn:hover:not(:disabled) {
-            background: linear-gradient(135deg, #ff6e40 0%, #ff1744 100%);
-            transform: translateY(-2px);
-        }
-
-        /* Header Buttons */
-        .header-btn {
-            background: linear-gradient(135deg, #ff1744 0%, #d32f2f 100%);
-            color: white;
-            border: 2px solid rgba(255, 23, 68, 0.6);
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-left: 0.5rem;
-        }
-
-        /* Choice Buttons */
-        .choices-section {
-            display: none;
-            margin-top: 1.5rem;
-        }
-
-        .choices-section.active {
-            display: block;
-        }
-
-        .choices-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-        }
-
+        /* Choices */
         .choice-btn {
-            background: linear-gradient(135deg, rgba(255, 23, 68, 0.3) 0%, rgba(255, 110, 64, 0.3) 100%);
-            color: #e0e0e0;
-            border: 2px solid rgba(255, 23, 68, 0.5);
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
+            background: rgba(255, 23, 68, 0.1);
+            border: 1px solid rgba(255, 23, 68, 0.3);
+            padding: 0.8rem;
+            border-radius: 4px;
             text-align: left;
-            transition: all 0.3s ease;
+            transition: 0.3s;
+            margin-bottom: 0.5rem;
+            width: 100%;
         }
+        .choice-btn:hover { background: rgba(255, 23, 68, 0.2); border-color: #ff1744; }
 
-        .choice-btn:hover {
-            background: linear-gradient(135deg, rgba(255, 23, 68, 0.5) 0%, rgba(255, 110, 64, 0.5) 100%);
-            transform: translateX(5px);
-        }
-
-        /* API Modal */
-        .api-modal {
+        /* Modal */
+        .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            inset: 0;
+            background: rgba(0,0,0,0.85);
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
+            padding: 1rem;
         }
-
-        .api-modal.active {
-            display: flex;
-        }
-
-        .api-modal-content {
-            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-            border: 2px solid rgba(255, 23, 68, 0.6);
-            border-radius: 16px;
+        .modal.active { display: flex; }
+        .modal-content {
+            background: #16213e;
+            border: 2px solid #ff1744;
             padding: 2rem;
-            width: 90%;
+            border-radius: 12px;
             max-width: 500px;
+            width: 100%;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="flex justify-between items-center flex-wrap gap-4">
-                <div>
-                    <h1>🚗 THE BLOODCAR</h1>
-                    <p>AUTONOMOUS HEIST NIGHTMARE v2.1</p>
-                </div>
-                <div>
-                    <button id="api-btn" class="header-btn" onclick="openApiModal()">🔑 API</button>
-                    <button id="reset-btn" class="header-btn" onclick="resetGame()">🔄 เริ่มใหม่</button>
-                </div>
+        <header class="flex justify-between items-center mb-8">
+            <div class="header">
+                <h1>THE BLOODCAR</h1>
+                <p class="text-xs tracking-widest text-gray-400">AI HEIST SIMULATOR v2.2</p>
             </div>
+            <div class="flex gap-2">
+                <button onclick="openApiModal()" class="text-xs border border-red-500 px-2 py-1 rounded hover:bg-red-500 transition">API KEY</button>
+                <button onclick="resetGame()" class="text-xs border border-gray-500 px-2 py-1 rounded hover:bg-gray-500 transition">RESET</button>
+            </div>
+        </header>
+
+        <!-- Guide System -->
+        <div id="guide-box" class="guide-box">
+            <div class="guide-icon">💡</div>
+            <div class="guide-text" id="guide-text">ยินดีต้อนรับสู่ภารกิจปล้นธนาคารด้วย AI! ผมคือ Game Master ของคุณ ผมจะคอยแนะนำขั้นตอนต่างๆ ให้เองครับ</div>
         </div>
 
-        <!-- Stage Indicator -->
-        <div class="stage-indicator">
-            <span class="stage-badge" id="stage-text">ตอนที่ 0: จุดเริ่มต้น</span>
-        </div>
-
-        <!-- Hacking Terminal -->
         <div id="terminal" class="terminal-window">
             <div id="terminal-content"></div>
         </div>
 
-        <!-- Story Container -->
-        <div class="story-section">
-            <div class="story-container">
-                <p class="story-text" id="story-text">กำลังเตรียมการ...</p>
-            </div>
+        <div class="story-container">
+            <div id="stage-badge" class="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded inline-block mb-2 uppercase font-bold">STAGE 0: INTRO</div>
+            <div id="story-text" class="story-text">กำลังโหลดเนื้อเรื่อง...</div>
         </div>
 
-        <!-- Input Section -->
-        <div class="input-section">
-            <input 
-                type="text" 
-                id="user-input" 
-                placeholder="พิมพ์คำสั่งหรือการตัดสินใจของคุณ..." 
-            >
-            <button id="send-btn">ส่ง</button>
+        <div class="flex gap-2 mb-6">
+            <input type="text" id="user-input" placeholder="พิมพ์คำสั่งหรือการตัดสินใจของคุณที่นี่...">
+            <button id="send-btn" class="btn-primary">ส่ง</button>
         </div>
 
-        <!-- Choices Section -->
-        <div id="choices-section" class="choices-section">
-            <div class="text-sm text-orange-400 font-bold mb-2 uppercase tracking-widest">📋 เลือกการตัดสินใจ:</div>
-            <div id="choices-container" class="choices-container"></div>
+        <div id="choices-section" class="hidden">
+            <p class="text-xs text-gray-500 mb-2 uppercase font-bold">คำแนะนำการตัดสินใจ:</p>
+            <div id="choices-container"></div>
         </div>
 
-        <!-- Status Text -->
-        <p id="status-text" class="status-text mt-4"></p>
+        <p id="status-text" class="text-center text-[10px] text-gray-500 mt-4"></p>
     </div>
 
-    <!-- API Key Modal -->
-    <div id="api-modal" class="api-modal">
-        <div class="api-modal-content">
-            <h2 class="text-xl text-orange-500 font-bold mb-4 text-center">🔑 ตั้งค่า API Key</h2>
-            <select id="api-provider-select" class="w-full p-2 bg-slate-800 text-white border border-red-500 rounded mb-4">
-                <option value="gemini">🔵 Google Gemini</option>
-                <option value="groq">⚡ Groq (ฟรี)</option>
-                <option value="deepseek">🟢 DeepSeek</option>
+    <!-- API Modal -->
+    <div id="api-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold text-red-500 mb-4">🔑 ตั้งค่า API KEY</h2>
+            <p class="text-xs text-gray-400 mb-4">เลือก Provider และใส่ Key เพื่อเริ่มเล่น (แนะนำ Groq เพราะเร็วและฟรี)</p>
+            <select id="api-provider" class="w-full bg-gray-900 border border-red-500 p-2 rounded mb-4 text-white">
+                <option value="groq">Groq (Llama 3.3)</option>
+                <option value="gemini">Google Gemini</option>
             </select>
-            <input type="text" id="api-key-input" placeholder="ป้อน API Key..." class="w-full p-2 bg-slate-800 text-white border border-red-500 rounded mb-4">
+            <input type="text" id="api-key" placeholder="ป้อน API Key ของคุณ..." class="w-full bg-gray-900 border border-red-500 p-2 rounded mb-6 text-white">
             <div class="flex justify-end gap-2">
-                <button onclick="closeApiModal()" class="px-4 py-2 bg-gray-600 rounded text-white">ยกเลิก</button>
-                <button onclick="saveApiKey()" class="px-4 py-2 bg-red-600 rounded text-white">บันทึก</button>
+                <button onclick="closeApiModal()" class="px-4 py-2 text-gray-400">ยกเลิก</button>
+                <button onclick="saveApiKey()" class="bg-red-600 px-6 py-2 rounded font-bold">บันทึก</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Game State
         const state = {
             stage: 'intro',
-            isWaiting: false,
             history: [],
+            apiKey: localStorage.getItem('bloodcar_key') || '',
             provider: localStorage.getItem('bloodcar_provider') || 'groq',
-            apiKey: localStorage.getItem('bloodcar_key') || ''
-        };
-
-        const stageTexts = {
-            intro: 'ตอนที่ 0: จุดเริ่มต้น',
-            planning: 'ตอนที่ 1: วางแผน & เขียนโค้ด',
-            recruitment: 'ตอนที่ 2: รวมทีม',
-            rehearsal: 'ตอนที่ 3: ซักซ้อมระบบ',
-            heist_begin: 'ตอนที่ 4: เริ่มปฏิบัติการ',
-            heist_crisis: 'ตอนที่ 5: วิกฤตการณ์',
-            ai_awakens: 'ตอนที่ 6: AI ตื่นตัว',
-            betrayal: 'ตอนที่ 7: การทรยศ',
-            final_heist: 'ตอนที่ 8: ปล้นครั้งสุดท้าย',
-            escape: 'ตอนที่ 9: หนีรอด',
-            epilogue: 'ตอนที่ 10: บทส่งท้าย'
+            isWaiting: false
         };
 
         const stageOrder = ['intro', 'planning', 'recruitment', 'rehearsal', 'heist_begin', 'heist_crisis', 'ai_awakens', 'betrayal', 'final_heist', 'escape', 'epilogue'];
 
-        const stagePrompts = {
-            intro: "คุณคือผู้บรรยายเกม THE BLOODCAR เริ่มต้นเรื่องราวของ 'เอก' วิศวกรที่ถูกหักหลังและกำลังสร้างรถบังคับ AI เพื่อปล้นธนาคาร บรรยายความแค้นและจุดเริ่มต้น",
-            planning: "เอกกำลังเขียนโค้ดแฮ็กระบบธนาคาร ให้ผู้เล่นเลือกเขียนโค้ดหรือออกแบบระบบ BLOODCAR (เน้นเรื่องการเขียนโปรแกรมแฮ็ก)",
-            heist_begin: "ปฏิบัติการเริ่มขึ้น BLOODCAR เข้าสู่ธนาคาร บรรยายการแฮ็กผ่าน Terminal",
-            heist_crisis: "ระบบป้องกันทำงาน! ต้องเขียนโค้ดแก้สถานการณ์ด่วน"
+        const guides = {
+            intro: "ยินดีต้อนรับ! คุณคือ 'เอก' วิศวกรที่ถูกหักหลัง ตอนนี้คุณกำลังสร้าง BLOODCAR รถบังคับ AI เพื่อล้างแค้น ลองเลือก 'เริ่มเขียนโค้ด' เพื่อเริ่มแผนการของคุณสิครับ",
+            planning: "ยอดเยี่ยม! ขั้นตอนต่อไปคือการวางแผน คุณต้องเลือกว่าจะเน้นที่ 'การแฮ็กระบบ' หรือ 'การปรับแต่งรถ' ลองพิมพ์คำสั่งแฮ็กดูสิ เช่น python3 exploit.py",
+            recruitment: "การปล้นครั้งนี้ทำคนเดียวไม่ได้ คุณต้องหาทีม! ผมแนะนำให้ลองชวน 'มิ้น' แฮ็กเกอร์ฝีมือดี หรือ 'บิ๊ก' นักแข่งรถใต้ดินดูครับ",
+            heist_begin: "ปฏิบัติการเริ่มแล้ว! BLOODCAR อยู่หน้าธนาคารแล้ว ตอนนี้คุณต้องสั่งการแฮ็กประตูนิรภัย ลองใช้คำสั่ง bloodcar --bypass-gate ดูครับ",
+            heist_crisis: "แย่แล้ว! ระบบป้องกันทำงาน BLOODCAR เริ่มมีท่าทีแปลกๆ คุณต้องตัดสินใจด่วนว่าจะ 'กู้ระบบ' หรือ 'ปล่อยให้ AI จัดการเอง'"
         };
 
         const defaultChoices = {
             intro: [
-                { text: '💻 เริ่มเขียนโค้ด AI', value: 'ฉันเริ่มเขียนโค้ด AI สำหรับรถบังคับทันที' },
-                { text: '😤 ฉันจะเอาคืน!', value: 'ฉันตัดสินใจแล้ว จะทำทุกอย่างเพื่อเอาคืน' }
+                { text: "💻 เริ่มเขียนโค้ด AI สำหรับ BLOODCAR", value: "ฉันเริ่มเขียนโค้ด AI ทันทีเพื่อเตรียมการปล้น" },
+                { text: "😤 วางแผนล้างแค้นบริษัทเก่า", value: "ฉันจะเริ่มจากการรวบรวมข้อมูลของธนาคารที่บริษัทเก่าใช้" }
             ],
             planning: [
-                { text: '⌨️ เขียน exploit.py', value: 'python3 exploit.py --target apex-bank' },
-                { text: '🔍 สแกนช่องโหว่', value: 'nmap -sV 192.168.1.100 --script vuln' },
-                { text: '🛠️ ปรับแต่งมอเตอร์', value: 'ฉันเลือกปรับแต่งความเร็วของรถบังคับ' }
+                { text: "⌨️ เขียน exploit.py เพื่อแฮ็กระบบธนาคาร", value: "python3 exploit.py --target apex-bank" },
+                { text: "🛠️ ปรับแต่งความเร็วและเซนเซอร์ของรถ", value: "ฉันเลือกปรับแต่งฮาร์ดแวร์ของรถให้คล่องตัวที่สุด" }
             ],
             heist_begin: [
-                { text: '🔓 แฮ็กประตูนิรภัย', value: 'bloodcar --bypass-gate' },
-                { text: '📸 ปิดกล้องวงจรปิด', value: 'disable --camera all' }
+                { text: "🔓 สั่ง BLOODCAR แฮ็กประตูนิรภัย", value: "bloodcar --bypass-gate" },
+                { text: "📸 สั่งปิดระบบกล้องวงจรปิด", value: "disable --camera all" }
             ]
         };
 
-        // UI Functions
-        function updateStatus(text) { document.getElementById('status-text').textContent = text; }
-        function openApiModal() { document.getElementById('api-modal').classList.add('active'); }
-        function closeApiModal() { document.getElementById('api-modal').classList.remove('active'); }
-        
-        function saveApiKey() {
-            state.provider = document.getElementById('api-provider-select').value;
-            state.apiKey = document.getElementById('api-key-input').value.trim();
-            localStorage.setItem('bloodcar_provider', state.provider);
-            localStorage.setItem('bloodcar_key', state.apiKey);
-            closeApiModal();
-            if (state.apiKey) initializeGame();
-        }
-
-        function showTerminal(lines) {
-            const term = document.getElementById('terminal');
-            const content = document.getElementById('terminal-content');
-            term.classList.add('active');
-            content.innerHTML = '';
-            lines.forEach((line, i) => {
-                setTimeout(() => {
-                    const div = document.createElement('div');
-                    div.className = 'terminal-line';
-                    div.textContent = `> ${line}`;
-                    content.appendChild(div);
-                    term.scrollTop = term.scrollHeight;
-                }, i * 1000);
-            });
-        }
-
-        async function callAI(prompt) {
-            if (!state.apiKey) { openApiModal(); return; }
-            updateStatus('⏳ กำลังประมวลผล...');
-            
-            try {
-                let responseText = "";
-                if (state.provider === 'groq') {
-                    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            model: 'llama-3.3-70b-versatile',
-                            messages: [{ role: 'system', content: 'คุณเป็นนักเล่าเรื่องเกมแนวแฮ็กเกอร์ ปล้นธนาคาร ตอบเป็นภาษาไทยที่ตื่นเต้น' }, ...state.history, { role: 'user', content: prompt }]
-                        })
-                    });
-                    const data = await res.json();
-                    responseText = data.choices[0].message.content;
-                } else if (state.provider === 'gemini') {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                    });
-                    const data = await res.json();
-                    responseText = data.candidates[0].content.parts[0].text;
-                }
-
-                state.history.push({ role: 'user', content: prompt });
-                state.history.push({ role: 'assistant', content: responseText });
-                return responseText;
-            } catch (e) {
-                return `❌ เกิดข้อผิดพลาด: ${e.message}`;
-            } finally {
-                updateStatus('💬 พร้อมรับคำสั่ง');
-            }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const msg = input.value.trim();
-            if (!msg || state.isWaiting) return;
-
-            state.isWaiting = true;
-            input.value = '';
-            
-            // Hacking simulation if input looks like code
-            if (msg.includes('.') || msg.includes('--') || msg.includes('python')) {
-                showTerminal([
-                    `Executing: ${msg}`,
-                    'Connecting to BLOODCAR AI...',
-                    'Injecting payload...',
-                    'Access Granted: 0x77FF21',
-                    'System compromised.'
-                ]);
-            }
-
-            const currentIdx = stageOrder.indexOf(state.stage);
-            if (currentIdx < stageOrder.length - 1) state.stage = stageOrder[currentIdx + 1];
-            
-            document.getElementById('stage-text').textContent = stageTexts[state.stage];
-            const response = await callAI(msg);
-            document.getElementById('story-text').innerHTML = response.replace(/\n/g, '<br>');
-            
+        function updateUI() {
+            document.getElementById('stage-badge').textContent = `STAGE ${stageOrder.indexOf(state.stage)}: ${state.stage.toUpperCase()}`;
+            document.getElementById('guide-text').textContent = guides[state.stage] || "ดำเนินเนื้อเรื่องต่อไปตามที่คุณต้องการได้เลยครับ ผมพร้อมสนับสนุน!";
             showChoices();
-            state.isWaiting = false;
         }
 
         function showChoices() {
@@ -494,9 +230,8 @@
             const section = document.getElementById('choices-section');
             container.innerHTML = '';
             const choices = defaultChoices[state.stage] || [];
-            
             if (choices.length > 0) {
-                section.classList.add('active');
+                section.classList.remove('hidden');
                 choices.forEach(c => {
                     const btn = document.createElement('button');
                     btn.className = 'choice-btn';
@@ -508,28 +243,117 @@
                     container.appendChild(btn);
                 });
             } else {
-                section.classList.remove('active');
+                section.classList.add('hidden');
             }
         }
 
-        async function initializeGame() {
-            const response = await callAI(stagePrompts.intro);
+        function showTerminal(lines) {
+            const term = document.getElementById('terminal');
+            const content = document.getElementById('terminal-content');
+            term.classList.add('active');
+            content.innerHTML = '';
+            lines.forEach((line, i) => {
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.textContent = `> ${line}`;
+                    content.appendChild(div);
+                    term.scrollTop = term.scrollHeight;
+                }, i * 800);
+            });
+        }
+
+        async function callAI(prompt) {
+            if (!state.apiKey) { openApiModal(); return; }
+            document.getElementById('status-text').textContent = "⏳ AI กำลังคิดคำตอบ...";
+            try {
+                let responseText = "";
+                const systemPrompt = `คุณเป็น Game Master ของเกม THE BLOODCAR (ธีมปล้นธนาคารด้วยรถบังคับ AI) 
+                หน้าที่ของคุณ:
+                1. เล่าเรื่องให้ตื่นเต้น เร้าใจ
+                2. คอยแนะนำผู้เล่น (Guide) ว่าควรทำอะไรต่อไป
+                3. ถ้าผู้เล่นพิมพ์คำสั่งแฮ็ก ให้ตอบสนองแบบแฮ็กเกอร์
+                4. ใช้ภาษาไทยที่ทันสมัยและน่าติดตาม`;
+
+                if (state.provider === 'groq') {
+                    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'llama-3.3-70b-versatile',
+                            messages: [{ role: 'system', content: systemPrompt }, ...state.history, { role: 'user', content: prompt }]
+                        })
+                    });
+                    const data = await res.json();
+                    responseText = data.choices[0].message.content;
+                } else {
+                    // Gemini fallback
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\n" + prompt }] }] })
+                    });
+                    const data = await res.json();
+                    responseText = data.candidates[0].content.parts[0].text;
+                }
+                state.history.push({ role: 'user', content: prompt }, { role: 'assistant', content: responseText });
+                return responseText;
+            } catch (e) {
+                return "❌ เกิดข้อผิดพลาดในการเชื่อมต่อ AI กรุณาตรวจสอบ API Key";
+            } finally {
+                document.getElementById('status-text').textContent = "";
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const msg = input.value.trim();
+            if (!msg || state.isWaiting) return;
+
+            state.isWaiting = true;
+            input.value = '';
+
+            if (msg.includes('.') || msg.includes('--') || msg.includes('python')) {
+                showTerminal([`RUNNING: ${msg}`, "CONNECTING TO BLOODCAR...", "BYPASSING FIREWALL...", "SUCCESS: ACCESS GRANTED"]);
+            }
+
+            const currentIdx = stageOrder.indexOf(state.stage);
+            if (currentIdx < stageOrder.length - 1) state.stage = stageOrder[currentIdx + 1];
+            
+            const response = await callAI(msg);
             document.getElementById('story-text').innerHTML = response.replace(/\n/g, '<br>');
-            showChoices();
+            updateUI();
+            state.isWaiting = false;
+        }
+
+        function openApiModal() { document.getElementById('api-modal').classList.add('active'); }
+        function closeApiModal() { document.getElementById('api-modal').classList.remove('active'); }
+        function saveApiKey() {
+            state.apiKey = document.getElementById('api-key').value.trim();
+            state.provider = document.getElementById('api-provider').value;
+            localStorage.setItem('bloodcar_key', state.apiKey);
+            localStorage.setItem('bloodcar_provider', state.provider);
+            closeApiModal();
+            if (state.apiKey) startGame();
+        }
+
+        async function startGame() {
+            const response = await callAI("เริ่มเกม THE BLOODCAR และแนะนำตัวละครเอก");
+            document.getElementById('story-text').innerHTML = response.replace(/\n/g, '<br>');
+            updateUI();
         }
 
         function resetGame() {
-            if (confirm('เริ่มใหม่ใช่ไหม?')) {
+            if (confirm("ต้องการเริ่มเกมใหม่ทั้งหมดใช่หรือไม่?")) {
                 state.stage = 'intro';
                 state.history = [];
-                initializeGame();
+                startGame();
             }
         }
 
         document.getElementById('send-btn').onclick = sendMessage;
         document.getElementById('user-input').onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
 
-        window.onload = () => { if (state.apiKey) initializeGame(); else openApiModal(); };
+        window.onload = () => { if (state.apiKey) startGame(); else openApiModal(); };
     </script>
 </body>
 </html>
