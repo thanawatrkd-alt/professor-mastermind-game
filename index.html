@@ -244,8 +244,16 @@
             cursor: pointer;
             font-size: 1.2rem;
             transition: 0.2s;
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         .send-btn:hover { transform: scale(1.1); color: #f472b6; }
+        .send-btn:active { transform: scale(0.95); }
 
         /* Modal Styles */
         .modal {
@@ -623,14 +631,29 @@
         renderCharacters();
 
         // Attach event listeners for chat input and send button
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('user-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
+        function attachChatListeners() {
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.querySelector('.send-btn');
+            
+            if (userInput) {
+                userInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+            }
+            
+            if (sendBtn) {
+                sendBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     sendMessage();
-                }
-            });
-            document.querySelector('.send-btn').addEventListener('click', sendMessage);
-        });
+                });
+            }
+        }
+        
+        attachChatListeners();
+        document.addEventListener('DOMContentLoaded', attachChatListeners);
     </script>
 </body>
 </html>
