@@ -305,7 +305,7 @@
         </nav>
         <div class="p-4">
             <button onclick="openApiModal()" class="w-full bg-slate-800 py-2 rounded-xl text-sm hover:bg-slate-700 transition">
-                <i class="fas fa-key mr-2"></i> API CONFIG
+                <i class="fas fa-key mr-2"></i> ตั้งค่า API
             </button>
         </div>
     </aside>
@@ -313,180 +313,147 @@
     <!-- Main Content -->
     <main class="main-content">
         <!-- Home View -->
-        <div id="home-view" class="view-container active">
-            <header class="p-6 md:hidden flex justify-between items-center bg-slate-900/50">
-                <div class="flex items-center gap-2" onclick="goHome()">
-                    <i class="fas fa-heart text-pink-500 text-2xl"></i>
-                    <h1 class="text-lg font-bold">KHUIAI</h1>
-                </div>
-                <button onclick="openApiModal()"><i class="fas fa-key text-slate-400"></i></button>
+        <section id="home-view" class="view-container active">
+            <header class="p-4 border-b border-slate-800 flex items-center justify-between flex-shrink-0">
+                <h2 class="text-xl font-bold">เลือกเพื่อนคุยของคุณ</h2>
+                <button onclick="openCreatorModal()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition">
+                    <i class="fas fa-plus mr-2"></i> สร้างใหม่
+                </button>
             </header>
-
             <div class="scroll-area">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold mb-1">ค้นหาตัวละครที่คุณต้องการคุยด้วย</h2>
-                    <p class="text-slate-400 text-sm">เลือกตัวละครเพื่อเริ่มการสนทนาโรลเพลย์ หรือแก้ไขตัวละครที่มีอยู่</p>
-                </div>
-
-                <!-- Character Grid -->
-                <div class="char-grid" id="char-grid">
-                    <!-- Custom Creator -->
-                    <div class="char-card border-dashed border-2 border-pink-500/30 bg-pink-500/5" onclick="openCreatorModal()">
-                        <div class="char-img-box flex items-center justify-center text-pink-500 text-4xl">
-                            <i class="fas fa-plus-circle"></i>
-                        </div>
-                        <div class="char-info">
-                            <h3 class="char-name text-pink-400">สร้างเพื่อนคุยเอง</h3>
-                            <p class="char-desc">กำหนดนิสัยและรูปภาพได้เอง</p>
-                        </div>
-                    </div>
-                    <!-- Characters will be rendered here by JS -->
-                </div>
+                <div id="character-grid" class="char-grid"></div>
             </div>
-
-            <!-- Bottom Nav (Mobile) -->
-            <div class="bottom-nav">
-                <div class="text-pink-500 flex flex-col items-center gap-1" onclick="goHome()"><i class="fas fa-home"></i><span class="text-[10px]">หน้าแรก</span></div>
-                <div class="text-slate-400 flex flex-col items-center gap-1" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-fire"></i><span class="text-[10px]">ยอดนิยม</span></div>
-                <div class="text-slate-400 flex flex-col items-center gap-1" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-star"></i><span class="text-[10px]">มาใหม่</span></div>
-                <div class="text-slate-400 flex flex-col items-center gap-1" onclick="openApiModal()"><i class="fas fa-user"></i><span class="text-[10px]">ตั้งค่า</span></div>
-            </div>
-        </div>
+        </section>
 
         <!-- Profile View -->
-        <div id="profile-view" class="view-container">
-            <div class="flex flex-col items-center w-full max-w-lg mx-auto py-10">
-                <img src="" id="profile-img" class="profile-img" alt="Profile" onerror="this.src='https://via.placeholder.com/300?text=Character'">
-                <h2 class="text-3xl font-bold mb-2" id="profile-name">Character Name</h2>
-                <p class="text-pink-400 font-medium mb-4" id="profile-tag">Tagline</p>
-                <p class="text-slate-400 mb-8 px-4" id="profile-desc">Description goes here...</p>
-                <div class="flex gap-4 w-full px-6">
-                    <button onclick="goHome()" class="flex-1 bg-slate-800 py-4 rounded-full font-bold hover:bg-slate-700 transition">ย้อนกลับ</button>
-                    <button onclick="startChat()" class="flex-1 bg-pink-600 py-4 rounded-full font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20">เริ่มแชทเลย</button>
-                </div>
-            </div>
-        </div>
+        <section id="profile-view" class="view-container">
+            <button onclick="goHome()" class="absolute top-4 left-4 text-slate-400 hover:text-pink-500 transition z-10">
+                <i class="fas fa-arrow-left text-2xl"></i>
+            </button>
+            <img id="profile-img" src="" alt="Character Avatar" class="profile-img">
+            <h2 id="profile-name" class="text-3xl font-bold text-white mb-2"></h2>
+            <p id="profile-tag" class="text-pink-400 text-sm mb-4"></p>
+            <p id="profile-desc" class="text-slate-300 max-w-prose text-center mb-6"></p>
+            <button onclick="startChat()" class="bg-pink-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-pink-700 transition shadow-lg">
+                <i class="fas fa-comment-dots mr-2"></i> เริ่มคุยกันเลย!
+            </button>
+        </section>
 
         <!-- Chat View -->
-        <div id="chat-view" class="view-container">
-            <div class="chat-header">
-                <button onclick="goHome()" class="text-slate-400 hover:text-white mr-2"><i class="fas fa-arrow-left"></i></button>
-                <img src="" id="chat-avatar-img" class="chat-avatar-img" alt="Avatar" onerror="this.src='https://via.placeholder.com/100?text=AI'">
-                <div class="flex-1">
-                    <h3 class="font-bold leading-none" id="chat-name">Character Name</h3>
-                    <span class="text-[10px] text-green-500 flex items-center gap-1 mt-1"><i class="fas fa-circle text-[6px]"></i> กำลังออนไลน์</span>
-                </div>
-                <div class="flex gap-4 text-slate-400">
-                    <i class="fas fa-phone-alt cursor-pointer hover:text-white"></i>
-                    <i class="fas fa-video cursor-pointer hover:text-white"></i>
-                    <i class="fas fa-ellipsis-v cursor-pointer hover:text-white"></i>
-                </div>
-            </div>
-            <div class="chat-messages" id="chat-messages"></div>
+        <section id="chat-view" class="view-container">
+            <header class="chat-header">
+                <button onclick="showProfile(state.characterIndex)" class="text-slate-400 hover:text-pink-500 transition">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <img id="chat-avatar-img" src="" alt="Avatar" class="chat-avatar-img">
+                <h2 id="chat-name" class="text-lg font-semibold"></h2>
+            </header>
+            <div id="chat-messages" class="chat-messages"></div>
             <div class="chat-input-area">
                 <div class="input-box">
-                    <i class="fas fa-plus text-slate-500 cursor-pointer"></i>
-                    <input type="text" id="user-input" placeholder="พิมพ์ข้อความคุยกับตัวละคร...">
-                    <i class="far fa-smile text-slate-500 cursor-pointer"></i>
-                    <div class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></div>
+                    <input type="text" id="user-input" placeholder="พิมพ์ข้อความของคุณ...">
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Key Modal -->
+        <div id="api-modal" class="modal">
+            <div class="modal-content">
+                <h3 class="text-xl font-bold mb-4">ตั้งค่า API Key</h3>
+                <p class="text-sm text-slate-400 mb-4">กรุณาเลือกผู้ให้บริการ AI และใส่ API Key ของคุณเพื่อเริ่มใช้งาน</p>
+                <div class="mb-4">
+                    <label for="api-provider" class="block text-sm font-medium text-slate-300 mb-2">ผู้ให้บริการ AI</label>
+                    <select id="api-provider" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white focus:ring-pink-500 focus:border-pink-500">
+                        <option value="groq">Groq (แนะนำ)</option>
+                        <option value="gemini">Gemini</option>
+                        <option value="deepseek">DeepSeek</option>
+                        <option value="claude">Claude</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="api-key" class="block text-sm font-medium text-slate-300 mb-2">API Key</label>
+                    <input type="password" id="api-key" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeApiModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
+                    <button onclick="saveApiKey()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition">บันทึก</button>
                 </div>
             </div>
         </div>
+
+        <!-- Creator/Editor Modal -->
+        <div id="creator-modal" class="modal">
+            <div class="modal-content">
+                <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
+                <input type="hidden" id="edit-index">
+                <div class="mb-4">
+                    <label for="custom-name" class="block text-sm font-medium text-slate-300 mb-2">ชื่อตัวละคร</label>
+                    <input type="text" id="custom-name" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500" placeholder="เช่น Gojo Satoru">
+                </div>
+                <div class="mb-4">
+                    <label for="custom-img" class="block text-sm font-medium text-slate-300 mb-2">รูปโปรไฟล์ (URL)</label>
+                    <input type="text" id="custom-img" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500" placeholder="https://example.com/avatar.jpg">
+                </div>
+                <div class="mb-4">
+                    <label for="custom-personality" class="block text-sm font-medium text-slate-300 mb-2">นิสัย / สไตล์การคุย</label>
+                    <textarea id="custom-personality" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500 h-32 resize-none" placeholder="เช่น เป็นคนกวนๆ ชอบแกล้งคนอื่น แต่ใจดี"></textarea>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeCreatorModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
+                    <button id="save-btn" onclick="saveCharacter()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (Mobile) -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="goHome()"><i class="fas fa-home"></i></div>
+            <div class="nav-item" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-fire"></i></div>
+            <div class="nav-item" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-star"></i></div>
+            <div class="nav-item" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-heart"></i></div>
+            <div class="nav-item" onclick="openApiModal()"><i class="fas fa-key"></i></div>
+        </nav>
     </main>
 
-    <!-- Creator/Editor Modal -->
-    <div id="creator-modal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-xl font-bold text-pink-500 mb-4" id="modal-title">✨ สร้างเพื่อนคุยใหม่</h2>
-            <div class="space-y-4">
-                <input type="hidden" id="edit-index" value="-1">
-                <div>
-                    <label class="text-xs text-slate-400">ชื่อตัวละคร</label>
-                    <input type="text" id="custom-name" placeholder="เช่น น้องแมวเหมียว" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500">
-                </div>
-                <div>
-                    <label class="text-xs text-slate-400">ลิงก์รูปภาพ (Image URL)</label>
-                    <input type="text" id="custom-img" placeholder="https://... (Pinterest, Google, etc.)" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500">
-                    <p class="text-[10px] text-slate-500 mt-1">* ใส่ลิงก์รูปภาพจากเน็ตมาใช้เป็นโปรไฟล์ได้เลย</p>
-                </div>
-                <div>
-                    <label class="text-xs text-slate-400">นิสัย / สไตล์การคุย</label>
-                    <textarea id="custom-personality" placeholder="บรรยายนิสัยหรือสไตล์การคุยของตัวละคร..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500 h-24 resize-none"></textarea>
-                </div>
-                <button onclick="saveCharacter()" class="w-full bg-pink-600 py-3 rounded-xl font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20" id="save-btn">สร้างและเริ่มคุย</button>
-                <button onclick="closeCreatorModal()" class="w-full text-slate-500 text-sm hover:text-slate-300">ยกเลิก</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- API Modal -->
-    <div id="api-modal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-xl font-bold text-pink-500 mb-4">🔑 API CONFIGURATION</h2>
-            <p class="text-xs text-slate-400 mb-4">กรุณาใส่ API Key เพื่อเริ่มการสนทนา (แนะนำ Groq)</p>
-            <select id="api-provider" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-4 text-white outline-none focus:border-pink-500">
-                <option value="groq">Groq (Llama 3.3)</option>
-                <option value="gemini">Google Gemini</option>
-            </select>
-            <input type="text" id="api-key" placeholder="ป้อน API Key ของคุณ..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-6 text-white outline-none focus:border-pink-500">
-            <button onclick="saveApiKey()" class="w-full bg-pink-600 py-3 rounded-xl font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20">บันทึกและเริ่มใช้งาน</button>
-            <button onclick="closeApiModal()" class="w-full mt-4 text-slate-500 text-sm hover:text-slate-300">ยกเลิก</button>
-        </div>
-    </div>
-
     <script>
-        // Default Characters
-        const defaultChars = [
-            { name: 'Dante', avatar: 'https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', tag: 'Limbus Company Manager', desc: 'ผู้จัดการนาฬิกาจอมป่วนจาก Limbus Company' },
-            { name: 'Aris (Alice)', avatar: 'https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png', tag: 'Blue Archive Game Dev', desc: 'หุ่นยนต์เกมเมอร์สุดน่ารักจาก Blue Archive' },
-            { name: 'Gojo Satoru', avatar: 'https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg', tag: 'The Strongest Sorcerer', desc: 'ผู้ใช้คุณไสยที่แข็งแกร่งที่สุดจาก Jujutsu Kaisen' },
-            { name: 'Rimuru Tempest', avatar: 'https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', tag: 'Slime Isekai Demon Lord', desc: 'จอมมารสไลม์สุดเทพจากเรื่องเกิดใหม่เป็นสไลม์' }
-        ];
-
+        // Global state
         const state = {
             view: 'home',
-            character: '',
-            avatar: '',
-            personality: '',
+            character: null,
+            characterIndex: -1,
+            avatar: null,
+            personality: null,
+            history: [],
             apiKey: localStorage.getItem('khuiai_key') || '',
             provider: localStorage.getItem('khuiai_provider') || 'groq',
-            history: [],
-            characters: JSON.parse(localStorage.getItem('khuiai_chars')) || defaultChars
+            characters: [
+                { name: 'Gojo Satoru', avatar: 'https://i.pinimg.com/564x/8a/0a/0a/8a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a.jpg', tag: 'อาจารย์สุดแกร่ง', desc: 'อาจารย์สุดแกร่งจาก Jujutsu Kaisen ผู้มีพลังไร้ขีดจำกัดและบุคลิกขี้เล่น' },
+                { name: 'Aris', avatar: 'https://i.pinimg.com/564x/b3/7c/41/b37c412e061b8e7c3e8c1e7c2e8c1e7c.jpg', tag: 'สาวน้อยเกมเมอร์', desc: 'สาวน้อยอัจฉริยะจาก Blue Archive ผู้หลงใหลในเกมและเทคโนโลยี' },
+                { name: 'Rimuru Tempest', avatar: 'https://i.pinimg.com/564x/c7/2c/7f/c72c7f0a7b7e7c7e7c7e7c7e7c7e7c7e.jpg', tag: 'สไลม์จอมปราชญ์', desc: 'สไลม์ผู้แข็งแกร่งจาก That Time I Got Reincarnated as a Slime ผู้สร้างอาณาจักรและมิตรภาพ' },
+                { name: 'Frieren', avatar: 'https://i.pinimg.com/564x/f3/7c/41/f37c412e061b8e7c3e8c1e7c2e8c1e7c.jpg', tag: 'จอมเวทผู้เป็นอมตะ', desc: 'จอมเวทเอลฟ์ผู้ใช้ชีวิตมานับพันปีจาก Frieren: Beyond Journey’s End ผู้เรียนรู้ความหมายของชีวิตและมิตรภาพ' },
+                { name: 'Makima', avatar: 'https://i.pinimg.com/564x/a2/7c/41/a27c412e061b8e7c3e8c1e7c2e8c1e7c.jpg', tag: 'ปีศาจควบคุม', desc: 'ปีศาจควบคุมจาก Chainsaw Man ผู้มีเสน่ห์ลึกลับและพลังอันน่าสะพรึงกลัว' },
+                { name: 'Power', avatar: 'https://i.pinimg.com/564x/d3/7c/41/d37c412e061b8e7c3e8c1e7c2e8c1e7c.jpg', tag: 'ปีศาจเลือด', desc: 'ปีศาจเลือดจาก Chainsaw Man ผู้รักอิสระและชอบความรุนแรง' },
+                { name: 'Denji', avatar: 'https://i.pinimg.com/564x/e4/7c/41/e47c412e061b8e7c3e8c1e7c2e8c1e7c.jpg', tag: 'มนุษย์เลื่อยยนต์', desc: 'มนุษย์เลื่อยยนต์จาก Chainsaw Man ผู้ใฝ่ฝันถึงชีวิตที่เรียบง่ายและอาหารอร่อย' },
+                { name: 'Anya Forger', avatar: 'https://i.pinimg.com/564x/f5/7c/41/f57c412e061b8e7c3e8c1e7c2e8c1e7c.jpg', tag: 'เด็กหญิงพลังจิต', desc: 'เด็กหญิงพลังจิตจาก Spy x Family ผู้สามารถอ่านใจคนได้และรักถั่วลิสง' },
+                { name: 'Loid Forger', avatar: 'https://i.pinimg.com/564x/a6/7c/41/a67c412e061b8e7c3e8c1e7c2e8c1e7c.jpg', tag: 'สายลับ Twilight', desc: 'สายลับ Twilight จาก Spy x Family ผู้เก่งกาจและพยายามสร้างครอบครัวปลอมๆ' },
+                { name: 'Yor Forger', avatar: 'https://i.pinimg.com/564x/b7/7c/41/b77c412e061b8e7c3e8c1e7c2e8c1e7c.jpg', tag: 'มือสังหาร Thorn Princess', desc: 'มือสังหาร Thorn Princess จาก Spy x Family ผู้แข็งแกร่งและพยายามเป็นแม่ที่ดี' },
+            ]
         };
 
-        function renderCharacters() {
-            const grid = document.getElementById('char-grid');
-            // Keep the creator card
-            const creatorCard = grid.firstElementChild;
-            grid.innerHTML = '';
-            grid.appendChild(creatorCard);
-
-            state.characters.forEach((char, index) => {
-                const card = document.createElement('div');
-                card.className = 'char-card';
-                card.innerHTML = `
-                    <div class="edit-btn" onclick="event.stopPropagation(); openEditModal(${index})">
-                        <i class="fas fa-pencil-alt text-xs"></i>
-                    </div>
-                    <div class="char-img-box" onclick="showProfile(${index})">
-                        <img src="${char.avatar}" alt="${char.name}" onerror="this.src='https://via.placeholder.com/300?text=${char.name}'">
-                        <div class="char-status"></div>
-                    </div>
-                    <div class="char-info" onclick="showProfile(${index})">
-                        <h3 class="char-name">${char.name}</h3>
-                        <p class="char-desc">${char.tag || char.desc.substring(0, 30) + '...'}</p>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
+        // Load characters from localStorage if available
+        const storedChars = localStorage.getItem('khuiai_chars');
+        if (storedChars) {
+            state.characters = JSON.parse(storedChars);
         }
 
+        // View functions
         function goHome() {
             state.view = 'home';
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.getElementById('home-view').classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.querySelector('.nav-item:first-child').classList.add('active');
             renderCharacters();
         }
 
@@ -495,8 +462,8 @@
             state.character = char.name;
             state.avatar = char.avatar;
             state.personality = char.desc;
-            state.history = [];
-            
+            state.characterIndex = index;
+
             document.getElementById('profile-name').textContent = char.name;
             document.getElementById('profile-img').src = char.avatar;
             document.getElementById('profile-tag').textContent = char.tag || 'ตัวละครที่คุณเลือก';
@@ -564,6 +531,30 @@
         }
 
         // Modal Handlers
+        function renderCharacters() {
+            const grid = document.getElementById('character-grid');
+            grid.innerHTML = '';
+            state.characters.forEach((char, index) => {
+                const card = document.createElement('div');
+                card.className = 'char-card';
+                card.innerHTML = `
+                    <div class="char-img-box">
+                        <img src="${char.avatar}" alt="${char.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27300%27 height=%27300%27%3E%3Crect fill=%27%23334155%27 width=%27300%27 height=%27300%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 font-family=%27Arial%27 font-size=%2724%27 fill=%27%2394a3b8%27%3E?%3C/text%3E%3C/svg%3E'">
+                        <div class="char-status"></div>
+                        <button class="edit-btn" onclick="event.stopPropagation(); openEditModal(${index})">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </div>
+                    <div class="char-info">
+                        <div class="char-name">${char.name}</div>
+                        <div class="char-desc">${char.tag || 'ตัวละครที่คุณสร้าง'}</div>
+                    </div>
+                `;
+                card.onclick = () => showProfile(index);
+                grid.appendChild(card);
+            });
+        }
+
         function openCreatorModal() {
             document.getElementById('modal-title').textContent = '✨ สร้างเพื่อนคุยใหม่';
             document.getElementById('save-btn').textContent = 'สร้างและเริ่มคุย';
@@ -630,6 +621,16 @@
 
         // Initial Render
         renderCharacters();
+
+        // Attach event listeners for chat input and send button
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('user-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            document.querySelector('.send-btn').addEventListener('click', sendMessage);
+        });
     </script>
 </body>
 </html>
