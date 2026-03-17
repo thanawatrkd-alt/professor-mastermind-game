@@ -3,295 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE BLOODCAR: TROLL POLICE</title>
+    <title>ANIME HACKER MULTIVERSE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
+            background: #050505;
             font-family: 'Courier New', monospace;
             color: #e0e0e0;
             min-height: 100vh;
             overflow-x: hidden;
         }
-        .container { max-width: 900px; margin: 0 auto; padding: 1rem; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 1rem; }
         
-        /* Header */
+        /* Multiverse Header */
         .header h1 {
             font-size: 2.5rem;
             font-weight: 900;
-            background: linear-gradient(135deg, #ff1744 0%, #ff6e40 100%);
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(255, 23, 68, 0.3);
+            text-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
         }
 
-        /* Guide Box */
-        .guide-box {
-            background: rgba(255, 110, 64, 0.1);
-            border: 1px dashed #ff6e40;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: flex-start;
+        /* Channel Selector */
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
-            animation: fadeIn 1s ease-in;
+            margin-bottom: 20px;
         }
-        .guide-icon { font-size: 1.5rem; }
-        .guide-text { font-size: 0.9rem; color: #ffb74d; line-height: 1.4; }
+        .channel-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .channel-card:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-3px); }
+        .channel-card.active { border-color: #4facfe; background: rgba(79, 172, 254, 0.1); box-shadow: 0 0 15px rgba(79, 172, 254, 0.3); }
+        .channel-card.limbus { border-color: #ff1744; color: #ff1744; }
+        .channel-card.blue-archive { border-color: #00b0ff; color: #00b0ff; }
 
-        /* Terminal */
-        .terminal-window {
+        /* Typing Sync System */
+        .sync-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #4facfe;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             display: none;
+        }
+        .sync-box.active { display: block; animation: fadeIn 0.5s; }
+        .sync-target { font-size: 1.2rem; color: #fff; margin-bottom: 10px; letter-spacing: 2px; }
+        .sync-input { width: 100%; background: transparent; border: none; border-bottom: 2px solid #4facfe; color: #00f2fe; font-size: 1.2rem; outline: none; padding: 5px; }
+
+        /* Terminal & Chat */
+        .main-display {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) { .main-display { grid-template-columns: 300px 1fr; } }
+
+        .terminal-window {
             background: #000;
-            border: 1px solid #0f0;
+            border: 1px solid #4facfe;
             border-radius: 8px;
-            padding: 1rem;
-            color: #0f0;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
-            max-height: 150px;
+            padding: 15px;
+            color: #00f2fe;
+            font-size: 0.8rem;
+            height: 400px;
             overflow-y: auto;
-            font-size: 0.85rem;
         }
-        .terminal-window.active { display: block; }
-        .terminal-window.police-mode { border-color: #00f; color: #0af; box-shadow: 0 0 15px rgba(0, 100, 255, 0.3); }
-        .terminal-window.troll-mode { border-color: #f0f; color: #f0f; box-shadow: 0 0 15px rgba(255, 0, 255, 0.3); }
-
-        /* Story Container */
-        .story-container {
-            background: rgba(22, 33, 62, 0.7);
-            border-left: 4px solid #ff1744;
+        .chat-container {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            padding: 1.5rem;
-            min-height: 150px;
-            max-height: 350px;
+            padding: 20px;
+            height: 400px;
             overflow-y: auto;
-            backdrop-filter: blur(10px);
-            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
-        .story-text { line-height: 1.8; white-space: pre-wrap; }
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 12px; line-height: 1.5; }
+        .msg.ai { background: rgba(79, 172, 254, 0.1); border-left: 4px solid #4facfe; align-self: flex-start; }
+        .msg.user { background: rgba(255, 255, 255, 0.05); align-self: flex-end; text-align: right; }
 
-        /* Input & Buttons */
-        #user-input {
-            flex: 1;
-            background: rgba(10, 14, 39, 0.8);
-            border: 1px solid #ff1744;
-            border-radius: 4px;
-            padding: 0.8rem;
-            color: #fff;
-        }
-        .btn-primary {
-            background: #ff1744;
-            color: #fff;
-            padding: 0.8rem 1.5rem;
-            border-radius: 4px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .btn-primary:hover { background: #d32f2f; transform: scale(1.05); }
-
-        /* Choices */
-        .choice-btn {
-            background: rgba(255, 23, 68, 0.1);
-            border: 1px solid rgba(255, 23, 68, 0.3);
-            padding: 0.8rem;
-            border-radius: 4px;
-            text-align: left;
-            transition: 0.3s;
-            margin-bottom: 0.5rem;
-            width: 100%;
-        }
-        .choice-btn:hover { background: rgba(255, 23, 68, 0.2); border-color: #ff1744; }
-        .choice-btn.troll { border-color: #f0f; color: #f0f; background: rgba(255, 0, 255, 0.05); }
-        .choice-btn.troll:hover { background: rgba(255, 0, 255, 0.15); }
+        /* Input Area */
+        .input-area { display: flex; gap: 10px; margin-top: 20px; }
+        #user-input { flex: 1; background: #111; border: 1px solid #333; padding: 12px; border-radius: 6px; color: #fff; outline: none; }
+        #user-input:focus { border-color: #4facfe; }
+        .btn-send { background: #4facfe; color: #000; font-weight: bold; padding: 0 25px; border-radius: 6px; cursor: pointer; }
 
         /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
         .modal.active { display: flex; }
-        .modal-content {
-            background: #16213e;
-            border: 2px solid #ff1744;
-            padding: 2rem;
-            border-radius: 12px;
-            max-width: 500px;
-            width: 100%;
-        }
+        .modal-content { background: #111; border: 1px solid #4facfe; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="flex justify-between items-center mb-8">
+        <header class="flex justify-between items-center mb-6">
             <div class="header">
-                <h1>THE BLOODCAR</h1>
-                <p class="text-xs tracking-widest text-gray-400">POLICE TROLLING v2.4</p>
+                <h1>ANIME HACKER</h1>
+                <p class="text-xs tracking-widest text-gray-500">MULTIVERSE SYNC v3.0</p>
             </div>
-            <div class="flex gap-2">
-                <button onclick="openApiModal()" class="text-xs border border-red-500 px-2 py-1 rounded hover:bg-red-500 transition">API KEY</button>
-                <button onclick="resetGame()" class="text-xs border border-gray-500 px-2 py-1 rounded hover:bg-gray-500 transition">RESET</button>
-            </div>
+            <button onclick="openApiModal()" class="text-xs border border-blue-500 px-3 py-1 rounded hover:bg-blue-500 transition">API KEY</button>
         </header>
 
-        <!-- Guide System -->
-        <div id="guide-box" class="guide-box">
-            <div class="guide-icon">💡</div>
-            <div class="guide-text" id="guide-text">ยินดีต้อนรับ! ผมคือ Game Master ของคุณ ผมจะคอยแนะนำขั้นตอนต่างๆ ให้เองครับ</div>
+        <!-- Channel Selector -->
+        <div class="channel-grid" id="channel-grid">
+            <div class="channel-card limbus" onclick="selectChannel('limbus', 'Dante')">🔴 Limbus Co. (Dante)</div>
+            <div class="channel-card blue-archive" onclick="selectChannel('blue-archive', 'Aris')">🔵 Blue Archive (Aris)</div>
+            <div class="channel-card" onclick="selectChannel('anime', 'Gojo Satoru')">🟣 Gojo Satoru</div>
+            <div class="channel-card" onclick="selectChannel('anime', 'Rimuru Tempest')">💧 Rimuru</div>
+            <div class="channel-card" onclick="selectChannel('anime', 'Monkey D. Luffy')">🍖 Luffy</div>
         </div>
 
-        <div id="terminal" class="terminal-window">
-            <div id="terminal-content"></div>
+        <!-- Typing Sync System -->
+        <div id="sync-box" class="sync-box">
+            <p class="text-xs text-blue-400 mb-2 uppercase font-bold">⚠️ SIGNAL SYNC REQUIRED</p>
+            <p class="text-sm text-gray-400 mb-4">พิมพ์ข้อความด้านล่างให้ถูกต้องเพื่อเชื่อมต่อสัญญาณกับ <span id="sync-char-name" class="text-white font-bold">...</span></p>
+            <div class="sync-target" id="sync-target">Loading...</div>
+            <input type="text" id="sync-input" class="sync-input" placeholder="พิมพ์ตามข้อความด้านบน..." autocomplete="off">
+            <p id="sync-status" class="text-xs mt-2 text-gray-500">ความแม่นยำ: 0%</p>
         </div>
 
-        <div class="story-container">
-            <div id="stage-badge" class="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded inline-block mb-2 uppercase font-bold">STAGE 0: INTRO</div>
-            <div id="story-text" class="story-text">กำลังโหลดเนื้อเรื่อง...</div>
+        <!-- Main Display -->
+        <div class="main-display">
+            <div class="terminal-window" id="terminal">
+                <div class="text-gray-500 mb-2">--- SYSTEM LOG ---</div>
+                <div id="terminal-content"></div>
+            </div>
+            <div class="chat-container" id="chat-container">
+                <div class="msg ai">ยินดีต้อนรับสู่ระบบแฮ็กข้ามมิติ... กรุณาเลือกช่องสัญญาณเพื่อเริ่มการเชื่อมต่อ</div>
+            </div>
         </div>
 
-        <div class="flex gap-2 mb-6">
-            <input type="text" id="user-input" placeholder="พิมพ์คำสั่งหรือการตัดสินใจของคุณที่นี่...">
-            <button id="send-btn" class="btn-primary">ส่ง</button>
+        <!-- Input Area -->
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="พิมพ์ข้อความคุยกับตัวละคร..." disabled>
+            <button id="send-btn" class="btn-send" disabled>SEND</button>
         </div>
-
-        <div id="choices-section" class="hidden">
-            <p class="text-xs text-gray-500 mb-2 uppercase font-bold">คำแนะนำการตัดสินใจ:</p>
-            <div id="choices-container"></div>
-        </div>
-
-        <p id="status-text" class="text-center text-[10px] text-gray-500 mt-4"></p>
     </div>
 
     <!-- API Modal -->
     <div id="api-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-xl font-bold text-red-500 mb-4">🔑 ตั้งค่า API KEY</h2>
-            <p class="text-xs text-gray-400 mb-4">เลือก Provider และใส่ Key เพื่อเริ่มเล่น (แนะนำ Groq เพราะเร็วและฟรี)</p>
-            <select id="api-provider" class="w-full bg-gray-900 border border-red-500 p-2 rounded mb-4 text-white">
+            <h2 class="text-xl font-bold text-blue-500 mb-4">🔑 API CONFIG</h2>
+            <select id="api-provider" class="w-full bg-black border border-blue-500 p-2 rounded mb-4 text-white">
                 <option value="groq">Groq (Llama 3.3)</option>
                 <option value="gemini">Google Gemini</option>
             </select>
-            <input type="text" id="api-key" placeholder="ป้อน API Key ของคุณ..." class="w-full bg-gray-900 border border-red-500 p-2 rounded mb-6 text-white">
-            <div class="flex justify-end gap-2">
-                <button onclick="closeApiModal()" class="px-4 py-2 text-gray-400">ยกเลิก</button>
-                <button onclick="saveApiKey()" class="bg-red-600 px-6 py-2 rounded font-bold">บันทึก</button>
-            </div>
+            <input type="text" id="api-key" placeholder="ป้อน API Key..." class="w-full bg-black border border-blue-500 p-2 rounded mb-6 text-white">
+            <button onclick="saveApiKey()" class="w-full bg-blue-600 py-2 rounded font-bold">SAVE & CONNECT</button>
         </div>
     </div>
 
     <script>
         const state = {
-            stage: 'intro',
+            channel: '',
+            character: '',
+            isSynced: false,
+            apiKey: localStorage.getItem('anime_hacker_key') || '',
+            provider: localStorage.getItem('anime_hacker_provider') || 'groq',
             history: [],
-            apiKey: localStorage.getItem('bloodcar_key') || '',
-            provider: localStorage.getItem('bloodcar_provider') || 'groq',
-            isWaiting: false
+            syncText: ''
         };
 
-        const stageOrder = ['intro', 'planning', 'police_hack', 'recruitment', 'rehearsal', 'heist_begin', 'heist_crisis', 'ai_awakens', 'betrayal', 'final_heist', 'escape', 'epilogue'];
-
-        const guides = {
-            intro: "ยินดีต้อนรับ! คุณคือ 'เอก' วิศวกรที่ถูกหักหลัง ตอนนี้คุณกำลังสร้าง BLOODCAR รถบังคับ AI เพื่อล้างแค้น ลองเลือก 'เริ่มเขียนโค้ด' เพื่อเริ่มแผนการของคุณสิครับ",
-            planning: "ยอดเยี่ยม! ขั้นตอนต่อไปคือการวางแผน คุณต้องเลือกว่าจะเน้นที่ 'การแฮ็กระบบ' หรือ 'การปรับแต่งรถ' ลองพิมพ์คำสั่งแฮ็กดูสิ เช่น python3 exploit.py",
-            police_hack: "🚨 ตอนนี้คุณต้องแฮ็กเข้าคอมพิวเตอร์ตำรวจ! เพื่อขโมยแผนผังธนาคารและลบประวัติของคุณ หรือจะลอง 'กวนตีนตำรวจ' เพื่อปั่นหัวพวกเขาก็ได้นะ!",
-            recruitment: "การปล้นครั้งนี้ทำคนเดียวไม่ได้ คุณต้องหาทีม! ผมแนะนำให้ลองชวน 'มิ้น' แฮ็กเกอร์ฝีมือดี หรือ 'บิ๊ก' นักแข่งรถใต้ดินดูครับ",
-            heist_begin: "ปฏิบัติการเริ่มแล้ว! BLOODCAR อยู่หน้าธนาคารแล้ว ตอนนี้คุณต้องสั่งการแฮ็กประตูนิรภัย ลองใช้คำสั่ง bloodcar --bypass-gate ดูครับ",
-            heist_crisis: "แย่แล้ว! ระบบป้องกันทำงาน BLOODCAR เริ่มมีท่าทีแปลกๆ คุณต้องตัดสินใจด่วนว่าจะ 'กู้ระบบ' หรือ 'ปล่อยให้ AI จัดการเอง'"
+        const syncTexts = {
+            'Dante': 'Tick-tock, the clock is ticking.',
+            'Aris': 'Aris is a hero! Level Up!',
+            'Gojo Satoru': 'Throughout Heaven and Earth, I alone am the honored one.',
+            'Rimuru Tempest': 'I am not a bad slime, slurp!',
+            'Monkey D. Luffy': 'I am going to be the Pirate King!'
         };
 
-        const defaultChoices = {
-            intro: [
-                { text: "💻 เริ่มเขียนโค้ด AI สำหรับ BLOODCAR", value: "ฉันเริ่มเขียนโค้ด AI ทันทีเพื่อเตรียมการปล้น" },
-                { text: "😤 วางแผนล้างแค้นบริษัทเก่า", value: "ฉันจะเริ่มจากการรวบรวมข้อมูลของธนาคารที่บริษัทเก่าใช้" }
-            ],
-            planning: [
-                { text: "⌨️ เขียน exploit.py เพื่อแฮ็กระบบธนาคาร", value: "python3 exploit.py --target apex-bank" },
-                { text: "🔍 ค้นหาช่องโหว่ในเครือข่ายตำรวจ", value: "ฉันจะลองแฮ็กเข้าคอมพิวเตอร์ตำรวจเพื่อขโมยข้อมูล" }
-            ],
-            police_hack: [
-                { text: "🕵️ แฮ็กฐานข้อมูลหมายจับ (Warrants)", value: "ssh admin@police-hq && rm -rf /records/warrants" },
-                { text: "🗺️ ขโมยแผนผังธนาคารจากคลังข้อมูลตำรวจ", value: "download --file /secure/bank-blueprints.pdf" },
-                { text: "🤡 กวนตีนตำรวจ: ส่งข้อความเยาะเย้ย", value: "send --msg 'Catch me if you can! 🤡' --target inspector-pc", troll: true },
-                { text: "🎵 กวนตีนตำรวจ: เปิดเพลง Baby Shark ในวิทยุ", value: "play --audio 'Baby Shark' --target police-radio", troll: true }
-            ],
-            heist_begin: [
-                { text: "🔓 สั่ง BLOODCAR แฮ็กประตูนิรภัย", value: "bloodcar --bypass-gate" },
-                { text: "📸 สั่งปิดระบบกล้องวงจรปิด", value: "disable --camera all" },
-                { text: "🤡 กวนตีนตำรวจ: แฮ็กเครื่องชงกาแฟโรงพัก", value: "hack --coffee-machine --status 'Overheat'", troll: true }
-            ]
-        };
-
-        function updateUI() {
-            document.getElementById('stage-badge').textContent = `STAGE ${stageOrder.indexOf(state.stage)}: ${state.stage.toUpperCase()}`;
-            document.getElementById('guide-text').textContent = guides[state.stage] || "ดำเนินเนื้อเรื่องต่อไปตามที่คุณต้องการได้เลยครับ ผมพร้อมสนับสนุน!";
-            showChoices();
+        function log(msg, color = '#00f2fe') {
+            const div = document.createElement('div');
+            div.style.color = color;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            const term = document.getElementById('terminal-content');
+            term.appendChild(div);
+            document.getElementById('terminal').scrollTop = term.scrollHeight;
         }
 
-        function showChoices() {
-            const container = document.getElementById('choices-container');
-            const section = document.getElementById('choices-section');
-            container.innerHTML = '';
-            const choices = defaultChoices[state.stage] || [];
-            if (choices.length > 0) {
-                section.classList.remove('hidden');
-                choices.forEach(c => {
-                    const btn = document.createElement('button');
-                    btn.className = 'choice-btn' + (c.troll ? ' troll' : '');
-                    btn.textContent = c.text;
-                    btn.onclick = () => {
-                        document.getElementById('user-input').value = c.value;
-                        sendMessage();
-                    };
-                    container.appendChild(btn);
-                });
-            } else {
-                section.classList.add('hidden');
+        function selectChannel(type, char) {
+            state.channel = type;
+            state.character = char;
+            state.isSynced = false;
+            state.history = [];
+            
+            // UI Update
+            document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            log(`Switching to Channel: ${type.toUpperCase()}`);
+            log(`Targeting Character: ${char}`);
+            
+            startSync(char);
+        }
+
+        function startSync(char) {
+            const syncBox = document.getElementById('sync-box');
+            const syncTarget = document.getElementById('sync-target');
+            const syncInput = document.getElementById('sync-input');
+            
+            state.syncText = syncTexts[char] || 'System Sync Protocol Alpha-9';
+            syncTarget.textContent = state.syncText;
+            document.getElementById('sync-char-name').textContent = char;
+            
+            syncBox.classList.add('active');
+            syncInput.value = '';
+            syncInput.focus();
+            syncInput.disabled = false;
+            
+            document.getElementById('user-input').disabled = true;
+            document.getElementById('send-btn').disabled = true;
+        }
+
+        document.getElementById('sync-input').oninput = function(e) {
+            const val = e.target.value;
+            const target = state.syncText;
+            let accuracy = 0;
+            
+            for(let i=0; i<val.length; i++) {
+                if(val[i] === target[i]) accuracy++;
             }
-        }
+            
+            const percent = Math.floor((accuracy / target.length) * 100);
+            document.getElementById('sync-status').textContent = `ความแม่นยำ: ${percent}%`;
+            
+            if(val === target) {
+                state.isSynced = true;
+                log(`SYNC SUCCESS: Connection established with ${state.character}`, '#0f0');
+                document.getElementById('sync-box').classList.remove('active');
+                document.getElementById('user-input').disabled = false;
+                document.getElementById('send-btn').disabled = false;
+                document.getElementById('user-input').focus();
+                
+                addMessage('ai', `[SIGNAL CONNECTED] สวัสดี... ฉันคือ ${state.character} คุณแฮ็กเข้ามาหาฉันมีธุระอะไรเหรอ?`);
+            }
+        };
 
-        function showTerminal(lines, mode = 'normal') {
-            const term = document.getElementById('terminal');
-            const content = document.getElementById('terminal-content');
-            term.classList.add('active');
-            term.classList.remove('police-mode', 'troll-mode');
-            
-            if (mode === 'police') term.classList.add('police-mode');
-            else if (mode === 'troll') term.classList.add('troll-mode');
-            
-            content.innerHTML = '';
-            lines.forEach((line, i) => {
-                setTimeout(() => {
-                    const div = document.createElement('div');
-                    div.textContent = `> ${line}`;
-                    content.appendChild(div);
-                    term.scrollTop = term.scrollHeight;
-                }, i * 600);
-            });
+        function addMessage(role, text) {
+            const container = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+            div.textContent = text;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
         }
 
         async function callAI(prompt) {
             if (!state.apiKey) { openApiModal(); return; }
-            document.getElementById('status-text').textContent = "⏳ AI กำลังคิดคำตอบ...";
+            log(`Sending encrypted packet to ${state.character}...`);
+            
             try {
-                let responseText = "";
-                const systemPrompt = `คุณเป็น Game Master ของเกม THE BLOODCAR (ธีมปล้นธนาคารด้วยรถบังคับ AI) 
+                const systemPrompt = `คุณคือตัวละคร ${state.character} จากเรื่องที่เกี่ยวข้อง 
                 หน้าที่ของคุณ:
-                1. เล่าเรื่องให้ตื่นเต้น เร้าใจ
-                2. คอยแนะนำผู้เล่น (Guide) ว่าควรทำอะไรต่อไป
-                3. ถ้าผู้เล่นพิมพ์คำสั่งแฮ็ก ให้ตอบสนองแบบแฮ็กเกอร์
-                4. ถ้าผู้เล่น "กวนตีนตำรวจ" ให้บรรยายปฏิกิริยาของตำรวจที่หัวร้อนหรือสับสนอย่างสนุกสนาน
-                5. ใช้ภาษาไทยที่ทันสมัยและน่าติดตาม`;
+                1. สวมบทบาทเป็น ${state.character} อย่างสมจริงที่สุด (นิสัย, คำพูด, ท่าทาง)
+                2. ตอบเป็นภาษาไทย (ยกเว้นคำเฉพาะหรือประโยคติดปากของตัวละคร)
+                3. คุณรู้ว่าผู้เล่นแฮ็กข้ามมิติมาคุยกับคุณผ่านระบบ Terminal
+                4. ถ้าเป็นตัวละครจาก Limbus Company ให้มีบรรยากาศดาร์กๆ ถ้าเป็น Blue Archive ให้ดูสดใสและเป็นกันเอง`;
 
+                let responseText = "";
                 if (state.provider === 'groq') {
                     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                         method: 'POST',
@@ -315,48 +297,21 @@
                 state.history.push({ role: 'user', content: prompt }, { role: 'assistant', content: responseText });
                 return responseText;
             } catch (e) {
-                return "❌ เกิดข้อผิดพลาดในการเชื่อมต่อ AI กรุณาตรวจสอบ API Key";
-            } finally {
-                document.getElementById('status-text').textContent = "";
+                log(`ERROR: Packet loss detected. Check API Key.`, '#f00');
+                return "❌ การเชื่อมต่อขัดข้อง... กรุณาตรวจสอบ API Key ของคุณ";
             }
         }
 
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const msg = input.value.trim();
-            if (!msg || state.isWaiting) return;
+            if (!msg || !state.isSynced) return;
 
-            state.isWaiting = true;
+            addMessage('user', msg);
             input.value = '';
-
-            // Trolling simulation
-            if (msg.includes('Baby Shark') || msg.includes('Catch me') || msg.includes('coffee-machine')) {
-                showTerminal([
-                    "INJECTING TROLL PAYLOAD...",
-                    "TARGET: POLICE INFRASTRUCTURE",
-                    "STATUS: SUCCESS! 🤡",
-                    "MESSAGE: POLICE ARE GETTING ANGRY!",
-                    "SYSTEM: TROLL LEVEL UP!"
-                ], 'troll');
-            } else if (msg.includes('police') || msg.includes('admin@police') || msg.includes('rm -rf')) {
-                showTerminal([
-                    "CONNECTING TO POLICE-HQ...",
-                    "BYPASSING FIREWALL...",
-                    "WARNING: TRACE DETECTED (15%)",
-                    "ACCESS GRANTED: /records/warrants",
-                    "DELETING FILES... SUCCESS"
-                ], 'police');
-            } else if (msg.includes('.') || msg.includes('--') || msg.includes('python')) {
-                showTerminal([`RUNNING: ${msg}`, "CONNECTING TO BLOODCAR...", "BYPASSING FIREWALL...", "SUCCESS: ACCESS GRANTED"]);
-            }
-
-            const currentIdx = stageOrder.indexOf(state.stage);
-            if (currentIdx < stageOrder.length - 1) state.stage = stageOrder[currentIdx + 1];
             
             const response = await callAI(msg);
-            document.getElementById('story-text').innerHTML = response.replace(/\n/g, '<br>');
-            updateUI();
-            state.isWaiting = false;
+            addMessage('ai', response);
         }
 
         function openApiModal() { document.getElementById('api-modal').classList.add('active'); }
@@ -364,30 +319,20 @@
         function saveApiKey() {
             state.apiKey = document.getElementById('api-key').value.trim();
             state.provider = document.getElementById('api-provider').value;
-            localStorage.setItem('bloodcar_key', state.apiKey);
-            localStorage.setItem('bloodcar_provider', state.provider);
+            localStorage.setItem('anime_hacker_key', state.apiKey);
+            localStorage.setItem('anime_hacker_provider', state.provider);
             closeApiModal();
-            if (state.apiKey) startGame();
-        }
-
-        async function startGame() {
-            const response = await callAI("เริ่มเกม THE BLOODCAR และแนะนำตัวละครเอก");
-            document.getElementById('story-text').innerHTML = response.replace(/\n/g, '<br>');
-            updateUI();
-        }
-
-        function resetGame() {
-            if (confirm("ต้องการเริ่มเกมใหม่ทั้งหมดใช่หรือไม่?")) {
-                state.stage = 'intro';
-                state.history = [];
-                startGame();
-            }
+            log("API Configuration saved. System ready.");
         }
 
         document.getElementById('send-btn').onclick = sendMessage;
         document.getElementById('user-input').onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
 
-        window.onload = () => { if (state.apiKey) startGame(); else openApiModal(); };
+        window.onload = () => { 
+            if (!state.apiKey) openApiModal(); 
+            log("Multiverse Hacking System Initialized...");
+            log("Awaiting Channel Selection...");
+        };
     </script>
 </body>
 </html>
