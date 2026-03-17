@@ -18,7 +18,7 @@
             overflow: hidden;
         }
 
-        /* Sidebar Style (Khuiai Style) */
+        /* Sidebar Style */
         .sidebar {
             width: 260px;
             background: #1e293b;
@@ -55,7 +55,7 @@
             background: #0f172a;
         }
 
-        /* Character Cards (Khuiai Style) */
+        /* Character Cards */
         .char-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -79,12 +79,14 @@
         .char-img-box {
             width: 100%;
             aspect-ratio: 1/1;
-            background: linear-gradient(135deg, #334155, #1e293b);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3.5rem;
+            background: #334155;
+            overflow: hidden;
             position: relative;
+        }
+        .char-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .char-status {
             position: absolute;
@@ -100,7 +102,7 @@
         .char-name { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; }
         .char-desc { font-size: 0.75rem; color: #94a3b8; line-height: 1.2; }
 
-        /* Chat View (Khuiai Style) */
+        /* Chat View */
         #chat-view {
             display: none;
             flex-direction: column;
@@ -120,6 +122,13 @@
             gap: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 10;
+        }
+        .chat-avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #334155;
         }
 
         .chat-messages {
@@ -155,7 +164,7 @@
             border-bottom-right-radius: 4px;
         }
 
-        /* Input Area (Khuiai Style) */
+        /* Input Area */
         .chat-input-area {
             padding: 1rem 1.5rem;
             background: #1e293b;
@@ -185,6 +194,27 @@
             transition: 0.2s;
         }
         .send-btn:hover { transform: scale(1.1); color: #7dd3fc; }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: #1e293b;
+            padding: 2rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
 
         /* Sync Overlay */
         .sync-overlay {
@@ -256,37 +286,51 @@
             <!-- Character Grid -->
             <div class="char-grid" id="char-grid">
                 <!-- Custom Creator -->
-                <div class="char-card border-dashed border-2 border-sky-500/30 bg-sky-500/5" onclick="showCreator()">
-                    <div class="char-img-box text-sky-500"><i class="fas fa-plus-circle"></i></div>
+                <div class="char-card border-dashed border-2 border-sky-500/30 bg-sky-500/5" onclick="openCreatorModal()">
+                    <div class="char-img-box flex items-center justify-center text-sky-500 text-4xl">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
                     <div class="char-info">
                         <h3 class="char-name text-sky-400">สร้างเพื่อนคุยเอง</h3>
-                        <p class="char-desc">กำหนดนิสัยได้ตามใจคุณ</p>
+                        <p class="char-desc">กำหนดนิสัยและรูปภาพได้เอง</p>
                     </div>
                 </div>
                 <!-- Characters -->
-                <div class="char-card" onclick="selectChar('Dante', '🔴', 'Tick-tock, the clock is ticking.')">
-                    <div class="char-img-box">🔴<div class="char-status"></div></div>
+                <div class="char-card" onclick="selectChar('Dante', 'https://avatars.githubusercontent.com/u/1410920?v=4', 'Tick-tock, the clock is ticking.')">
+                    <div class="char-img-box">
+                        <img src="https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Dante" onerror="this.src='https://via.placeholder.com/150?text=Dante'">
+                        <div class="char-status"></div>
+                    </div>
                     <div class="char-info">
                         <h3 class="char-name">Dante</h3>
                         <p class="char-desc">Limbus Company Manager</p>
                     </div>
                 </div>
-                <div class="char-card" onclick="selectChar('Aris', '🔵', 'Aris is a hero! Level Up!')">
-                    <div class="char-img-box">🔵<div class="char-status"></div></div>
+                <div class="char-card" onclick="selectChar('Aris', 'https://i.pinimg.com/originals/0a/8a/8a/0a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a.png', 'Aris is a hero! Level Up!')">
+                    <div class="char-img-box">
+                        <img src="https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png" alt="Aris" onerror="this.src='https://via.placeholder.com/150?text=Aris'">
+                        <div class="char-status"></div>
+                    </div>
                     <div class="char-info">
                         <h3 class="char-name">Aris (Alice)</h3>
                         <p class="char-desc">Blue Archive Game Dev</p>
                     </div>
                 </div>
-                <div class="char-card" onclick="selectChar('Gojo Satoru', '🟣', 'Throughout Heaven and Earth, I alone am the honored one.')">
-                    <div class="char-img-box">🟣<div class="char-status"></div></div>
+                <div class="char-card" onclick="selectChar('Gojo Satoru', 'https://i.pinimg.com/originals/5b/5b/5b/5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b.jpg', 'Throughout Heaven and Earth, I alone am the honored one.')">
+                    <div class="char-img-box">
+                        <img src="https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg" alt="Gojo" onerror="this.src='https://via.placeholder.com/150?text=Gojo'">
+                        <div class="char-status"></div>
+                    </div>
                     <div class="char-info">
                         <h3 class="char-name">Gojo Satoru</h3>
                         <p class="char-desc">The Strongest Sorcerer</p>
                     </div>
                 </div>
-                <div class="char-card" onclick="selectChar('Rimuru', '💧', 'I am not a bad slime, slurp!')">
-                    <div class="char-img-box">💧<div class="char-status"></div></div>
+                <div class="char-card" onclick="selectChar('Rimuru', 'https://i.pinimg.com/originals/3c/3c/3c/3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c.jpg', 'I am not a bad slime, slurp!')">
+                    <div class="char-img-box">
+                        <img src="https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Rimuru" onerror="this.src='https://via.placeholder.com/150?text=Rimuru'">
+                        <div class="char-status"></div>
+                    </div>
                     <div class="char-info">
                         <h3 class="char-name">Rimuru Tempest</h3>
                         <p class="char-desc">Slime Isekai Demon Lord</p>
@@ -308,7 +352,7 @@
     <div id="chat-view">
         <div class="chat-header">
             <button onclick="goHome()" class="text-slate-400 hover:text-white mr-2"><i class="fas fa-arrow-left"></i></button>
-            <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-xl" id="chat-avatar">👤</div>
+            <img src="" id="chat-avatar-img" class="chat-avatar-img" alt="Avatar">
             <div class="flex-1">
                 <h3 class="font-bold leading-none" id="chat-name">Character Name</h3>
                 <span class="text-[10px] text-green-500 flex items-center gap-1 mt-1"><i class="fas fa-circle text-[6px]"></i> กำลังออนไลน์</span>
@@ -326,6 +370,34 @@
                 <input type="text" id="user-input" placeholder="พิมพ์ข้อความคุยกับตัวละคร...">
                 <i class="far fa-smile text-slate-500 cursor-pointer"></i>
                 <div class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Creator Modal -->
+    <div id="creator-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold text-sky-500 mb-4">✨ สร้างเพื่อนคุยใหม่</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400">ชื่อตัวละคร</label>
+                    <input type="text" id="custom-name" placeholder="เช่น น้องแมวเหมียว" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">URL รูปภาพ (Avatar)</label>
+                    <input type="text" id="custom-img" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">นิสัย / สไตล์การคุย</label>
+                    <select id="custom-personality" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+                        <option value="ซึนเดเระ (ปากร้ายแต่ใจดี)">Tsundere (ซึนเดเระ)</option>
+                        <option value="ร่าเริง แจ่มใส คอยให้กำลังใจ">Cheerful (ร่าเริง)</option>
+                        <option value="คูลๆ นิ่งๆ พูดน้อยแต่ดูเท่">Cool (นิ่งๆ เท่ๆ)</option>
+                        <option value="เป็นกันเอง คุยเรื่องเกมและอนิเมะ">Gamer (เป็นกันเอง)</option>
+                    </select>
+                </div>
+                <button onclick="createCustomChar()" class="w-full bg-sky-600 py-3 rounded-xl font-bold hover:bg-sky-500 transition shadow-lg shadow-sky-600/20">สร้างและเริ่มคุย</button>
+                <button onclick="closeCreatorModal()" class="w-full text-slate-500 text-sm hover:text-slate-300">ยกเลิก</button>
             </div>
         </div>
     </div>
@@ -370,6 +442,7 @@
             character: '',
             avatar: '',
             syncText: '',
+            personality: '',
             apiKey: localStorage.getItem('khuiai_key') || '',
             provider: localStorage.getItem('khuiai_provider') || 'groq',
             history: []
@@ -383,10 +456,11 @@
             document.querySelector('.nav-item:first-child').classList.add('active');
         }
 
-        function selectChar(name, avatar, sync) {
+        function selectChar(name, avatar, sync, personality = '') {
             state.character = name;
             state.avatar = avatar;
             state.syncText = sync;
+            state.personality = personality;
             state.history = [];
             
             document.getElementById('sync-name').textContent = name;
@@ -417,7 +491,7 @@
             document.getElementById('home-view').style.display = 'none';
             document.getElementById('chat-view').classList.add('active');
             document.getElementById('chat-name').textContent = state.character;
-            document.getElementById('chat-avatar').textContent = state.avatar;
+            document.getElementById('chat-avatar-img').src = state.avatar;
             document.getElementById('chat-messages').innerHTML = '';
             addBubble('ai', `[SIGNAL CONNECTED] สวัสดี... ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ! มีอะไรอยากคุยกับฉันไหม?`);
         }
@@ -434,7 +508,7 @@
         async function callAI(prompt) {
             if (!state.apiKey) { openApiModal(); return; }
             try {
-                const systemPrompt = `คุณคือตัวละคร ${state.character} สวมบทบาทอย่างสมจริงที่สุด ตอบเป็นภาษาไทย ใช้ภาษาที่เป็นกันเองเหมือนคุยในแอปแชท (เช่น Messenger/Line) ไม่ต้องเป็นทางการมากนัก`;
+                const systemPrompt = `คุณคือตัวละคร ${state.character} ${state.personality ? 'ที่มีนิสัย ' + state.personality : ''} สวมบทบาทอย่างสมจริงที่สุด ตอบเป็นภาษาไทย ใช้ภาษาที่เป็นกันเองเหมือนคุยในแอปแชท (เช่น Messenger/Line) ไม่ต้องเป็นทางการมากนัก`;
                 let responseText = "";
                 if (state.provider === 'groq') {
                     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -469,6 +543,17 @@
             input.value = '';
             const response = await callAI(msg);
             addBubble('ai', response);
+        }
+
+        function openCreatorModal() { document.getElementById('creator-modal').classList.add('active'); }
+        function closeCreatorModal() { document.getElementById('creator-modal').classList.remove('active'); }
+        function createCustomChar() {
+            const name = document.getElementById('custom-name').value.trim();
+            const img = document.getElementById('custom-img').value.trim() || 'https://via.placeholder.com/150?text=' + name;
+            const personality = document.getElementById('custom-personality').value;
+            if (!name) return alert('กรุณาใส่ชื่อตัวละคร');
+            closeCreatorModal();
+            selectChar(name, img, `I am ${name}, your new friend!`, personality);
         }
 
         function openApiModal() { document.getElementById('api-modal').classList.add('active'); }
