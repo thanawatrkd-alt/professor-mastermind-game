@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KHUIAI ANIME - คุยไอ อนิเมะ</title>
+    <title>KHUIAI AI - คุยไอ โรลเพลย์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -216,19 +216,27 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Sync Overlay */
-        .sync-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.98);
-            z-index: 100;
+        /* Profile View */
+        #profile-view {
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            height: 100vh;
             padding: 2rem;
+            text-align: center;
+            background: linear-gradient(to bottom, #1e293b, #0f172a);
         }
-        .sync-overlay.active { display: flex; }
+        #profile-view.active { display: flex; }
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #38bdf8;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+        }
 
         /* Bottom Nav (Mobile) */
         .bottom-nav {
@@ -247,8 +255,8 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="p-6 flex items-center gap-3">
-            <i class="fas fa-robot text-sky-500 text-3xl"></i>
-            <h1 class="text-xl font-bold tracking-tight">KHUIAI <span class="text-sky-500">AI</span></h1>
+            <i class="fas fa-heart text-pink-500 text-3xl"></i>
+            <h1 class="text-xl font-bold tracking-tight">KHUIAI <span class="text-pink-500">AI</span></h1>
         </div>
         <nav class="flex-1">
             <div class="nav-item active" onclick="goHome()"><i class="fas fa-home"></i> หน้าแรก</div>
@@ -271,7 +279,7 @@
     <main class="main-content" id="home-view">
         <header class="p-6 md:hidden flex justify-between items-center bg-slate-900/50">
             <div class="flex items-center gap-2">
-                <i class="fas fa-robot text-sky-500 text-2xl"></i>
+                <i class="fas fa-heart text-pink-500 text-2xl"></i>
                 <h1 class="text-lg font-bold">KHUIAI</h1>
             </div>
             <button onclick="openApiModal()"><i class="fas fa-key text-slate-400"></i></button>
@@ -280,25 +288,25 @@
         <div class="p-6">
             <div class="mb-8">
                 <h2 class="text-2xl font-bold mb-1">ค้นหาตัวละครที่คุณต้องการคุยด้วย</h2>
-                <p class="text-slate-400 text-sm">เลือกตัวละครเพื่อเริ่มการแฮ็กสัญญาณและสนทนา</p>
+                <p class="text-slate-400 text-sm">เลือกตัวละครเพื่อเริ่มการสนทนาโรลเพลย์</p>
             </div>
 
             <!-- Character Grid -->
             <div class="char-grid" id="char-grid">
                 <!-- Custom Creator -->
-                <div class="char-card border-dashed border-2 border-sky-500/30 bg-sky-500/5" onclick="openCreatorModal()">
-                    <div class="char-img-box flex items-center justify-center text-sky-500 text-4xl">
+                <div class="char-card border-dashed border-2 border-pink-500/30 bg-pink-500/5" onclick="openCreatorModal()">
+                    <div class="char-img-box flex items-center justify-center text-pink-500 text-4xl">
                         <i class="fas fa-plus-circle"></i>
                     </div>
                     <div class="char-info">
-                        <h3 class="char-name text-sky-400">สร้างเพื่อนคุยเอง</h3>
+                        <h3 class="char-name text-pink-400">สร้างเพื่อนคุยเอง</h3>
                         <p class="char-desc">กำหนดนิสัยและรูปภาพได้เอง</p>
                     </div>
                 </div>
                 <!-- Characters -->
-                <div class="char-card" onclick="selectChar('Dante', 'https://avatars.githubusercontent.com/u/1410920?v=4', 'Tick-tock, the clock is ticking.')">
+                <div class="char-card" onclick="showProfile('Dante', 'https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', 'Limbus Company Manager', 'ผู้จัดการนาฬิกาจอมป่วนจาก Limbus Company')">
                     <div class="char-img-box">
-                        <img src="https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Dante" onerror="this.src='https://via.placeholder.com/150?text=Dante'">
+                        <img src="https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Dante">
                         <div class="char-status"></div>
                     </div>
                     <div class="char-info">
@@ -306,9 +314,9 @@
                         <p class="char-desc">Limbus Company Manager</p>
                     </div>
                 </div>
-                <div class="char-card" onclick="selectChar('Aris', 'https://i.pinimg.com/originals/0a/8a/8a/0a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a.png', 'Aris is a hero! Level Up!')">
+                <div class="char-card" onclick="showProfile('Aris', 'https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png', 'Blue Archive Game Dev', 'หุ่นยนต์เกมเมอร์สุดน่ารักจาก Blue Archive')">
                     <div class="char-img-box">
-                        <img src="https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png" alt="Aris" onerror="this.src='https://via.placeholder.com/150?text=Aris'">
+                        <img src="https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png" alt="Aris">
                         <div class="char-status"></div>
                     </div>
                     <div class="char-info">
@@ -316,9 +324,9 @@
                         <p class="char-desc">Blue Archive Game Dev</p>
                     </div>
                 </div>
-                <div class="char-card" onclick="selectChar('Gojo Satoru', 'https://i.pinimg.com/originals/5b/5b/5b/5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b.jpg', 'Throughout Heaven and Earth, I alone am the honored one.')">
+                <div class="char-card" onclick="showProfile('Gojo Satoru', 'https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg', 'The Strongest Sorcerer', 'ผู้ใช้คุณไสยที่แข็งแกร่งที่สุดจาก Jujutsu Kaisen')">
                     <div class="char-img-box">
-                        <img src="https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg" alt="Gojo" onerror="this.src='https://via.placeholder.com/150?text=Gojo'">
+                        <img src="https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg" alt="Gojo">
                         <div class="char-status"></div>
                     </div>
                     <div class="char-info">
@@ -326,9 +334,9 @@
                         <p class="char-desc">The Strongest Sorcerer</p>
                     </div>
                 </div>
-                <div class="char-card" onclick="selectChar('Rimuru', 'https://i.pinimg.com/originals/3c/3c/3c/3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c.jpg', 'I am not a bad slime, slurp!')">
+                <div class="char-card" onclick="showProfile('Rimuru', 'https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', 'Slime Isekai Demon Lord', 'จอมมารสไลม์สุดเทพจากเรื่องเกิดใหม่เป็นสไลม์')">
                     <div class="char-img-box">
-                        <img src="https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Rimuru" onerror="this.src='https://via.placeholder.com/150?text=Rimuru'">
+                        <img src="https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Rimuru">
                         <div class="char-status"></div>
                     </div>
                     <div class="char-info">
@@ -341,12 +349,24 @@
 
         <!-- Bottom Nav (Mobile) -->
         <div class="bottom-nav mt-auto">
-            <div class="text-sky-500 flex flex-col items-center gap-1"><i class="fas fa-home"></i><span class="text-[10px]">หน้าแรก</span></div>
+            <div class="text-pink-500 flex flex-col items-center gap-1"><i class="fas fa-home"></i><span class="text-[10px]">หน้าแรก</span></div>
             <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-fire"></i><span class="text-[10px]">ยอดนิยม</span></div>
             <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-star"></i><span class="text-[10px]">มาใหม่</span></div>
             <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-user"></i><span class="text-[10px]">โปรไฟล์</span></div>
         </div>
     </main>
+
+    <!-- Profile View -->
+    <div id="profile-view">
+        <img src="" id="profile-img" class="profile-img" alt="Profile">
+        <h2 class="text-3xl font-bold mb-2" id="profile-name">Character Name</h2>
+        <p class="text-sky-400 font-medium mb-4" id="profile-tag">Tagline</p>
+        <p class="text-slate-400 max-w-md mb-8" id="profile-desc">Description goes here...</p>
+        <div class="flex gap-4">
+            <button onclick="goHome()" class="bg-slate-800 px-8 py-3 rounded-full font-bold hover:bg-slate-700 transition">ย้อนกลับ</button>
+            <button onclick="startChat()" class="bg-pink-600 px-8 py-3 rounded-full font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20">เริ่มแชทเลย</button>
+        </div>
+    </div>
 
     <!-- Chat View -->
     <div id="chat-view">
@@ -377,46 +397,27 @@
     <!-- Creator Modal -->
     <div id="creator-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-xl font-bold text-sky-500 mb-4">✨ สร้างเพื่อนคุยใหม่</h2>
+            <h2 class="text-xl font-bold text-pink-500 mb-4">✨ สร้างเพื่อนคุยใหม่</h2>
             <div class="space-y-4">
                 <div>
                     <label class="text-xs text-slate-400">ชื่อตัวละคร</label>
-                    <input type="text" id="custom-name" placeholder="เช่น น้องแมวเหมียว" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+                    <input type="text" id="custom-name" placeholder="เช่น น้องแมวเหมียว" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">URL รูปภาพ (Avatar)</label>
-                    <input type="text" id="custom-img" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+                    <input type="text" id="custom-img" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">นิสัย / สไตล์การคุย</label>
-                    <select id="custom-personality" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+                    <select id="custom-personality" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500">
                         <option value="ซึนเดเระ (ปากร้ายแต่ใจดี)">Tsundere (ซึนเดเระ)</option>
                         <option value="ร่าเริง แจ่มใส คอยให้กำลังใจ">Cheerful (ร่าเริง)</option>
                         <option value="คูลๆ นิ่งๆ พูดน้อยแต่ดูเท่">Cool (นิ่งๆ เท่ๆ)</option>
                         <option value="เป็นกันเอง คุยเรื่องเกมและอนิเมะ">Gamer (เป็นกันเอง)</option>
                     </select>
                 </div>
-                <button onclick="createCustomChar()" class="w-full bg-sky-600 py-3 rounded-xl font-bold hover:bg-sky-500 transition shadow-lg shadow-sky-600/20">สร้างและเริ่มคุย</button>
+                <button onclick="createCustomChar()" class="w-full bg-pink-600 py-3 rounded-xl font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20">สร้างและเริ่มคุย</button>
                 <button onclick="closeCreatorModal()" class="w-full text-slate-500 text-sm hover:text-slate-300">ยกเลิก</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sync Overlay -->
-    <div id="sync-overlay" class="sync-overlay">
-        <div class="text-center max-w-md w-full">
-            <div class="mb-8">
-                <div class="w-20 h-20 bg-sky-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-wifi text-sky-500 text-3xl animate-pulse"></i>
-                </div>
-                <h2 class="text-2xl font-bold mb-2">SYNCING SIGNAL...</h2>
-                <p class="text-slate-400 text-sm">พิมพ์ข้อความด้านล่างให้ถูกต้องเพื่อเชื่อมต่อสัญญาณกับ <span id="sync-name" class="text-white font-bold">...</span></p>
-            </div>
-            <div class="bg-slate-800 p-6 rounded-2xl mb-6 text-xl tracking-wider font-mono border border-white/5" id="sync-target">Target Text</div>
-            <input type="text" id="sync-input" class="w-full bg-slate-900 border-2 border-sky-500 p-4 rounded-2xl text-center text-xl outline-none shadow-lg shadow-sky-500/20" placeholder="พิมพ์ตามข้อความด้านบน..." autocomplete="off">
-            <div class="mt-6 flex items-center justify-between text-xs text-slate-500 px-2">
-                <span>ความแม่นยำ: <span id="sync-percent">0</span>%</span>
-                <span>สถานะ: กำลังเชื่อมต่อ...</span>
             </div>
         </div>
     </div>
@@ -424,14 +425,14 @@
     <!-- API Modal -->
     <div id="api-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-xl font-bold text-sky-500 mb-4">🔑 API CONFIGURATION</h2>
+            <h2 class="text-xl font-bold text-pink-500 mb-4">🔑 API CONFIGURATION</h2>
             <p class="text-xs text-slate-400 mb-4">กรุณาใส่ API Key เพื่อเริ่มการสนทนา (แนะนำ Groq)</p>
-            <select id="api-provider" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-4 text-white outline-none focus:border-sky-500">
+            <select id="api-provider" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-4 text-white outline-none focus:border-pink-500">
                 <option value="groq">Groq (Llama 3.3)</option>
                 <option value="gemini">Google Gemini</option>
             </select>
-            <input type="text" id="api-key" placeholder="ป้อน API Key ของคุณ..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-6 text-white outline-none focus:border-sky-500">
-            <button onclick="saveApiKey()" class="w-full bg-sky-600 py-3 rounded-xl font-bold hover:bg-sky-500 transition shadow-lg shadow-sky-600/20">บันทึกและเริ่มใช้งาน</button>
+            <input type="text" id="api-key" placeholder="ป้อน API Key ของคุณ..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-6 text-white outline-none focus:border-pink-500">
+            <button onclick="saveApiKey()" class="w-full bg-pink-600 py-3 rounded-xl font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20">บันทึกและเริ่มใช้งาน</button>
             <button onclick="closeApiModal()" class="w-full mt-4 text-slate-500 text-sm hover:text-slate-300">ยกเลิก</button>
         </div>
     </div>
@@ -441,7 +442,6 @@
             view: 'home',
             character: '',
             avatar: '',
-            syncText: '',
             personality: '',
             apiKey: localStorage.getItem('khuiai_key') || '',
             provider: localStorage.getItem('khuiai_provider') || 'groq',
@@ -452,48 +452,35 @@
             state.view = 'home';
             document.getElementById('home-view').style.display = 'flex';
             document.getElementById('chat-view').classList.remove('active');
+            document.getElementById('profile-view').classList.remove('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.querySelector('.nav-item:first-child').classList.add('active');
         }
 
-        function selectChar(name, avatar, sync, personality = '') {
+        function showProfile(name, avatar, tag, desc) {
             state.character = name;
             state.avatar = avatar;
-            state.syncText = sync;
-            state.personality = personality;
+            state.personality = desc;
             state.history = [];
             
-            document.getElementById('sync-name').textContent = name;
-            document.getElementById('sync-target').textContent = sync;
-            document.getElementById('sync-overlay').classList.add('active');
-            document.getElementById('sync-input').value = '';
-            document.getElementById('sync-input').focus();
-        }
-
-        document.getElementById('sync-input').oninput = function(e) {
-            const val = e.target.value;
-            const target = state.syncText;
-            let accuracy = 0;
-            for(let i=0; i<val.length; i++) if(val[i] === target[i]) accuracy++;
-            const percent = Math.floor((accuracy / target.length) * 100);
-            document.getElementById('sync-percent').textContent = percent;
+            document.getElementById('profile-name').textContent = name;
+            document.getElementById('profile-img').src = avatar;
+            document.getElementById('profile-tag').textContent = tag;
+            document.getElementById('profile-desc').textContent = desc;
             
-            if(val === target) {
-                setTimeout(() => {
-                    document.getElementById('sync-overlay').classList.remove('active');
-                    startChat();
-                }, 300);
-            }
-        };
+            state.view = 'profile';
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('profile-view').classList.add('active');
+        }
 
         function startChat() {
             state.view = 'chat';
-            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('profile-view').classList.remove('active');
             document.getElementById('chat-view').classList.add('active');
             document.getElementById('chat-name').textContent = state.character;
             document.getElementById('chat-avatar-img').src = state.avatar;
             document.getElementById('chat-messages').innerHTML = '';
-            addBubble('ai', `[SIGNAL CONNECTED] สวัสดี... ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ! มีอะไรอยากคุยกับฉันไหม?`);
+            addBubble('ai', `สวัสดีจ๊ะ! ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ มีอะไรอยากคุยกับฉันไหม?`);
         }
 
         function addBubble(role, text) {
@@ -508,7 +495,7 @@
         async function callAI(prompt) {
             if (!state.apiKey) { openApiModal(); return; }
             try {
-                const systemPrompt = `คุณคือตัวละคร ${state.character} ${state.personality ? 'ที่มีนิสัย ' + state.personality : ''} สวมบทบาทอย่างสมจริงที่สุด ตอบเป็นภาษาไทย ใช้ภาษาที่เป็นกันเองเหมือนคุยในแอปแชท (เช่น Messenger/Line) ไม่ต้องเป็นทางการมากนัก`;
+                const systemPrompt = `คุณคือตัวละคร ${state.character} ${state.personality ? 'ที่มีนิสัย ' + state.personality : ''} สวมบทบาทอย่างสมจริงที่สุด ตอบเป็นภาษาไทย ใช้ภาษาที่เป็นกันเองเหมือนคุยในแอปแชท (เช่น Messenger/Line) ไม่ต้องเป็นทางการมากนัก เน้นการสร้างความสัมพันธ์และโรลเพลย์`;
                 let responseText = "";
                 if (state.provider === 'groq') {
                     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -553,7 +540,7 @@
             const personality = document.getElementById('custom-personality').value;
             if (!name) return alert('กรุณาใส่ชื่อตัวละคร');
             closeCreatorModal();
-            selectChar(name, img, `I am ${name}, your new friend!`, personality);
+            showProfile(name, img, 'Custom Companion', personality);
         }
 
         function openApiModal() { document.getElementById('api-modal').classList.add('active'); }
