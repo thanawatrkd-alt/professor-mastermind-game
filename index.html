@@ -269,8 +269,8 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="p-6 flex items-center gap-3">
-            <i class="fas fa-heart text-pink-500 text-3xl"></i>
-            <h1 class="text-xl font-bold tracking-tight">KHUIAI <span class="text-pink-500">AI</span></h1>
+            <i class="fas fa-heart text-pink-500 text-3xl" onclick="goHome()" style="cursor:pointer"></i>
+            <h1 class="text-xl font-bold tracking-tight" onclick="goHome()" style="cursor:pointer">KHUIAI <span class="text-pink-500">AI</span></h1>
         </div>
         <nav class="flex-1">
             <div class="nav-item active" onclick="goHome()"><i class="fas fa-home"></i> หน้าแรก</div>
@@ -294,7 +294,7 @@
         <!-- Home View -->
         <div id="home-view" class="view-container active">
             <header class="p-6 md:hidden flex justify-between items-center bg-slate-900/50">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2" onclick="goHome()">
                     <i class="fas fa-heart text-pink-500 text-2xl"></i>
                     <h1 class="text-lg font-bold">KHUIAI</h1>
                 </div>
@@ -322,7 +322,7 @@
                     <!-- Characters -->
                     <div class="char-card" onclick="showProfile('Dante', 'https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', 'Limbus Company Manager', 'ผู้จัดการนาฬิกาจอมป่วนจาก Limbus Company')">
                         <div class="char-img-box">
-                            <img src="https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Dante">
+                            <img src="https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Dante" onerror="this.src='https://via.placeholder.com/300?text=Dante'">
                             <div class="char-status"></div>
                         </div>
                         <div class="char-info">
@@ -332,7 +332,7 @@
                     </div>
                     <div class="char-card" onclick="showProfile('Aris', 'https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png', 'Blue Archive Game Dev', 'หุ่นยนต์เกมเมอร์สุดน่ารักจาก Blue Archive')">
                         <div class="char-img-box">
-                            <img src="https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png" alt="Aris">
+                            <img src="https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png" alt="Aris" onerror="this.src='https://via.placeholder.com/300?text=Aris'">
                             <div class="char-status"></div>
                         </div>
                         <div class="char-info">
@@ -342,7 +342,7 @@
                     </div>
                     <div class="char-card" onclick="showProfile('Gojo Satoru', 'https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg', 'The Strongest Sorcerer', 'ผู้ใช้คุณไสยที่แข็งแกร่งที่สุดจาก Jujutsu Kaisen')">
                         <div class="char-img-box">
-                            <img src="https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg" alt="Gojo">
+                            <img src="https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg" alt="Gojo" onerror="this.src='https://via.placeholder.com/300?text=Gojo'">
                             <div class="char-status"></div>
                         </div>
                         <div class="char-info">
@@ -352,7 +352,7 @@
                     </div>
                     <div class="char-card" onclick="showProfile('Rimuru', 'https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', 'Slime Isekai Demon Lord', 'จอมมารสไลม์สุดเทพจากเรื่องเกิดใหม่เป็นสไลม์')">
                         <div class="char-img-box">
-                            <img src="https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Rimuru">
+                            <img src="https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Rimuru" onerror="this.src='https://via.placeholder.com/300?text=Rimuru'">
                             <div class="char-status"></div>
                         </div>
                         <div class="char-info">
@@ -375,7 +375,7 @@
         <!-- Profile View -->
         <div id="profile-view" class="view-container">
             <div class="flex flex-col items-center w-full max-w-lg mx-auto py-10">
-                <img src="" id="profile-img" class="profile-img" alt="Profile">
+                <img src="" id="profile-img" class="profile-img" alt="Profile" onerror="this.src='https://via.placeholder.com/300?text=Character'">
                 <h2 class="text-3xl font-bold mb-2" id="profile-name">Character Name</h2>
                 <p class="text-pink-400 font-medium mb-4" id="profile-tag">Tagline</p>
                 <p class="text-slate-400 mb-8 px-4" id="profile-desc">Description goes here...</p>
@@ -390,7 +390,7 @@
         <div id="chat-view" class="view-container">
             <div class="chat-header">
                 <button onclick="goHome()" class="text-slate-400 hover:text-white mr-2"><i class="fas fa-arrow-left"></i></button>
-                <img src="" id="chat-avatar-img" class="chat-avatar-img" alt="Avatar">
+                <img src="" id="chat-avatar-img" class="chat-avatar-img" alt="Avatar" onerror="this.src='https://via.placeholder.com/100?text=AI'">
                 <div class="flex-1">
                     <h3 class="font-bold leading-none" id="chat-name">Character Name</h3>
                     <span class="text-[10px] text-green-500 flex items-center gap-1 mt-1"><i class="fas fa-circle text-[6px]"></i> กำลังออนไลน์</span>
@@ -423,8 +423,9 @@
                     <input type="text" id="custom-name" placeholder="เช่น น้องแมวเหมียว" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500">
                 </div>
                 <div>
-                    <label class="text-xs text-slate-400">URL รูปภาพ (Avatar)</label>
-                    <input type="text" id="custom-img" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500">
+                    <label class="text-xs text-slate-400">ลิงก์รูปภาพ (Image URL)</label>
+                    <input type="text" id="custom-img" placeholder="https://... (Pinterest, Google, etc.)" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500">
+                    <p class="text-[10px] text-slate-500 mt-1">* ใส่ลิงก์รูปภาพจากเน็ตมาใช้เป็นโปรไฟล์ได้เลย</p>
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">นิสัย / สไตล์การคุย</label>
@@ -433,6 +434,7 @@
                         <option value="ร่าเริง แจ่มใส คอยให้กำลังใจ">Cheerful (ร่าเริง)</option>
                         <option value="คูลๆ นิ่งๆ พูดน้อยแต่ดูเท่">Cool (นิ่งๆ เท่ๆ)</option>
                         <option value="เป็นกันเอง คุยเรื่องเกมและอนิเมะ">Gamer (เป็นกันเอง)</option>
+                        <option value="รักมากจนน่ากลัว">Yandere (ยันเดเระ)</option>
                     </select>
                 </div>
                 <button onclick="createCustomChar()" class="w-full bg-pink-600 py-3 rounded-xl font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20">สร้างและเริ่มคุย</button>
@@ -554,7 +556,7 @@
         function closeCreatorModal() { document.getElementById('creator-modal').classList.remove('active'); }
         function createCustomChar() {
             const name = document.getElementById('custom-name').value.trim();
-            const img = document.getElementById('custom-img').value.trim() || 'https://via.placeholder.com/150?text=' + name;
+            const img = document.getElementById('custom-img').value.trim() || 'https://via.placeholder.com/300?text=' + name;
             const personality = document.getElementById('custom-personality').value;
             if (!name) return alert('กรุณาใส่ชื่อตัวละคร');
             closeCreatorModal();
