@@ -52,9 +52,26 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow-y: auto;
+            overflow: hidden;
             background: #0f172a;
             position: relative;
+        }
+
+        /* Views */
+        .view-container {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        .view-container.active { display: flex; }
+
+        /* Home View Scroll */
+        #home-view .scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
         }
 
         /* Character Cards */
@@ -62,7 +79,6 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 1.5rem;
-            padding: 1.5rem;
         }
         .char-card {
             background: #1e293b;
@@ -103,16 +119,6 @@
         .char-info { padding: 1rem; text-align: center; }
         .char-name { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; }
         .char-desc { font-size: 0.75rem; color: #94a3b8; line-height: 1.2; }
-
-        /* Views */
-        .view-container {
-            display: none;
-            flex-direction: column;
-            height: 100vh;
-            width: 100%;
-            overflow: hidden;
-        }
-        .view-container.active { display: flex; }
 
         /* Profile View */
         #profile-view {
@@ -263,13 +269,13 @@
         </div>
         <nav class="flex-1">
             <div class="nav-item active" onclick="goHome()"><i class="fas fa-home"></i> หน้าแรก</div>
-            <div class="nav-item"><i class="fas fa-fire"></i> ยอดนิยม</div>
-            <div class="nav-item"><i class="fas fa-star"></i> มาใหม่</div>
-            <div class="nav-item"><i class="fas fa-heart"></i> รายการโปรด</div>
+            <div class="nav-item" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-fire"></i> ยอดนิยม</div>
+            <div class="nav-item" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-star"></i> มาใหม่</div>
+            <div class="nav-item" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-heart"></i> รายการโปรด</div>
             <div class="mt-6 px-6 text-[10px] uppercase tracking-widest text-slate-500 font-bold">หมวดหมู่</div>
-            <div class="nav-item"><i class="fas fa-tv"></i> อนิเมะ</div>
-            <div class="nav-item"><i class="fas fa-gamepad"></i> เกม</div>
-            <div class="nav-item"><i class="fas fa-user-friends"></i> เพื่อนคุย</div>
+            <div class="nav-item" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-tv"></i> อนิเมะ</div>
+            <div class="nav-item" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-gamepad"></i> เกม</div>
+            <div class="nav-item" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-user-friends"></i> เพื่อนคุย</div>
         </nav>
         <div class="p-4">
             <button onclick="openApiModal()" class="w-full bg-slate-800 py-2 rounded-xl text-sm hover:bg-slate-700 transition">
@@ -290,7 +296,7 @@
                 <button onclick="openApiModal()"><i class="fas fa-key text-slate-400"></i></button>
             </header>
 
-            <div class="p-6 overflow-y-auto flex-1">
+            <div class="scroll-area">
                 <div class="mb-8">
                     <h2 class="text-2xl font-bold mb-1">ค้นหาตัวละครที่คุณต้องการคุยด้วย</h2>
                     <p class="text-slate-400 text-sm">เลือกตัวละครเพื่อเริ่มการสนทนาโรลเพลย์</p>
@@ -355,9 +361,9 @@
             <!-- Bottom Nav (Mobile) -->
             <div class="bottom-nav">
                 <div class="text-pink-500 flex flex-col items-center gap-1" onclick="goHome()"><i class="fas fa-home"></i><span class="text-[10px]">หน้าแรก</span></div>
-                <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-fire"></i><span class="text-[10px]">ยอดนิยม</span></div>
-                <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-star"></i><span class="text-[10px]">มาใหม่</span></div>
-                <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-user"></i><span class="text-[10px]">โปรไฟล์</span></div>
+                <div class="text-slate-400 flex flex-col items-center gap-1" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-fire"></i><span class="text-[10px]">ยอดนิยม</span></div>
+                <div class="text-slate-400 flex flex-col items-center gap-1" onclick="alert('ฟีเจอร์นี้กำลังพัฒนา!')"><i class="fas fa-star"></i><span class="text-[10px]">มาใหม่</span></div>
+                <div class="text-slate-400 flex flex-col items-center gap-1" onclick="openApiModal()"><i class="fas fa-user"></i><span class="text-[10px]">ตั้งค่า</span></div>
             </div>
         </div>
 
