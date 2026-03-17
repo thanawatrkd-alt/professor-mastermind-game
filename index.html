@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANIME HACKER MULTIVERSE</title>
+    <title>ANIME HACKER: ROLEPLAY COMPANION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,8 +44,18 @@
         }
         .channel-card:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-3px); }
         .channel-card.active { border-color: #4facfe; background: rgba(79, 172, 254, 0.1); box-shadow: 0 0 15px rgba(79, 172, 254, 0.3); }
-        .channel-card.limbus { border-color: #ff1744; color: #ff1744; }
-        .channel-card.blue-archive { border-color: #00b0ff; color: #00b0ff; }
+        .channel-card.custom { border-color: #f0f; color: #f0f; }
+
+        /* Custom Companion Creator */
+        .creator-box {
+            background: rgba(255, 0, 255, 0.05);
+            border: 1px solid #f0f;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .creator-box.active { display: block; animation: fadeIn 0.5s; }
 
         /* Typing Sync System */
         .sync-box {
@@ -112,18 +122,44 @@
         <header class="flex justify-between items-center mb-6">
             <div class="header">
                 <h1>ANIME HACKER</h1>
-                <p class="text-xs tracking-widest text-gray-500">MULTIVERSE SYNC v3.0</p>
+                <p class="text-xs tracking-widest text-gray-500">ROLEPLAY COMPANION v3.1</p>
             </div>
             <button onclick="openApiModal()" class="text-xs border border-blue-500 px-3 py-1 rounded hover:bg-blue-500 transition">API KEY</button>
         </header>
 
         <!-- Channel Selector -->
         <div class="channel-grid" id="channel-grid">
-            <div class="channel-card limbus" onclick="selectChannel('limbus', 'Dante')">🔴 Limbus Co. (Dante)</div>
-            <div class="channel-card blue-archive" onclick="selectChannel('blue-archive', 'Aris')">🔵 Blue Archive (Aris)</div>
+            <div class="channel-card custom" onclick="showCreator()">💖 สร้างเพื่อนคุย (Custom)</div>
+            <div class="channel-card" onclick="selectChannel('limbus', 'Dante')">🔴 Limbus (Dante)</div>
+            <div class="channel-card" onclick="selectChannel('blue-archive', 'Aris')">🔵 Blue Archive (Aris)</div>
             <div class="channel-card" onclick="selectChannel('anime', 'Gojo Satoru')">🟣 Gojo Satoru</div>
             <div class="channel-card" onclick="selectChannel('anime', 'Rimuru Tempest')">💧 Rimuru</div>
-            <div class="channel-card" onclick="selectChannel('anime', 'Monkey D. Luffy')">🍖 Luffy</div>
+        </div>
+
+        <!-- Custom Companion Creator -->
+        <div id="creator-box" class="creator-box">
+            <h3 class="text-pink-500 font-bold mb-4">💖 สร้างเพื่อนคุยโรลเพลย์ของคุณ</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="text-xs text-gray-400">ชื่อเพื่อนคุย:</label>
+                    <input type="text" id="custom-name" class="w-full bg-black border border-pink-500 p-2 rounded text-white" placeholder="เช่น ยูนะ, ฮารุ...">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">นิสัย (Personality):</label>
+                    <select id="custom-personality" class="w-full bg-black border border-pink-500 p-2 rounded text-white">
+                        <option value="Tsundere (ซึนเดเระ ปากร้ายแต่ใจดี)">Tsundere (ซึนเดเระ)</option>
+                        <option value="Cheerful (ร่าเริง แจ่มใส คอยให้กำลังใจ)">Cheerful (ร่าเริง)</option>
+                        <option value="Cool/Mysterious (พูดน้อย ดูเท่ ลึกลับ)">Cool/Mysterious (คูล)</option>
+                        <option value="Gamer Friend (เป็นกันเอง คุยเรื่องเกม/อนิเมะ)">Gamer Friend (เพื่อนเกมเมอร์)</option>
+                        <option value="Yandere (รักมากจนน่ากลัว)">Yandere (ยันเดเระ)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="text-xs text-gray-400">ชื่อของคุณ (Player Name):</label>
+                <input type="text" id="player-name" class="w-full bg-black border border-pink-500 p-2 rounded text-white" placeholder="ให้เพื่อนคุยเรียกคุณว่าอะไร?">
+            </div>
+            <button onclick="createCompanion()" class="w-full bg-pink-600 py-2 rounded font-bold text-white hover:bg-pink-500 transition">สร้างและเริ่มแฮ็กสัญญาณ 🚀</button>
         </div>
 
         <!-- Typing Sync System -->
@@ -142,7 +178,7 @@
                 <div id="terminal-content"></div>
             </div>
             <div class="chat-container" id="chat-container">
-                <div class="msg ai">ยินดีต้อนรับสู่ระบบแฮ็กข้ามมิติ... กรุณาเลือกช่องสัญญาณเพื่อเริ่มการเชื่อมต่อ</div>
+                <div class="msg ai">ยินดีต้อนรับสู่ระบบแฮ็กข้ามมิติ... กรุณาเลือกช่องสัญญาณหรือสร้างเพื่อนคุยเพื่อเริ่มการเชื่อมต่อ</div>
             </div>
         </div>
 
@@ -170,6 +206,8 @@
         const state = {
             channel: '',
             character: '',
+            personality: '',
+            playerName: '',
             isSynced: false,
             apiKey: localStorage.getItem('anime_hacker_key') || '',
             provider: localStorage.getItem('anime_hacker_provider') || 'groq',
@@ -194,19 +232,42 @@
             document.getElementById('terminal').scrollTop = term.scrollHeight;
         }
 
-        function selectChannel(type, char) {
-            state.channel = type;
-            state.character = char;
+        function showCreator() {
+            document.getElementById('creator-box').classList.toggle('active');
+            document.getElementById('sync-box').classList.remove('active');
+        }
+
+        function createCompanion() {
+            const name = document.getElementById('custom-name').value.trim();
+            const personality = document.getElementById('custom-personality').value;
+            const pName = document.getElementById('player-name').value.trim();
+            
+            if(!name || !pName) { alert('กรุณาใส่ชื่อเพื่อนคุยและชื่อของคุณด้วยครับ!'); return; }
+            
+            state.channel = 'custom';
+            state.character = name;
+            state.personality = personality;
+            state.playerName = pName;
             state.isSynced = false;
             state.history = [];
             
-            // UI Update
+            document.getElementById('creator-box').classList.remove('active');
+            log(`Creating Custom Companion: ${name} (${personality})`);
+            startSync(name);
+        }
+
+        function selectChannel(type, char) {
+            state.channel = type;
+            state.character = char;
+            state.personality = '';
+            state.isSynced = false;
+            state.history = [];
+            
             document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
             event.currentTarget.classList.add('active');
+            document.getElementById('creator-box').classList.remove('active');
             
             log(`Switching to Channel: ${type.toUpperCase()}`);
-            log(`Targeting Character: ${char}`);
-            
             startSync(char);
         }
 
@@ -215,7 +276,7 @@
             const syncTarget = document.getElementById('sync-target');
             const syncInput = document.getElementById('sync-input');
             
-            state.syncText = syncTexts[char] || 'System Sync Protocol Alpha-9';
+            state.syncText = syncTexts[char] || `Syncing with ${char}... Initializing neural link.`;
             syncTarget.textContent = state.syncText;
             document.getElementById('sync-char-name').textContent = char;
             
@@ -232,11 +293,7 @@
             const val = e.target.value;
             const target = state.syncText;
             let accuracy = 0;
-            
-            for(let i=0; i<val.length; i++) {
-                if(val[i] === target[i]) accuracy++;
-            }
-            
+            for(let i=0; i<val.length; i++) if(val[i] === target[i]) accuracy++;
             const percent = Math.floor((accuracy / target.length) * 100);
             document.getElementById('sync-status').textContent = `ความแม่นยำ: ${percent}%`;
             
@@ -248,7 +305,10 @@
                 document.getElementById('send-btn').disabled = false;
                 document.getElementById('user-input').focus();
                 
-                addMessage('ai', `[SIGNAL CONNECTED] สวัสดี... ฉันคือ ${state.character} คุณแฮ็กเข้ามาหาฉันมีธุระอะไรเหรอ?`);
+                const intro = state.channel === 'custom' ? 
+                    `[SIGNAL CONNECTED] สวัสดีค่ะ ${state.playerName}... ฉันคือ ${state.character} เพื่อนคุยคนใหม่ของคุณค่ะ ยินดีที่ได้รู้จักนะ!` :
+                    `[SIGNAL CONNECTED] สวัสดี... ฉันคือ ${state.character} คุณแฮ็กเข้ามาหาฉันมีธุระอะไรเหรอ?`;
+                addMessage('ai', intro);
             }
         };
 
@@ -263,15 +323,23 @@
 
         async function callAI(prompt) {
             if (!state.apiKey) { openApiModal(); return; }
-            log(`Sending encrypted packet to ${state.character}...`);
+            log(`Sending packet to ${state.character}...`);
             
             try {
-                const systemPrompt = `คุณคือตัวละคร ${state.character} จากเรื่องที่เกี่ยวข้อง 
-                หน้าที่ของคุณ:
-                1. สวมบทบาทเป็น ${state.character} อย่างสมจริงที่สุด (นิสัย, คำพูด, ท่าทาง)
-                2. ตอบเป็นภาษาไทย (ยกเว้นคำเฉพาะหรือประโยคติดปากของตัวละคร)
-                3. คุณรู้ว่าผู้เล่นแฮ็กข้ามมิติมาคุยกับคุณผ่านระบบ Terminal
-                4. ถ้าเป็นตัวละครจาก Limbus Company ให้มีบรรยากาศดาร์กๆ ถ้าเป็น Blue Archive ให้ดูสดใสและเป็นกันเอง`;
+                let systemPrompt = "";
+                if(state.channel === 'custom') {
+                    systemPrompt = `คุณคือ ${state.character} เพื่อนคุยโรลเพลย์ของผู้เล่น 
+                    นิสัยของคุณคือ: ${state.personality}
+                    ผู้เล่นชื่อ: ${state.playerName} (คุณต้องเรียกผู้เล่นด้วยชื่อนี้เสมอ)
+                    หน้าที่ของคุณ:
+                    1. สวมบทบาทตามนิสัยที่กำหนดอย่างเคร่งครัด
+                    2. แสดงอารมณ์ผ่านข้อความในวงเล็บ เช่น (ยิ้ม), (หน้าแดง), (กอดอก)
+                    3. ตอบเป็นภาษาไทยที่ดูเป็นธรรมชาติและเข้ากับนิสัย
+                    4. คุณรู้ว่าคุณถูกสร้างขึ้นมาเป็นเพื่อนคุยผ่านระบบแฮ็กข้ามมิติ`;
+                } else {
+                    systemPrompt = `คุณคือตัวละคร ${state.character} จากเรื่องที่เกี่ยวข้อง 
+                    หน้าที่ของคุณ: สวมบทบาทเป็น ${state.character} อย่างสมจริงที่สุด ตอบเป็นภาษาไทย คุณรู้ว่าผู้เล่นแฮ็กข้ามมิติมาคุยกับคุณ`;
+                }
 
                 let responseText = "";
                 if (state.provider === 'groq') {
@@ -297,8 +365,8 @@
                 state.history.push({ role: 'user', content: prompt }, { role: 'assistant', content: responseText });
                 return responseText;
             } catch (e) {
-                log(`ERROR: Packet loss detected. Check API Key.`, '#f00');
-                return "❌ การเชื่อมต่อขัดข้อง... กรุณาตรวจสอบ API Key ของคุณ";
+                log(`ERROR: Connection failed.`, '#f00');
+                return "❌ การเชื่อมต่อขัดข้อง... กรุณาตรวจสอบ API Key";
             }
         }
 
@@ -306,10 +374,8 @@
             const input = document.getElementById('user-input');
             const msg = input.value.trim();
             if (!msg || !state.isSynced) return;
-
             addMessage('user', msg);
             input.value = '';
-            
             const response = await callAI(msg);
             addMessage('ai', response);
         }
@@ -322,17 +388,12 @@
             localStorage.setItem('anime_hacker_key', state.apiKey);
             localStorage.setItem('anime_hacker_provider', state.provider);
             closeApiModal();
-            log("API Configuration saved. System ready.");
+            log("API Configuration saved.");
         }
 
         document.getElementById('send-btn').onclick = sendMessage;
         document.getElementById('user-input').onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
-
-        window.onload = () => { 
-            if (!state.apiKey) openApiModal(); 
-            log("Multiverse Hacking System Initialized...");
-            log("Awaiting Channel Selection...");
-        };
+        window.onload = () => { if (!state.apiKey) openApiModal(); log("System Initialized..."); };
     </script>
 </body>
 </html>
