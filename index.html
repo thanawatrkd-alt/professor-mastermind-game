@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANIME HACKER: KHUIAI STYLE</title>
+    <title>KHUIAI ANIME - คุยไอ อนิเมะ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Kanit', sans-serif; }
         body {
@@ -15,85 +15,136 @@
             color: #f8fafc;
             min-height: 100vh;
             display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar Style (Khuiai Style) */
+        .sidebar {
+            width: 260px;
+            background: #1e293b;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
             flex-direction: column;
+            transition: 0.3s;
+        }
+        @media (max-width: 768px) { .sidebar { display: none; } }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.2s;
+            border-left: 4px solid transparent;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border-left-color: #38bdf8;
         }
 
-        /* Header Style */
-        header {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 50;
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            background: #0f172a;
         }
 
-        /* Character Gallery (Khuiai Style) */
+        /* Character Cards (Khuiai Style) */
+        .char-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
         .char-card {
             background: #1e293b;
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
             transition: 0.3s;
             cursor: pointer;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         .char-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             border-color: #38bdf8;
-            box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.2);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
         }
-        .char-img {
+        .char-img-box {
             width: 100%;
-            height: 180px;
-            background: linear-gradient(45deg, #334155, #475569);
+            aspect-ratio: 1/1;
+            background: linear-gradient(135deg, #334155, #1e293b);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            font-size: 3.5rem;
+            position: relative;
         }
-        .char-info { padding: 1rem; }
-        .char-tag {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 99px;
-            background: rgba(56, 189, 248, 0.1);
-            color: #38bdf8;
-            margin-bottom: 0.5rem;
-            display: inline-block;
+        .char-status {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            background: #22c55e;
+            border: 2px solid #1e293b;
+            border-radius: 50%;
         }
+        .char-info { padding: 1rem; text-align: center; }
+        .char-name { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; }
+        .char-desc { font-size: 0.75rem; color: #94a3b8; line-height: 1.2; }
 
-        /* Chat Interface */
+        /* Chat View (Khuiai Style) */
         #chat-view {
             display: none;
             flex-direction: column;
-            height: calc(100vh - 70px);
-            max-width: 800px;
-            margin: 0 auto;
+            height: 100vh;
             width: 100%;
+            background: #0f172a;
+            position: relative;
         }
         #chat-view.active { display: flex; }
         
+        .chat-header {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(12px);
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 10;
+        }
+
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.2rem;
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 24px 24px;
         }
+
         .bubble {
-            max-width: 85%;
-            padding: 0.8rem 1.2rem;
-            border-radius: 18px;
+            max-width: 80%;
+            padding: 0.9rem 1.2rem;
+            border-radius: 20px;
             line-height: 1.6;
-            position: relative;
-            animation: slideUp 0.3s ease-out;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease-out;
         }
         .bubble.ai {
             align-self: flex-start;
-            background: #334155;
+            background: #1e293b;
             color: #f1f5f9;
             border-bottom-left-radius: 4px;
         }
@@ -104,17 +155,18 @@
             border-bottom-right-radius: 4px;
         }
 
-        /* Input Area */
-        .input-container {
-            padding: 1rem;
+        /* Input Area (Khuiai Style) */
+        .chat-input-area {
+            padding: 1rem 1.5rem;
             background: #1e293b;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .input-wrapper {
+        .input-box {
             display: flex;
-            gap: 0.5rem;
+            align-items: center;
+            gap: 10px;
             background: #0f172a;
-            padding: 0.5rem;
+            padding: 0.6rem 1.2rem;
             border-radius: 99px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -124,26 +176,21 @@
             border: none;
             outline: none;
             color: #fff;
-            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
         }
         .send-btn {
-            background: #0284c7;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: #38bdf8;
             cursor: pointer;
+            font-size: 1.2rem;
             transition: 0.2s;
         }
-        .send-btn:hover { background: #0369a1; transform: scale(1.1); }
+        .send-btn:hover { transform: scale(1.1); color: #7dd3fc; }
 
         /* Sync Overlay */
         .sync-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(15, 23, 42, 0.98);
             z-index: 100;
             display: none;
             flex-direction: column;
@@ -153,124 +200,167 @@
         }
         .sync-overlay.active { display: flex; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Bottom Nav (Mobile) */
+        .bottom-nav {
+            display: none;
+            background: #1e293b;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.5rem;
+            justify-content: space-around;
+        }
+        @media (max-width: 768px) { .bottom-nav { display: flex; } }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <header class="flex justify-between items-center">
-        <div class="flex items-center gap-2 cursor-pointer" onclick="goHome()">
-            <i class="fas fa-robot text-sky-500 text-2xl"></i>
-            <h1 class="text-xl font-bold tracking-tight">KHUIAI <span class="text-sky-500">ANIME</span></h1>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="p-6 flex items-center gap-3">
+            <i class="fas fa-robot text-sky-500 text-3xl"></i>
+            <h1 class="text-xl font-bold tracking-tight">KHUIAI <span class="text-sky-500">AI</span></h1>
         </div>
-        <div class="flex gap-3">
-            <button onclick="openApiModal()" class="text-sm bg-slate-800 px-4 py-2 rounded-full hover:bg-slate-700 transition">API KEY</button>
+        <nav class="flex-1">
+            <div class="nav-item active" onclick="goHome()"><i class="fas fa-home"></i> หน้าแรก</div>
+            <div class="nav-item"><i class="fas fa-fire"></i> ยอดนิยม</div>
+            <div class="nav-item"><i class="fas fa-star"></i> มาใหม่</div>
+            <div class="nav-item"><i class="fas fa-heart"></i> รายการโปรด</div>
+            <div class="mt-6 px-6 text-[10px] uppercase tracking-widest text-slate-500 font-bold">หมวดหมู่</div>
+            <div class="nav-item"><i class="fas fa-tv"></i> อนิเมะ</div>
+            <div class="nav-item"><i class="fas fa-gamepad"></i> เกม</div>
+            <div class="nav-item"><i class="fas fa-user-friends"></i> เพื่อนคุย</div>
+        </nav>
+        <div class="p-4">
+            <button onclick="openApiModal()" class="w-full bg-slate-800 py-2 rounded-xl text-sm hover:bg-slate-700 transition">
+                <i class="fas fa-key mr-2"></i> API CONFIG
+            </button>
         </div>
-    </header>
+    </aside>
 
-    <main class="flex-1 overflow-y-auto p-4" id="home-view">
-        <div class="max-w-6xl mx-auto">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold mb-2">เลือกตัวละครที่คุณต้องการคุยด้วย</h2>
-                <p class="text-slate-400 text-sm">แฮ็กข้ามมิติเพื่อเริ่มการสนทนากับตัวละครโปรดของคุณ</p>
+    <!-- Main Content -->
+    <main class="main-content" id="home-view">
+        <header class="p-6 md:hidden flex justify-between items-center bg-slate-900/50">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-robot text-sky-500 text-2xl"></i>
+                <h1 class="text-lg font-bold">KHUIAI</h1>
             </div>
+            <button onclick="openApiModal()"><i class="fas fa-key text-slate-400"></i></button>
+        </header>
 
-            <!-- Categories -->
-            <div class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar">
-                <button class="bg-sky-500 text-white px-4 py-1.5 rounded-full text-sm">ทั้งหมด</button>
-                <button class="bg-slate-800 text-slate-300 px-4 py-1.5 rounded-full text-sm hover:bg-slate-700">อนิเมะ</button>
-                <button class="bg-slate-800 text-slate-300 px-4 py-1.5 rounded-full text-sm hover:bg-slate-700">เกม</button>
-                <button class="bg-slate-800 text-slate-300 px-4 py-1.5 rounded-full text-sm hover:bg-slate-700">เพื่อนคุย</button>
+        <div class="p-6">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-1">ค้นหาตัวละครที่คุณต้องการคุยด้วย</h2>
+                <p class="text-slate-400 text-sm">เลือกตัวละครเพื่อเริ่มการแฮ็กสัญญาณและสนทนา</p>
             </div>
 
             <!-- Character Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="char-grid">
-                <!-- Custom Creator Card -->
-                <div class="char-card border-dashed border-2 border-sky-500/50 bg-sky-500/5" onclick="showCreator()">
-                    <div class="char-img text-sky-500"><i class="fas fa-plus-circle"></i></div>
-                    <div class="char-info text-center">
-                        <h3 class="font-bold text-sky-400">สร้างเพื่อนคุยเอง</h3>
-                        <p class="text-xs text-slate-500">กำหนดนิสัยได้ตามใจ</p>
+            <div class="char-grid" id="char-grid">
+                <!-- Custom Creator -->
+                <div class="char-card border-dashed border-2 border-sky-500/30 bg-sky-500/5" onclick="showCreator()">
+                    <div class="char-img-box text-sky-500"><i class="fas fa-plus-circle"></i></div>
+                    <div class="char-info">
+                        <h3 class="char-name text-sky-400">สร้างเพื่อนคุยเอง</h3>
+                        <p class="char-desc">กำหนดนิสัยได้ตามใจคุณ</p>
                     </div>
                 </div>
-                <!-- Predefined Characters -->
-                <div class="char-card" onclick="selectChar('Dante', 'Limbus Company', '🔴', 'Tick-tock, the clock is ticking.')">
-                    <div class="char-img">🔴</div>
+                <!-- Characters -->
+                <div class="char-card" onclick="selectChar('Dante', '🔴', 'Tick-tock, the clock is ticking.')">
+                    <div class="char-img-box">🔴<div class="char-status"></div></div>
                     <div class="char-info">
-                        <span class="char-tag">Limbus Co.</span>
-                        <h3 class="font-bold">Dante</h3>
-                        <p class="text-xs text-slate-500">ผู้จัดการนาฬิกาจอมป่วน</p>
+                        <h3 class="char-name">Dante</h3>
+                        <p class="char-desc">Limbus Company Manager</p>
                     </div>
                 </div>
-                <div class="char-card" onclick="selectChar('Aris', 'Blue Archive', '🔵', 'Aris is a hero! Level Up!')">
-                    <div class="char-img">🔵</div>
+                <div class="char-card" onclick="selectChar('Aris', '🔵', 'Aris is a hero! Level Up!')">
+                    <div class="char-img-box">🔵<div class="char-status"></div></div>
                     <div class="char-info">
-                        <span class="char-tag">Blue Archive</span>
-                        <h3 class="font-bold">Aris (Alice)</h3>
-                        <p class="text-xs text-slate-500">หุ่นยนต์เกมเมอร์สุดน่ารัก</p>
+                        <h3 class="char-name">Aris (Alice)</h3>
+                        <p class="char-desc">Blue Archive Game Dev</p>
                     </div>
                 </div>
-                <div class="char-card" onclick="selectChar('Gojo Satoru', 'Jujutsu Kaisen', '🟣', 'Throughout Heaven and Earth, I alone am the honored one.')">
-                    <div class="char-img">🟣</div>
+                <div class="char-card" onclick="selectChar('Gojo Satoru', '🟣', 'Throughout Heaven and Earth, I alone am the honored one.')">
+                    <div class="char-img-box">🟣<div class="char-status"></div></div>
                     <div class="char-info">
-                        <span class="char-tag">Anime</span>
-                        <h3 class="font-bold">Gojo Satoru</h3>
-                        <p class="text-xs text-slate-500">ผู้ใช้คุณไสยที่แข็งแกร่งที่สุด</p>
+                        <h3 class="char-name">Gojo Satoru</h3>
+                        <p class="char-desc">The Strongest Sorcerer</p>
                     </div>
                 </div>
-                <div class="char-card" onclick="selectChar('Rimuru', 'Slime Isekai', '💧', 'I am not a bad slime, slurp!')">
-                    <div class="char-img">💧</div>
+                <div class="char-card" onclick="selectChar('Rimuru', '💧', 'I am not a bad slime, slurp!')">
+                    <div class="char-img-box">💧<div class="char-status"></div></div>
                     <div class="char-info">
-                        <span class="char-tag">Anime</span>
-                        <h3 class="font-bold">Rimuru Tempest</h3>
-                        <p class="text-xs text-slate-500">จอมมารสไลม์สุดเทพ</p>
+                        <h3 class="char-name">Rimuru Tempest</h3>
+                        <p class="char-desc">Slime Isekai Demon Lord</p>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Bottom Nav (Mobile) -->
+        <div class="bottom-nav mt-auto">
+            <div class="text-sky-500 flex flex-col items-center gap-1"><i class="fas fa-home"></i><span class="text-[10px]">หน้าแรก</span></div>
+            <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-fire"></i><span class="text-[10px]">ยอดนิยม</span></div>
+            <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-star"></i><span class="text-[10px]">มาใหม่</span></div>
+            <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-user"></i><span class="text-[10px]">โปรไฟล์</span></div>
         </div>
     </main>
 
     <!-- Chat View -->
     <div id="chat-view">
-        <div class="bg-slate-800/50 p-4 flex items-center gap-3 border-bottom border-white/10">
-            <button onclick="goHome()" class="text-slate-400 hover:text-white"><i class="fas fa-chevron-left"></i></button>
+        <div class="chat-header">
+            <button onclick="goHome()" class="text-slate-400 hover:text-white mr-2"><i class="fas fa-arrow-left"></i></button>
             <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-xl" id="chat-avatar">👤</div>
-            <div>
+            <div class="flex-1">
                 <h3 class="font-bold leading-none" id="chat-name">Character Name</h3>
-                <span class="text-[10px] text-green-500 flex items-center gap-1"><i class="fas fa-circle text-[6px]"></i> Online</span>
+                <span class="text-[10px] text-green-500 flex items-center gap-1 mt-1"><i class="fas fa-circle text-[6px]"></i> กำลังออนไลน์</span>
+            </div>
+            <div class="flex gap-4 text-slate-400">
+                <i class="fas fa-phone-alt cursor-pointer hover:text-white"></i>
+                <i class="fas fa-video cursor-pointer hover:text-white"></i>
+                <i class="fas fa-ellipsis-v cursor-pointer hover:text-white"></i>
             </div>
         </div>
         <div class="chat-messages" id="chat-messages"></div>
-        <div class="input-container">
-            <div class="input-wrapper">
-                <input type="text" id="user-input" placeholder="พิมพ์ข้อความที่นี่...">
-                <div class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane text-sm"></i></div>
+        <div class="chat-input-area">
+            <div class="input-box">
+                <i class="fas fa-plus text-slate-500 cursor-pointer"></i>
+                <input type="text" id="user-input" placeholder="พิมพ์ข้อความคุยกับตัวละคร...">
+                <i class="far fa-smile text-slate-500 cursor-pointer"></i>
+                <div class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></div>
             </div>
         </div>
     </div>
 
     <!-- Sync Overlay -->
     <div id="sync-overlay" class="sync-overlay">
-        <div class="text-center max-w-md">
-            <i class="fas fa-bolt text-sky-500 text-4xl mb-4 animate-pulse"></i>
-            <h2 class="text-2xl font-bold mb-2">SYNCING SIGNAL...</h2>
-            <p class="text-slate-400 text-sm mb-6">พิมพ์ข้อความด้านล่างให้ถูกต้องเพื่อเชื่อมต่อสัญญาณกับ <span id="sync-name" class="text-white font-bold">...</span></p>
-            <div class="bg-slate-800 p-4 rounded-xl mb-4 text-xl tracking-wider font-mono" id="sync-target">Target Text</div>
-            <input type="text" id="sync-input" class="w-full bg-slate-900 border-2 border-sky-500 p-3 rounded-xl text-center text-xl outline-none" placeholder="พิมพ์ตามข้อความด้านบน..." autocomplete="off">
-            <p class="text-xs text-slate-500 mt-4">ความแม่นยำ: <span id="sync-percent">0</span>%</p>
+        <div class="text-center max-w-md w-full">
+            <div class="mb-8">
+                <div class="w-20 h-20 bg-sky-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-wifi text-sky-500 text-3xl animate-pulse"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">SYNCING SIGNAL...</h2>
+                <p class="text-slate-400 text-sm">พิมพ์ข้อความด้านล่างให้ถูกต้องเพื่อเชื่อมต่อสัญญาณกับ <span id="sync-name" class="text-white font-bold">...</span></p>
+            </div>
+            <div class="bg-slate-800 p-6 rounded-2xl mb-6 text-xl tracking-wider font-mono border border-white/5" id="sync-target">Target Text</div>
+            <input type="text" id="sync-input" class="w-full bg-slate-900 border-2 border-sky-500 p-4 rounded-2xl text-center text-xl outline-none shadow-lg shadow-sky-500/20" placeholder="พิมพ์ตามข้อความด้านบน..." autocomplete="off">
+            <div class="mt-6 flex items-center justify-between text-xs text-slate-500 px-2">
+                <span>ความแม่นยำ: <span id="sync-percent">0</span>%</span>
+                <span>สถานะ: กำลังเชื่อมต่อ...</span>
+            </div>
         </div>
     </div>
 
     <!-- API Modal -->
     <div id="api-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-xl font-bold text-sky-500 mb-4">🔑 ตั้งค่า API KEY</h2>
-            <select id="api-provider" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-4 text-white">
+            <h2 class="text-xl font-bold text-sky-500 mb-4">🔑 API CONFIGURATION</h2>
+            <p class="text-xs text-slate-400 mb-4">กรุณาใส่ API Key เพื่อเริ่มการสนทนา (แนะนำ Groq)</p>
+            <select id="api-provider" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-4 text-white outline-none focus:border-sky-500">
                 <option value="groq">Groq (Llama 3.3)</option>
                 <option value="gemini">Google Gemini</option>
             </select>
-            <input type="text" id="api-key" placeholder="ป้อน API Key ของคุณ..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-6 text-white">
-            <button onclick="saveApiKey()" class="w-full bg-sky-600 py-3 rounded-xl font-bold hover:bg-sky-500 transition">บันทึกและเริ่มใช้งาน</button>
-            <button onclick="closeApiModal()" class="w-full mt-2 text-slate-500 text-sm">ยกเลิก</button>
+            <input type="text" id="api-key" placeholder="ป้อน API Key ของคุณ..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl mb-6 text-white outline-none focus:border-sky-500">
+            <button onclick="saveApiKey()" class="w-full bg-sky-600 py-3 rounded-xl font-bold hover:bg-sky-500 transition shadow-lg shadow-sky-600/20">บันทึกและเริ่มใช้งาน</button>
+            <button onclick="closeApiModal()" class="w-full mt-4 text-slate-500 text-sm hover:text-slate-300">ยกเลิก</button>
         </div>
     </div>
 
@@ -287,11 +377,13 @@
 
         function goHome() {
             state.view = 'home';
-            document.getElementById('home-view').style.display = 'block';
+            document.getElementById('home-view').style.display = 'flex';
             document.getElementById('chat-view').classList.remove('active');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelector('.nav-item:first-child').classList.add('active');
         }
 
-        function selectChar(name, tag, avatar, sync) {
+        function selectChar(name, avatar, sync) {
             state.character = name;
             state.avatar = avatar;
             state.syncText = sync;
@@ -313,8 +405,10 @@
             document.getElementById('sync-percent').textContent = percent;
             
             if(val === target) {
-                document.getElementById('sync-overlay').classList.remove('active');
-                startChat();
+                setTimeout(() => {
+                    document.getElementById('sync-overlay').classList.remove('active');
+                    startChat();
+                }, 300);
             }
         };
 
@@ -325,7 +419,7 @@
             document.getElementById('chat-name').textContent = state.character;
             document.getElementById('chat-avatar').textContent = state.avatar;
             document.getElementById('chat-messages').innerHTML = '';
-            addBubble('ai', `[SIGNAL CONNECTED] สวัสดี... ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ!`);
+            addBubble('ai', `[SIGNAL CONNECTED] สวัสดี... ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ! มีอะไรอยากคุยกับฉันไหม?`);
         }
 
         function addBubble(role, text) {
@@ -340,7 +434,7 @@
         async function callAI(prompt) {
             if (!state.apiKey) { openApiModal(); return; }
             try {
-                const systemPrompt = `คุณคือตัวละคร ${state.character} สวมบทบาทอย่างสมจริงที่สุด ตอบเป็นภาษาไทย ใช้ภาษาที่เป็นกันเองเหมือนคุยในแอปแชท`;
+                const systemPrompt = `คุณคือตัวละคร ${state.character} สวมบทบาทอย่างสมจริงที่สุด ตอบเป็นภาษาไทย ใช้ภาษาที่เป็นกันเองเหมือนคุยในแอปแชท (เช่น Messenger/Line) ไม่ต้องเป็นทางการมากนัก`;
                 let responseText = "";
                 if (state.provider === 'groq') {
                     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -364,7 +458,7 @@
                 }
                 state.history.push({ role: 'user', content: prompt }, { role: 'assistant', content: responseText });
                 return responseText;
-            } catch (e) { return "❌ การเชื่อมต่อขัดข้อง..."; }
+            } catch (e) { return "❌ การเชื่อมต่อขัดข้อง... กรุณาลองใหม่อีกครั้ง"; }
         }
 
         async function sendMessage() {
