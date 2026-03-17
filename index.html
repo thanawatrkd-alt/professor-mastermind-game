@@ -89,6 +89,7 @@
             cursor: pointer;
             border: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         .char-card:hover {
             transform: translateY(-8px);
@@ -120,6 +121,26 @@
         .char-info { padding: 1rem; text-align: center; }
         .char-name { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; }
         .char-desc { font-size: 0.75rem; color: #94a3b8; line-height: 1.2; }
+
+        /* Edit Button on Card */
+        .edit-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.2s;
+            z-index: 10;
+        }
+        .char-card:hover .edit-btn { opacity: 1; }
+        .edit-btn:hover { background: #ec4899; transform: scale(1.1); }
 
         /* Profile View */
         #profile-view {
@@ -304,7 +325,7 @@
             <div class="scroll-area">
                 <div class="mb-8">
                     <h2 class="text-2xl font-bold mb-1">ค้นหาตัวละครที่คุณต้องการคุยด้วย</h2>
-                    <p class="text-slate-400 text-sm">เลือกตัวละครเพื่อเริ่มการสนทนาโรลเพลย์</p>
+                    <p class="text-slate-400 text-sm">เลือกตัวละครเพื่อเริ่มการสนทนาโรลเพลย์ หรือแก้ไขตัวละครที่มีอยู่</p>
                 </div>
 
                 <!-- Character Grid -->
@@ -319,47 +340,7 @@
                             <p class="char-desc">กำหนดนิสัยและรูปภาพได้เอง</p>
                         </div>
                     </div>
-                    <!-- Characters -->
-                    <div class="char-card" onclick="showProfile('Dante', 'https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', 'Limbus Company Manager', 'ผู้จัดการนาฬิกาจอมป่วนจาก Limbus Company')">
-                        <div class="char-img-box">
-                            <img src="https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Dante" onerror="this.src='https://via.placeholder.com/300?text=Dante'">
-                            <div class="char-status"></div>
-                        </div>
-                        <div class="char-info">
-                            <h3 class="char-name">Dante</h3>
-                            <p class="char-desc">Limbus Company Manager</p>
-                        </div>
-                    </div>
-                    <div class="char-card" onclick="showProfile('Aris', 'https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png', 'Blue Archive Game Dev', 'หุ่นยนต์เกมเมอร์สุดน่ารักจาก Blue Archive')">
-                        <div class="char-img-box">
-                            <img src="https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png" alt="Aris" onerror="this.src='https://via.placeholder.com/300?text=Aris'">
-                            <div class="char-status"></div>
-                        </div>
-                        <div class="char-info">
-                            <h3 class="char-name">Aris (Alice)</h3>
-                            <p class="char-desc">Blue Archive Game Dev</p>
-                        </div>
-                    </div>
-                    <div class="char-card" onclick="showProfile('Gojo Satoru', 'https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg', 'The Strongest Sorcerer', 'ผู้ใช้คุณไสยที่แข็งแกร่งที่สุดจาก Jujutsu Kaisen')">
-                        <div class="char-img-box">
-                            <img src="https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg" alt="Gojo" onerror="this.src='https://via.placeholder.com/300?text=Gojo'">
-                            <div class="char-status"></div>
-                        </div>
-                        <div class="char-info">
-                            <h3 class="char-name">Gojo Satoru</h3>
-                            <p class="char-desc">The Strongest Sorcerer</p>
-                        </div>
-                    </div>
-                    <div class="char-card" onclick="showProfile('Rimuru', 'https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', 'Slime Isekai Demon Lord', 'จอมมารสไลม์สุดเทพจากเรื่องเกิดใหม่เป็นสไลม์')">
-                        <div class="char-img-box">
-                            <img src="https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Rimuru" onerror="this.src='https://via.placeholder.com/300?text=Rimuru'">
-                            <div class="char-status"></div>
-                        </div>
-                        <div class="char-info">
-                            <h3 class="char-name">Rimuru Tempest</h3>
-                            <p class="char-desc">Slime Isekai Demon Lord</p>
-                        </div>
-                    </div>
+                    <!-- Characters will be rendered here by JS -->
                 </div>
             </div>
 
@@ -413,11 +394,12 @@
         </div>
     </main>
 
-    <!-- Creator Modal -->
+    <!-- Creator/Editor Modal -->
     <div id="creator-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-xl font-bold text-pink-500 mb-4">✨ สร้างเพื่อนคุยใหม่</h2>
+            <h2 class="text-xl font-bold text-pink-500 mb-4" id="modal-title">✨ สร้างเพื่อนคุยใหม่</h2>
             <div class="space-y-4">
+                <input type="hidden" id="edit-index" value="-1">
                 <div>
                     <label class="text-xs text-slate-400">ชื่อตัวละคร</label>
                     <input type="text" id="custom-name" placeholder="เช่น น้องแมวเหมียว" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500">
@@ -429,15 +411,9 @@
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">นิสัย / สไตล์การคุย</label>
-                    <select id="custom-personality" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500">
-                        <option value="ซึนเดเระ (ปากร้ายแต่ใจดี)">Tsundere (ซึนเดเระ)</option>
-                        <option value="ร่าเริง แจ่มใส คอยให้กำลังใจ">Cheerful (ร่าเริง)</option>
-                        <option value="คูลๆ นิ่งๆ พูดน้อยแต่ดูเท่">Cool (นิ่งๆ เท่ๆ)</option>
-                        <option value="เป็นกันเอง คุยเรื่องเกมและอนิเมะ">Gamer (เป็นกันเอง)</option>
-                        <option value="รักมากจนน่ากลัว">Yandere (ยันเดเระ)</option>
-                    </select>
+                    <textarea id="custom-personality" placeholder="บรรยายนิสัยหรือสไตล์การคุยของตัวละคร..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-pink-500 h-24 resize-none"></textarea>
                 </div>
-                <button onclick="createCustomChar()" class="w-full bg-pink-600 py-3 rounded-xl font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20">สร้างและเริ่มคุย</button>
+                <button onclick="saveCharacter()" class="w-full bg-pink-600 py-3 rounded-xl font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20" id="save-btn">สร้างและเริ่มคุย</button>
                 <button onclick="closeCreatorModal()" class="w-full text-slate-500 text-sm hover:text-slate-300">ยกเลิก</button>
             </div>
         </div>
@@ -459,6 +435,14 @@
     </div>
 
     <script>
+        // Default Characters
+        const defaultChars = [
+            { name: 'Dante', avatar: 'https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', tag: 'Limbus Company Manager', desc: 'ผู้จัดการนาฬิกาจอมป่วนจาก Limbus Company' },
+            { name: 'Aris (Alice)', avatar: 'https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png', tag: 'Blue Archive Game Dev', desc: 'หุ่นยนต์เกมเมอร์สุดน่ารักจาก Blue Archive' },
+            { name: 'Gojo Satoru', avatar: 'https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg', tag: 'The Strongest Sorcerer', desc: 'ผู้ใช้คุณไสยที่แข็งแกร่งที่สุดจาก Jujutsu Kaisen' },
+            { name: 'Rimuru Tempest', avatar: 'https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', tag: 'Slime Isekai Demon Lord', desc: 'จอมมารสไลม์สุดเทพจากเรื่องเกิดใหม่เป็นสไลม์' }
+        ];
+
         const state = {
             view: 'home',
             character: '',
@@ -466,8 +450,36 @@
             personality: '',
             apiKey: localStorage.getItem('khuiai_key') || '',
             provider: localStorage.getItem('khuiai_provider') || 'groq',
-            history: []
+            history: [],
+            characters: JSON.parse(localStorage.getItem('khuiai_chars')) || defaultChars
         };
+
+        function renderCharacters() {
+            const grid = document.getElementById('char-grid');
+            // Keep the creator card
+            const creatorCard = grid.firstElementChild;
+            grid.innerHTML = '';
+            grid.appendChild(creatorCard);
+
+            state.characters.forEach((char, index) => {
+                const card = document.createElement('div');
+                card.className = 'char-card';
+                card.innerHTML = `
+                    <div class="edit-btn" onclick="event.stopPropagation(); openEditModal(${index})">
+                        <i class="fas fa-pencil-alt text-xs"></i>
+                    </div>
+                    <div class="char-img-box" onclick="showProfile(${index})">
+                        <img src="${char.avatar}" alt="${char.name}" onerror="this.src='https://via.placeholder.com/300?text=${char.name}'">
+                        <div class="char-status"></div>
+                    </div>
+                    <div class="char-info" onclick="showProfile(${index})">
+                        <h3 class="char-name">${char.name}</h3>
+                        <p class="char-desc">${char.tag || char.desc.substring(0, 30) + '...'}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
 
         function goHome() {
             state.view = 'home';
@@ -475,18 +487,20 @@
             document.getElementById('home-view').classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.querySelector('.nav-item:first-child').classList.add('active');
+            renderCharacters();
         }
 
-        function showProfile(name, avatar, tag, desc) {
-            state.character = name;
-            state.avatar = avatar;
-            state.personality = desc;
+        function showProfile(index) {
+            const char = state.characters[index];
+            state.character = char.name;
+            state.avatar = char.avatar;
+            state.personality = char.desc;
             state.history = [];
             
-            document.getElementById('profile-name').textContent = name;
-            document.getElementById('profile-img').src = avatar;
-            document.getElementById('profile-tag').textContent = tag;
-            document.getElementById('profile-desc').textContent = desc;
+            document.getElementById('profile-name').textContent = char.name;
+            document.getElementById('profile-img').src = char.avatar;
+            document.getElementById('profile-tag').textContent = char.tag || 'ตัวละครที่คุณเลือก';
+            document.getElementById('profile-desc').textContent = char.desc;
             
             state.view = 'profile';
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
@@ -500,81 +514,122 @@
             document.getElementById('chat-name').textContent = state.character;
             document.getElementById('chat-avatar-img').src = state.avatar;
             document.getElementById('chat-messages').innerHTML = '';
-            addBubble('ai', `สวัสดีจ๊ะ! ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ มีอะไรอยากคุยกับฉันไหม?`);
+            
+            addMessage('ai', `สวัสดี! ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ วันนี้อยากคุยเรื่องอะไรดีล่ะ?`);
         }
 
-        function addBubble(role, text) {
+        function addMessage(role, text) {
             const container = document.getElementById('chat-messages');
             const div = document.createElement('div');
             div.className = `bubble ${role}`;
             div.textContent = text;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
-        }
-
-        async function callAI(prompt) {
-            if (!state.apiKey) { openApiModal(); return; }
-            try {
-                const systemPrompt = `คุณคือตัวละคร ${state.character} ${state.personality ? 'ที่มีนิสัย ' + state.personality : ''} สวมบทบาทอย่างสมจริงที่สุด ตอบเป็นภาษาไทย ใช้ภาษาที่เป็นกันเองเหมือนคุยในแอปแชท (เช่น Messenger/Line) ไม่ต้องเป็นทางการมากนัก เน้นการสร้างความสัมพันธ์และโรลเพลย์`;
-                let responseText = "";
-                if (state.provider === 'groq') {
-                    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            model: 'llama-3.3-70b-versatile',
-                            messages: [{ role: 'system', content: systemPrompt }, ...state.history, { role: 'user', content: prompt }]
-                        })
-                    });
-                    const data = await res.json();
-                    responseText = data.choices[0].message.content;
-                } else {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\n" + prompt }] }] })
-                    });
-                    const data = await res.json();
-                    responseText = data.candidates[0].content.parts[0].text;
-                }
-                state.history.push({ role: 'user', content: prompt }, { role: 'assistant', content: responseText });
-                return responseText;
-            } catch (e) { return "❌ การเชื่อมต่อขัดข้อง... กรุณาลองใหม่อีกครั้ง"; }
+            state.history.push({ role, content: text });
         }
 
         async function sendMessage() {
             const input = document.getElementById('user-input');
-            const msg = input.value.trim();
-            if (!msg) return;
-            addBubble('user', msg);
+            const text = input.value.trim();
+            if (!text) return;
+            if (!state.apiKey) { openApiModal(); return; }
+
+            addMessage('user', text);
             input.value = '';
-            const response = await callAI(msg);
-            addBubble('ai', response);
+
+            try {
+                const response = await fetch(state.provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + state.apiKey, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(state.provider === 'groq' && { 'Authorization': `Bearer ${state.apiKey}` })
+                    },
+                    body: JSON.stringify(state.provider === 'groq' ? {
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            { role: "system", content: `You are ${state.character}. Personality: ${state.personality}. Reply in Thai language with roleplay style.` },
+                            ...state.history.map(h => ({ role: h.role === 'ai' ? 'assistant' : 'user', content: h.content }))
+                        ]
+                    } : {
+                        contents: [{ parts: [{ text: `You are ${state.character}. Personality: ${state.personality}. Reply in Thai language with roleplay style. History: ${JSON.stringify(state.history)} User: ${text}` }] }]
+                    })
+                });
+
+                const data = await response.json();
+                const aiText = state.provider === 'groq' ? data.choices[0].message.content : data.candidates[0].content.parts[0].text;
+                addMessage('ai', aiText);
+            } catch (e) {
+                addMessage('ai', 'ขออภัย ระบบขัดข้อง กรุณาตรวจสอบ API Key ของคุณ');
+            }
         }
 
-        function openCreatorModal() { document.getElementById('creator-modal').classList.add('active'); }
+        // Modal Handlers
+        function openCreatorModal() {
+            document.getElementById('modal-title').textContent = '✨ สร้างเพื่อนคุยใหม่';
+            document.getElementById('save-btn').textContent = 'สร้างและเริ่มคุย';
+            document.getElementById('edit-index').value = '-1';
+            document.getElementById('custom-name').value = '';
+            document.getElementById('custom-img').value = '';
+            document.getElementById('custom-personality').value = '';
+            document.getElementById('creator-modal').classList.add('active');
+        }
+
+        function openEditModal(index) {
+            const char = state.characters[index];
+            document.getElementById('modal-title').textContent = '✏️ แก้ไขตัวละคร';
+            document.getElementById('save-btn').textContent = 'บันทึกการแก้ไข';
+            document.getElementById('edit-index').value = index;
+            document.getElementById('custom-name').value = char.name;
+            document.getElementById('custom-img').value = char.avatar;
+            document.getElementById('custom-personality').value = char.desc;
+            document.getElementById('creator-modal').classList.add('active');
+        }
+
         function closeCreatorModal() { document.getElementById('creator-modal').classList.remove('active'); }
-        function createCustomChar() {
+
+        function saveCharacter() {
             const name = document.getElementById('custom-name').value.trim();
             const img = document.getElementById('custom-img').value.trim() || 'https://via.placeholder.com/300?text=' + name;
-            const personality = document.getElementById('custom-personality').value;
-            if (!name) return alert('กรุณาใส่ชื่อตัวละคร');
+            const desc = document.getElementById('custom-personality').value.trim();
+            const editIndex = parseInt(document.getElementById('edit-index').value);
+
+            if (!name || !desc) { alert('กรุณากรอกชื่อและนิสัยตัวละคร'); return; }
+
+            const charData = { name, avatar: img, tag: 'ตัวละครที่คุณปรับแต่ง', desc };
+
+            if (editIndex === -1) {
+                state.characters.push(charData);
+            } else {
+                state.characters[editIndex] = charData;
+            }
+
+            localStorage.setItem('khuiai_chars', JSON.stringify(state.characters));
             closeCreatorModal();
-            showProfile(name, img, 'Custom Companion', personality);
+            renderCharacters();
+            
+            if (editIndex === -1) {
+                showProfile(state.characters.length - 1);
+            } else {
+                showProfile(editIndex);
+            }
         }
 
         function openApiModal() { document.getElementById('api-modal').classList.add('active'); }
         function closeApiModal() { document.getElementById('api-modal').classList.remove('active'); }
         function saveApiKey() {
-            state.apiKey = document.getElementById('api-key').value.trim();
-            state.provider = document.getElementById('api-provider').value;
-            localStorage.setItem('khuiai_key', state.apiKey);
-            localStorage.setItem('khuiai_provider', state.provider);
+            const key = document.getElementById('api-key').value.trim();
+            const provider = document.getElementById('api-provider').value;
+            if (!key) return;
+            state.apiKey = key;
+            state.provider = provider;
+            localStorage.setItem('khuiai_key', key);
+            localStorage.setItem('khuiai_provider', provider);
             closeApiModal();
+            alert('บันทึก API Key เรียบร้อย!');
         }
 
-        document.getElementById('user-input').onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
-        window.onload = () => { if (!state.apiKey) openApiModal(); };
+        // Initial Render
+        renderCharacters();
     </script>
 </body>
 </html>
