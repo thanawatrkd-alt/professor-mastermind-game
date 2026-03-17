@@ -13,7 +13,7 @@
         body {
             background: #0f172a;
             color: #f8fafc;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             overflow: hidden;
         }
@@ -25,6 +25,7 @@
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
             transition: 0.3s;
         }
         @media (max-width: 768px) { .sidebar { display: none; } }
@@ -40,9 +41,9 @@
             border-left: 4px solid transparent;
         }
         .nav-item:hover, .nav-item.active {
-            background: rgba(56, 189, 248, 0.1);
-            color: #38bdf8;
-            border-left-color: #38bdf8;
+            background: rgba(236, 72, 153, 0.1);
+            color: #ec4899;
+            border-left-color: #ec4899;
         }
 
         /* Main Content Area */
@@ -53,6 +54,7 @@
             height: 100vh;
             overflow-y: auto;
             background: #0f172a;
+            position: relative;
         }
 
         /* Character Cards */
@@ -73,7 +75,7 @@
         }
         .char-card:hover {
             transform: translateY(-8px);
-            border-color: #38bdf8;
+            border-color: #ec4899;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
         }
         .char-img-box {
@@ -102,17 +104,36 @@
         .char-name { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; }
         .char-desc { font-size: 0.75rem; color: #94a3b8; line-height: 1.2; }
 
-        /* Chat View */
-        #chat-view {
+        /* Views */
+        .view-container {
             display: none;
             flex-direction: column;
             height: 100vh;
             width: 100%;
-            background: #0f172a;
-            position: relative;
+            overflow: hidden;
         }
-        #chat-view.active { display: flex; }
-        
+        .view-container.active { display: flex; }
+
+        /* Profile View */
+        #profile-view {
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(to bottom, #1e293b, #0f172a);
+            overflow-y: auto;
+        }
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ec4899;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.3);
+        }
+
+        /* Chat View */
         .chat-header {
             background: rgba(30, 41, 59, 0.8);
             backdrop-filter: blur(12px);
@@ -122,6 +143,7 @@
             gap: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 10;
+            flex-shrink: 0;
         }
         .chat-avatar-img {
             width: 40px;
@@ -150,6 +172,7 @@
             font-size: 0.95rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             animation: fadeIn 0.3s ease-out;
+            word-wrap: break-word;
         }
         .bubble.ai {
             align-self: flex-start;
@@ -159,7 +182,7 @@
         }
         .bubble.user {
             align-self: flex-end;
-            background: #0284c7;
+            background: #ec4899;
             color: #fff;
             border-bottom-right-radius: 4px;
         }
@@ -169,6 +192,7 @@
             padding: 1rem 1.5rem;
             background: #1e293b;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
         }
         .input-box {
             display: flex;
@@ -188,12 +212,12 @@
             font-size: 0.95rem;
         }
         .send-btn {
-            color: #38bdf8;
+            color: #ec4899;
             cursor: pointer;
             font-size: 1.2rem;
             transition: 0.2s;
         }
-        .send-btn:hover { transform: scale(1.1); color: #7dd3fc; }
+        .send-btn:hover { transform: scale(1.1); color: #f472b6; }
 
         /* Modal Styles */
         .modal {
@@ -216,28 +240,6 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Profile View */
-        #profile-view {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            padding: 2rem;
-            text-align: center;
-            background: linear-gradient(to bottom, #1e293b, #0f172a);
-        }
-        #profile-view.active { display: flex; }
-        .profile-img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #38bdf8;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
-        }
-
         /* Bottom Nav (Mobile) */
         .bottom-nav {
             display: none;
@@ -245,6 +247,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0.5rem;
             justify-content: space-around;
+            flex-shrink: 0;
         }
         @media (max-width: 768px) { .bottom-nav { display: flex; } }
 
@@ -276,123 +279,126 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content" id="home-view">
-        <header class="p-6 md:hidden flex justify-between items-center bg-slate-900/50">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-heart text-pink-500 text-2xl"></i>
-                <h1 class="text-lg font-bold">KHUIAI</h1>
-            </div>
-            <button onclick="openApiModal()"><i class="fas fa-key text-slate-400"></i></button>
-        </header>
+    <main class="main-content">
+        <!-- Home View -->
+        <div id="home-view" class="view-container active">
+            <header class="p-6 md:hidden flex justify-between items-center bg-slate-900/50">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-heart text-pink-500 text-2xl"></i>
+                    <h1 class="text-lg font-bold">KHUIAI</h1>
+                </div>
+                <button onclick="openApiModal()"><i class="fas fa-key text-slate-400"></i></button>
+            </header>
 
-        <div class="p-6">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold mb-1">ค้นหาตัวละครที่คุณต้องการคุยด้วย</h2>
-                <p class="text-slate-400 text-sm">เลือกตัวละครเพื่อเริ่มการสนทนาโรลเพลย์</p>
+            <div class="p-6 overflow-y-auto flex-1">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-1">ค้นหาตัวละครที่คุณต้องการคุยด้วย</h2>
+                    <p class="text-slate-400 text-sm">เลือกตัวละครเพื่อเริ่มการสนทนาโรลเพลย์</p>
+                </div>
+
+                <!-- Character Grid -->
+                <div class="char-grid" id="char-grid">
+                    <!-- Custom Creator -->
+                    <div class="char-card border-dashed border-2 border-pink-500/30 bg-pink-500/5" onclick="openCreatorModal()">
+                        <div class="char-img-box flex items-center justify-center text-pink-500 text-4xl">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="char-info">
+                            <h3 class="char-name text-pink-400">สร้างเพื่อนคุยเอง</h3>
+                            <p class="char-desc">กำหนดนิสัยและรูปภาพได้เอง</p>
+                        </div>
+                    </div>
+                    <!-- Characters -->
+                    <div class="char-card" onclick="showProfile('Dante', 'https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', 'Limbus Company Manager', 'ผู้จัดการนาฬิกาจอมป่วนจาก Limbus Company')">
+                        <div class="char-img-box">
+                            <img src="https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Dante">
+                            <div class="char-status"></div>
+                        </div>
+                        <div class="char-info">
+                            <h3 class="char-name">Dante</h3>
+                            <p class="char-desc">Limbus Company Manager</p>
+                        </div>
+                    </div>
+                    <div class="char-card" onclick="showProfile('Aris', 'https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png', 'Blue Archive Game Dev', 'หุ่นยนต์เกมเมอร์สุดน่ารักจาก Blue Archive')">
+                        <div class="char-img-box">
+                            <img src="https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png" alt="Aris">
+                            <div class="char-status"></div>
+                        </div>
+                        <div class="char-info">
+                            <h3 class="char-name">Aris (Alice)</h3>
+                            <p class="char-desc">Blue Archive Game Dev</p>
+                        </div>
+                    </div>
+                    <div class="char-card" onclick="showProfile('Gojo Satoru', 'https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg', 'The Strongest Sorcerer', 'ผู้ใช้คุณไสยที่แข็งแกร่งที่สุดจาก Jujutsu Kaisen')">
+                        <div class="char-img-box">
+                            <img src="https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg" alt="Gojo">
+                            <div class="char-status"></div>
+                        </div>
+                        <div class="char-info">
+                            <h3 class="char-name">Gojo Satoru</h3>
+                            <p class="char-desc">The Strongest Sorcerer</p>
+                        </div>
+                    </div>
+                    <div class="char-card" onclick="showProfile('Rimuru', 'https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', 'Slime Isekai Demon Lord', 'จอมมารสไลม์สุดเทพจากเรื่องเกิดใหม่เป็นสไลม์')">
+                        <div class="char-img-box">
+                            <img src="https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Rimuru">
+                            <div class="char-status"></div>
+                        </div>
+                        <div class="char-info">
+                            <h3 class="char-name">Rimuru Tempest</h3>
+                            <p class="char-desc">Slime Isekai Demon Lord</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Character Grid -->
-            <div class="char-grid" id="char-grid">
-                <!-- Custom Creator -->
-                <div class="char-card border-dashed border-2 border-pink-500/30 bg-pink-500/5" onclick="openCreatorModal()">
-                    <div class="char-img-box flex items-center justify-center text-pink-500 text-4xl">
-                        <i class="fas fa-plus-circle"></i>
-                    </div>
-                    <div class="char-info">
-                        <h3 class="char-name text-pink-400">สร้างเพื่อนคุยเอง</h3>
-                        <p class="char-desc">กำหนดนิสัยและรูปภาพได้เอง</p>
-                    </div>
-                </div>
-                <!-- Characters -->
-                <div class="char-card" onclick="showProfile('Dante', 'https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', 'Limbus Company Manager', 'ผู้จัดการนาฬิกาจอมป่วนจาก Limbus Company')">
-                    <div class="char-img-box">
-                        <img src="https://i.pinimg.com/736x/ba/6b/0b/ba6b0b3d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Dante">
-                        <div class="char-status"></div>
-                    </div>
-                    <div class="char-info">
-                        <h3 class="char-name">Dante</h3>
-                        <p class="char-desc">Limbus Company Manager</p>
-                    </div>
-                </div>
-                <div class="char-card" onclick="showProfile('Aris', 'https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png', 'Blue Archive Game Dev', 'หุ่นยนต์เกมเมอร์สุดน่ารักจาก Blue Archive')">
-                    <div class="char-img-box">
-                        <img src="https://static.wikia.nocookie.net/bluearchive/images/d/d1/Aris_Icon.png" alt="Aris">
-                        <div class="char-status"></div>
-                    </div>
-                    <div class="char-info">
-                        <h3 class="char-name">Aris (Alice)</h3>
-                        <p class="char-desc">Blue Archive Game Dev</p>
-                    </div>
-                </div>
-                <div class="char-card" onclick="showProfile('Gojo Satoru', 'https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg', 'The Strongest Sorcerer', 'ผู้ใช้คุณไสยที่แข็งแกร่งที่สุดจาก Jujutsu Kaisen')">
-                    <div class="char-img-box">
-                        <img src="https://i.pinimg.com/736x/64/64/64/64646464646464646464646464646464.jpg" alt="Gojo">
-                        <div class="char-status"></div>
-                    </div>
-                    <div class="char-info">
-                        <h3 class="char-name">Gojo Satoru</h3>
-                        <p class="char-desc">The Strongest Sorcerer</p>
-                    </div>
-                </div>
-                <div class="char-card" onclick="showProfile('Rimuru', 'https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg', 'Slime Isekai Demon Lord', 'จอมมารสไลม์สุดเทพจากเรื่องเกิดใหม่เป็นสไลม์')">
-                    <div class="char-img-box">
-                        <img src="https://i.pinimg.com/736x/8d/8d/8d/8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d.jpg" alt="Rimuru">
-                        <div class="char-status"></div>
-                    </div>
-                    <div class="char-info">
-                        <h3 class="char-name">Rimuru Tempest</h3>
-                        <p class="char-desc">Slime Isekai Demon Lord</p>
-                    </div>
-                </div>
+            <!-- Bottom Nav (Mobile) -->
+            <div class="bottom-nav">
+                <div class="text-pink-500 flex flex-col items-center gap-1" onclick="goHome()"><i class="fas fa-home"></i><span class="text-[10px]">หน้าแรก</span></div>
+                <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-fire"></i><span class="text-[10px]">ยอดนิยม</span></div>
+                <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-star"></i><span class="text-[10px]">มาใหม่</span></div>
+                <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-user"></i><span class="text-[10px]">โปรไฟล์</span></div>
             </div>
         </div>
 
-        <!-- Bottom Nav (Mobile) -->
-        <div class="bottom-nav mt-auto">
-            <div class="text-pink-500 flex flex-col items-center gap-1"><i class="fas fa-home"></i><span class="text-[10px]">หน้าแรก</span></div>
-            <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-fire"></i><span class="text-[10px]">ยอดนิยม</span></div>
-            <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-star"></i><span class="text-[10px]">มาใหม่</span></div>
-            <div class="text-slate-400 flex flex-col items-center gap-1"><i class="fas fa-user"></i><span class="text-[10px]">โปรไฟล์</span></div>
+        <!-- Profile View -->
+        <div id="profile-view" class="view-container">
+            <img src="" id="profile-img" class="profile-img" alt="Profile">
+            <h2 class="text-3xl font-bold mb-2" id="profile-name">Character Name</h2>
+            <p class="text-pink-400 font-medium mb-4" id="profile-tag">Tagline</p>
+            <p class="text-slate-400 max-w-md mb-8" id="profile-desc">Description goes here...</p>
+            <div class="flex gap-4">
+                <button onclick="goHome()" class="bg-slate-800 px-8 py-3 rounded-full font-bold hover:bg-slate-700 transition">ย้อนกลับ</button>
+                <button onclick="startChat()" class="bg-pink-600 px-8 py-3 rounded-full font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20">เริ่มแชทเลย</button>
+            </div>
+        </div>
+
+        <!-- Chat View -->
+        <div id="chat-view" class="view-container">
+            <div class="chat-header">
+                <button onclick="goHome()" class="text-slate-400 hover:text-white mr-2"><i class="fas fa-arrow-left"></i></button>
+                <img src="" id="chat-avatar-img" class="chat-avatar-img" alt="Avatar">
+                <div class="flex-1">
+                    <h3 class="font-bold leading-none" id="chat-name">Character Name</h3>
+                    <span class="text-[10px] text-green-500 flex items-center gap-1 mt-1"><i class="fas fa-circle text-[6px]"></i> กำลังออนไลน์</span>
+                </div>
+                <div class="flex gap-4 text-slate-400">
+                    <i class="fas fa-phone-alt cursor-pointer hover:text-white"></i>
+                    <i class="fas fa-video cursor-pointer hover:text-white"></i>
+                    <i class="fas fa-ellipsis-v cursor-pointer hover:text-white"></i>
+                </div>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-area">
+                <div class="input-box">
+                    <i class="fas fa-plus text-slate-500 cursor-pointer"></i>
+                    <input type="text" id="user-input" placeholder="พิมพ์ข้อความคุยกับตัวละคร...">
+                    <i class="far fa-smile text-slate-500 cursor-pointer"></i>
+                    <div class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></div>
+                </div>
+            </div>
         </div>
     </main>
-
-    <!-- Profile View -->
-    <div id="profile-view">
-        <img src="" id="profile-img" class="profile-img" alt="Profile">
-        <h2 class="text-3xl font-bold mb-2" id="profile-name">Character Name</h2>
-        <p class="text-sky-400 font-medium mb-4" id="profile-tag">Tagline</p>
-        <p class="text-slate-400 max-w-md mb-8" id="profile-desc">Description goes here...</p>
-        <div class="flex gap-4">
-            <button onclick="goHome()" class="bg-slate-800 px-8 py-3 rounded-full font-bold hover:bg-slate-700 transition">ย้อนกลับ</button>
-            <button onclick="startChat()" class="bg-pink-600 px-8 py-3 rounded-full font-bold hover:bg-pink-500 transition shadow-lg shadow-pink-600/20">เริ่มแชทเลย</button>
-        </div>
-    </div>
-
-    <!-- Chat View -->
-    <div id="chat-view">
-        <div class="chat-header">
-            <button onclick="goHome()" class="text-slate-400 hover:text-white mr-2"><i class="fas fa-arrow-left"></i></button>
-            <img src="" id="chat-avatar-img" class="chat-avatar-img" alt="Avatar">
-            <div class="flex-1">
-                <h3 class="font-bold leading-none" id="chat-name">Character Name</h3>
-                <span class="text-[10px] text-green-500 flex items-center gap-1 mt-1"><i class="fas fa-circle text-[6px]"></i> กำลังออนไลน์</span>
-            </div>
-            <div class="flex gap-4 text-slate-400">
-                <i class="fas fa-phone-alt cursor-pointer hover:text-white"></i>
-                <i class="fas fa-video cursor-pointer hover:text-white"></i>
-                <i class="fas fa-ellipsis-v cursor-pointer hover:text-white"></i>
-            </div>
-        </div>
-        <div class="chat-messages" id="chat-messages"></div>
-        <div class="chat-input-area">
-            <div class="input-box">
-                <i class="fas fa-plus text-slate-500 cursor-pointer"></i>
-                <input type="text" id="user-input" placeholder="พิมพ์ข้อความคุยกับตัวละคร...">
-                <i class="far fa-smile text-slate-500 cursor-pointer"></i>
-                <div class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></div>
-            </div>
-        </div>
-    </div>
 
     <!-- Creator Modal -->
     <div id="creator-modal" class="modal">
@@ -450,9 +456,8 @@
 
         function goHome() {
             state.view = 'home';
-            document.getElementById('home-view').style.display = 'flex';
-            document.getElementById('chat-view').classList.remove('active');
-            document.getElementById('profile-view').classList.remove('active');
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+            document.getElementById('home-view').classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.querySelector('.nav-item:first-child').classList.add('active');
         }
@@ -469,13 +474,13 @@
             document.getElementById('profile-desc').textContent = desc;
             
             state.view = 'profile';
-            document.getElementById('home-view').style.display = 'none';
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.getElementById('profile-view').classList.add('active');
         }
 
         function startChat() {
             state.view = 'chat';
-            document.getElementById('profile-view').classList.remove('active');
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.getElementById('chat-view').classList.add('active');
             document.getElementById('chat-name').textContent = state.character;
             document.getElementById('chat-avatar-img').src = state.avatar;
