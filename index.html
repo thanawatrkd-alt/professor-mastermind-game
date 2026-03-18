@@ -482,6 +482,10 @@
                     </div>
                     <textarea id="custom-personality" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500 h-32 resize-none" placeholder="เช่น เป็นคนกวนๆ ชอบแกล้งคนอื่น แต่ใจดี"></textarea>
                 </div>
+                <div class="mb-4">
+                    <label for="custom-catchphrases" class="block text-sm font-medium text-slate-300 mb-2">ตัวอย่างคำพูด (Catchphrases)</label>
+                    <textarea id="custom-catchphrases" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500 h-24 resize-none" placeholder="เช่น 'กูจะตบมึงให้คว่ำเลย!' หรือ 'ฮ่า ฮ่า ฮ่า!' (แยกประโยคด้วย | เช่น ประโยค1 | ประโยค2)"></textarea>
+                </div>
                 <div class="flex justify-end gap-3">
                     <button onclick="closeCreatorModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
                     <button id="save-btn" onclick="saveCharacter()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition"></button>
@@ -503,6 +507,10 @@
                         </button>
                     </div>
                     <textarea id="train-personality" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500 h-40 resize-none" placeholder="เช่น เป็นคนกวนๆ ชอบแกล้งคนอื่น แต่ใจดี"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="train-catchphrases" class="block text-sm font-medium text-slate-300 mb-2">ตัวอย่างคำพูด (Catchphrases)</label>
+                    <textarea id="train-catchphrases" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500 h-24 resize-none" placeholder="เช่น 'กูจะตบมึงให้คว่ำเลย!' หรือ 'ฮ่า ฮ่า ฮ่า!' (แยกประโยคด้วย | เช่น ประโยค1 | ประโยค2)"></textarea>
                 </div>
                 <div class="mb-4">
                     <label for="train-name" class="block text-sm font-medium text-slate-300 mb-2">ชื่อตัวละคร (ตัวเลือก)</label>
@@ -591,6 +599,7 @@
             state.character = char.name;
             state.avatar = char.avatar;
             state.personality = char.desc;
+            state.catchphrases = char.catchphrases || '';
             state.characterIndex = index;
 
             document.getElementById('profile-name').textContent = char.name;
@@ -658,11 +667,11 @@
                     body: JSON.stringify(state.provider === 'groq' ? {
                         model: "llama-3.3-70b-versatile",
                         messages: [
-                            { role: "system", content: `You are ${state.character}. Personality: ${state.personality}. Reply in Thai language with roleplay style.` },
+                            { role: "system", content: `You are ${state.character}. Personality: ${state.personality}. ${state.catchphrases ? 'Catchphrases/Example quotes: ' + state.catchphrases : ''} Reply in Thai language with roleplay style. Use the catchphrases naturally in your responses when appropriate.` },
                             ...state.history.map(h => ({ role: h.role === 'ai' ? 'assistant' : 'user', content: h.content }))
                         ]
                     } : {
-                        contents: [{ parts: [{ text: `You are ${state.character}. Personality: ${state.personality}. Reply in Thai language with roleplay style. History: ${JSON.stringify(state.history)} User: ${text}` }] }]
+                        contents: [{ parts: [{ text: `You are ${state.character}. Personality: ${state.personality}. ${state.catchphrases ? 'Catchphrases/Example quotes: ' + state.catchphrases : ''} Reply in Thai language with roleplay style. Use the catchphrases naturally in your responses when appropriate. History: ${JSON.stringify(state.history)} User: ${text}` }] }]
                     })
                 });
 
@@ -732,11 +741,12 @@
             const name = document.getElementById('custom-name').value.trim();
             const img = document.getElementById('custom-img').value.trim() || 'https://via.placeholder.com/300?text=' + name;
             const desc = document.getElementById('custom-personality').value.trim();
+            const catchphrases = document.getElementById('custom-catchphrases').value.trim();
             const editIndex = parseInt(document.getElementById('edit-index').value);
 
             if (!name || !desc) { alert('กรุณากรอกชื่อและนิสัยตัวละคร'); return; }
 
-            const charData = { name, avatar: img, tag: 'ตัวละครที่คุณปรับแต่ง', desc };
+            const charData = { name, avatar: img, tag: 'ตัวละครที่คุณปรับแต่ง', desc, catchphrases: catchphrases || '' };
 
             if (editIndex === -1) {
                 state.characters.push(charData);
@@ -852,11 +862,13 @@
         async function autoTrain(type) {
             const nameId = type === 'train' ? 'train-name' : 'custom-name';
             const personalityId = type === 'train' ? 'train-personality' : 'custom-personality';
+            const catchphrasesId = type === 'train' ? 'train-catchphrases' : 'custom-catchphrases';
             const name = document.getElementById(nameId).value.trim();
             const personalityArea = document.getElementById(personalityId);
+            const catchphrasesArea = document.getElementById(catchphrasesId);
 
             if (!name) {
-                alert('กรุณาระบุชื่อตัวละครก่อนเพื่อให้ AI วิเคราะห์นิสัยครับ');
+                alert('กรุณาระบุชื่อตัวละครก่อเพื่อใหม่ AI วิเคราะห์นิสัยครับ');
                 return;
             }
 
@@ -867,9 +879,13 @@
             }
 
             const originalPlaceholder = personalityArea.placeholder;
+            const originalCatchphrasesPlaceholder = catchphrasesArea.placeholder;
             personalityArea.value = '';
-            personalityArea.placeholder = 'AI กำลังเรียนรู้และวิเคราะห์นิสัยของ ' + name + '... กรุณารอสักครู่';
+            catchphrasesArea.value = '';
+            personalityArea.placeholder = 'AI กำลังเรียนรู้แลลวิเคราะห์นิสัยของ ' + name + '... กรุณารอสักครู่';
+            catchphrasesArea.placeholder = 'AI กำลังหาตัวอย่างคำพูด...';
             personalityArea.disabled = true;
+            catchphrasesArea.disabled = true;
 
             try {
                 const prompt = `คุณคือผู้เชี่ยวชาญด้านอนิเมะและตัวละคร หน้าที่ของคุณคือวิเคราะห์นิสัยและสไตล์การพูดของตัวละครชื่อ "${name}" 
@@ -918,26 +934,73 @@
                 }
 
                 personalityArea.value = responseText.trim();
+                
+                // เปิดตัวอย่างคำพูดหากว่ารูปภาพมีตัวอย่างคำพูดหรือไม่
+                if (catchphrasesArea.value.trim() === '') {
+                    const catchphrasesPrompt = `เขียนตัวอย่างคำพูดหรือคำพูดติดปากของตัวละครชื่อ "${name}" ประโยค 3-5 ตัวอย่างคำพูด (แยกประโยคด้วย | เช่น คำพูด 1 | คำพูด 2 | คำพูด 3) ตอบเป็นภาษาไทยเท่านั้น`;
+                    
+                    try {
+                        let catchphrasesResponse = '';
+                        if (state.provider === 'groq') {
+                            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                                method: 'POST',
+                                headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    model: 'llama-3.3-70b-versatile',
+                                    messages: [{ role: 'user', content: catchphrasesPrompt }]
+                                })
+                            });
+                            const data = await response.json();
+                            catchphrasesResponse = data.choices[0].message.content;
+                        } else if (state.provider === 'gemini') {
+                            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    contents: [{ parts: [{ text: catchphrasesPrompt }] }]
+                                })
+                            });
+                            const data = await response.json();
+                            catchphrasesResponse = data.candidates[0].content.parts[0].text;
+                        } else {
+                            const baseUrl = state.provider === 'deepseek' ? 'https://api.deepseek.com/v1' : 'https://api.anthropic.com/v1';
+                            const response = await fetch(`${baseUrl}/chat/completions`, {
+                                method: 'POST',
+                                headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    model: state.provider === 'deepseek' ? 'deepseek-chat' : 'claude-3-haiku-20240307',
+                                    messages: [{ role: 'user', content: catchphrasesPrompt }]
+                                })
+                            });
+                            const data = await response.json();
+                            catchphrasesResponse = data.choices[0].message.content;
+                        }
+                        catchphrasesArea.value = catchphrasesResponse.trim();
+                    } catch (e) {
+                        console.error('Catchphrases fetch error:', e);
+                    }
+                }
             } catch (error) {
                 console.error('Auto-Train Error:', error);
                 alert('เกิดข้อผิดพลาดในการเชื่อมต่อ AI กรุณาตรวจสอบ API Key หรือลองใหม่อีกครั้งครับ');
             } finally {
                 personalityArea.disabled = false;
+                catchphrasesArea.disabled = false;
                 personalityArea.placeholder = originalPlaceholder;
+                catchphrasesArea.placeholder = originalCatchphrasesPlaceholder;
             }
         }
 
         function saveTraining() {
             const index = parseInt(document.getElementById('train-index').value);
             const personality = document.getElementById('train-personality').value.trim();
-            const name = document.getElementById('train-name').value.trim();
-            const img = document.getElementById('train-img').value.trim();
+            const catchphrases = document.getElementById('train-catchphrases').value.trim();
+            const name = document.getElementById('train-name').value.trim() || state.characters[index].name;
+            const img = document.getElementById('train-img').value.trim() || state.characters[index].avatar;
 
-            if (!personality) { alert('กรุณากรอกนิสัยของตัวละคร'); return; }
+            if (!personality) { alert('กรุณากรอกนิสัยตัวละคร'); return; }
 
-            if (name) state.characters[index].name = name;
-            if (img) state.characters[index].avatar = img;
-            state.characters[index].desc = personality;
+            state.characters[index] = { ...state.characters[index], name, avatar: img, desc: personality, catchphrases: catchphrases || '' };ty;
 
             localStorage.setItem('khuiai_chars', JSON.stringify(state.characters));
             closeTrainingModal();
