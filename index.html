@@ -179,6 +179,9 @@
             border-radius: 50%;
             object-fit: cover;
             background: #334155;
+            flex-shrink: 0;
+            border: 2px solid rgba(236, 72, 153, 0.5);
+            display: block;
         }
 
         .chat-messages {
@@ -190,6 +193,8 @@
             gap: 1.2rem;
             background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
             background-size: 24px 24px;
+            position: relative;
+            z-index: 1;
         }
 
         .bubble {
@@ -201,6 +206,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             animation: fadeIn 0.3s ease-out;
             word-wrap: break-word;
+            position: relative;
+            z-index: 1;
         }
         .bubble.ai {
             align-self: flex-start;
@@ -487,7 +494,13 @@
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.getElementById('chat-view').classList.add('active');
             document.getElementById('chat-name').textContent = state.character;
-            document.getElementById('chat-avatar-img').src = state.avatar;
+            
+            const avatarImg = document.getElementById('chat-avatar-img');
+            avatarImg.src = state.avatar;
+            avatarImg.onerror = function() {
+                this.src = 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27300%27 height=%27300%27%3E%3Crect fill=%27%23334155%27 width=%27300%27 height=%27300%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 font-family=%27Arial%27 font-size=%2724%27 fill=%27%2394a3b8%27%3E?%3C/text%3E%3C/svg%3E';
+            };
+            
             document.getElementById('chat-messages').innerHTML = '';
             
             addMessage('ai', `สวัสดี! ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ วันนี้อยากคุยเรื่องอะไรดีล่ะ?`);
