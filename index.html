@@ -390,9 +390,14 @@
             <h2 id="profile-name" class="text-3xl font-bold text-white mb-2"></h2>
             <p id="profile-tag" class="text-pink-400 text-sm mb-4"></p>
             <p id="profile-desc" class="text-slate-300 max-w-prose text-center mb-6"></p>
-            <button onclick="startChat()" class="bg-pink-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-pink-700 transition shadow-lg">
-                <i class="fas fa-comment-dots mr-2"></i> เริ่มคุยกันเลย!
-            </button>
+            <div class="flex gap-3 justify-center">
+                <button onclick="startChat()" class="bg-pink-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-pink-700 transition shadow-lg">
+                    <i class="fas fa-comment-dots mr-2"></i> เริ่มคุยกันเลย!
+                </button>
+                <button onclick="openTrainingModal(state.characterIndex)" class="bg-blue-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transition shadow-lg">
+                    <i class="fas fa-graduation-cap mr-2"></i> เทรน
+                </button>
+            </div>
         </section>
 
         <!-- Chat View -->
@@ -460,6 +465,31 @@
                 <div class="flex justify-end gap-3">
                     <button onclick="closeCreatorModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
                     <button id="save-btn" onclick="saveCharacter()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Modal -->
+        <div id="training-modal" class="modal">
+            <div class="modal-content">
+                <h3 class="text-xl font-bold mb-4">🎓 เทรนตัวละคร</h3>
+                <p class="text-sm text-slate-400 mb-4">ปรับแต่งนิสัยและสไตล์การคุยของตัวละครให้เหมาะกับคุณ</p>
+                <input type="hidden" id="train-index">
+                <div class="mb-4">
+                    <label for="train-personality" class="block text-sm font-medium text-slate-300 mb-2">นิสัย / สไตล์การคุย</label>
+                    <textarea id="train-personality" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500 h-40 resize-none" placeholder="เช่น เป็นคนกวนๆ ชอบแกล้งคนอื่น แต่ใจดี"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="train-name" class="block text-sm font-medium text-slate-300 mb-2">ชื่อตัวละคร (ตัวเลือก)</label>
+                    <input type="text" id="train-name" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500" placeholder="เช่น Gojo Satoru">
+                </div>
+                <div class="mb-4">
+                    <label for="train-img" class="block text-sm font-medium text-slate-300 mb-2">รูปโปรไฟล์ (URL)</label>
+                    <input type="text" id="train-img" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500" placeholder="https://example.com/avatar.jpg">
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeTrainingModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
+                    <button onclick="saveTraining()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition">บันทึกการเทรน</button>
                 </div>
             </div>
         </div>
@@ -672,6 +702,35 @@
             } else {
                 showProfile(editIndex);
             }
+        }
+
+        function openTrainingModal(index) {
+            const char = state.characters[index];
+            document.getElementById('train-index').value = index;
+            document.getElementById('train-personality').value = char.desc;
+            document.getElementById('train-name').value = char.name;
+            document.getElementById('train-img').value = char.avatar;
+            document.getElementById('training-modal').classList.add('active');
+        }
+
+        function closeTrainingModal() { document.getElementById('training-modal').classList.remove('active'); }
+
+        function saveTraining() {
+            const index = parseInt(document.getElementById('train-index').value);
+            const personality = document.getElementById('train-personality').value.trim();
+            const name = document.getElementById('train-name').value.trim();
+            const img = document.getElementById('train-img').value.trim();
+
+            if (!personality) { alert('กรุณากรอกนิสัยของตัวละคร'); return; }
+
+            if (name) state.characters[index].name = name;
+            if (img) state.characters[index].avatar = img;
+            state.characters[index].desc = personality;
+
+            localStorage.setItem('khuiai_chars', JSON.stringify(state.characters));
+            closeTrainingModal();
+            renderCharacters();
+            showProfile(index);
         }
 
         function openApiModal() { document.getElementById('api-modal').classList.add('active'); }
