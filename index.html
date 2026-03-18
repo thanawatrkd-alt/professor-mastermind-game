@@ -805,38 +805,33 @@
             const resultsContainer = document.getElementById(resultsId);
             resultsContainer.innerHTML = '<div class="col-span-4 text-center text-xs text-slate-500 py-4">กำลังค้นหา...</div>';
 
-            // ใช้ Unsplash Source URL ที่ระบุคำค้นหาและสุ่มลำดับ (sig) เป็นหลัก เพราะเสถียรและสุ่มได้จริง
+            // ใช้ URL รูปภาพโดยตรงจาก Unsplash (Direct URL) ซึ่งเสถียรกว่า Source URL
             let images = [];
             for (let i = 1; i <= 8; i++) {
                 // ใช้ URL ที่ระบุคำค้นหาและสุ่มลำดับ (sig) เพื่อให้ได้รูปไม่ซ้ำ
-                images.push(`https://images.unsplash.com/featured/?${encodeURIComponent(smartQuery)}&sig=${randomSig}${i}`);
+                images.push(`https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=200&h=200&fit=crop&q=80&sig=${randomSig}${i}&query=${encodeURIComponent(smartQuery)}`);
             }
 
             resultsContainer.innerHTML = '';
-            images.forEach(url => {
+            images.forEach((url, i) => {
                 const imgDiv = document.createElement('div');
                 imgDiv.className = 'cursor-pointer hover:ring-2 hover:ring-pink-500 rounded-lg overflow-hidden aspect-square bg-slate-800 relative group';
                 
-                // สร้าง Image element เพื่อเช็กการโหลด
-                const img = new Image();
-                img.src = url;
-                img.className = 'w-full h-full object-cover opacity-0 transition-opacity duration-300';
-                img.loading = 'lazy';
+                // ใช้ URL ที่สุ่มรูปตามคำค้นหาจริงๆ
+                const finalUrl = `https://images.unsplash.com/featured/200x200/?${encodeURIComponent(smartQuery)}&sig=${randomSig}${i}`;
                 
-                img.onload = () => {
-                    img.classList.remove('opacity-0');
-                };
-                
-                img.onerror = () => {
-                    img.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(query + i)}`;
-                    img.classList.remove('opacity-0');
-                };
-
-                imgDiv.appendChild(img);
-                imgDiv.innerHTML += `<div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition"></div>`;
+                imgDiv.innerHTML = `
+                    <img src="${finalUrl}" 
+                         class="w-full h-full object-cover transition-opacity duration-300" 
+                         loading="lazy"
+                         onload="this.style.opacity='1'"
+                         style="opacity: 0"
+                         onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(query + i)}'; this.style.opacity='1'">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition"></div>
+                `;
                 
                 imgDiv.onclick = () => {
-                    document.getElementById(targetImgId).value = url;
+                    document.getElementById(targetImgId).value = finalUrl;
                     resultsContainer.querySelectorAll('div').forEach(d => d.classList.remove('ring-2', 'ring-pink-500'));
                     imgDiv.classList.add('ring-2', 'ring-pink-500');
                 };
