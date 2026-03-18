@@ -232,7 +232,7 @@
         }
 
         /* Input Area */
-        .chat-input-area {
+        #chat-input-area {
             padding: 1rem 1.5rem;
             background: #1e293b;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -244,13 +244,13 @@
             right: 0;
             width: 100%;
             box-sizing: border-box;
-            display: none;
+            display: none !important;
             justify-content: center;
             align-items: center;
             min-height: 80px;
         }
-        .chat-input-area.active {
-            display: flex;
+        #chat-input-area.show {
+            display: flex !important;
         }
         .input-box {
             display: flex;
@@ -403,7 +403,7 @@
                 <h2 id="chat-name" class="text-lg font-semibold"></h2>
             </header>
             <div id="chat-messages" class="chat-messages"></div>
-            <div class="chat-input-area">
+            <div id="chat-input-area">
                 <div class="input-box">
                     <input type="text" id="user-input" placeholder="พิมพ์ข้อความของคุณ...">
                     <button class="send-btn" onclick="sendMessage()">
@@ -508,7 +508,8 @@
             state.view = 'home';
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.getElementById('home-view').classList.add('active');
-            document.querySelector('.chat-input-area').classList.remove('active');
+            document.getElementById('chat-input-area').classList.remove('show');
+            document.getElementById('chat-input-area').style.display = 'none';
         }
         
         renderCharacters();
@@ -528,7 +529,8 @@
             state.view = 'profile';
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.getElementById('profile-view').classList.add('active');
-            document.querySelector('.chat-input-area').classList.remove('active');
+            document.getElementById('chat-input-area').classList.remove('show');
+            document.getElementById('chat-input-area').style.display = 'none';
         }
 
         function startChat() {
@@ -536,7 +538,8 @@
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.getElementById('chat-view').classList.add('active');
             document.getElementById('chat-name').textContent = state.character;
-            document.querySelector('.chat-input-area').classList.add('active');
+            document.getElementById('chat-input-area').classList.add('show');
+            document.getElementById('chat-input-area').style.display = 'flex';
             
             const avatarImg = document.getElementById('chat-avatar-img');
             avatarImg.src = state.avatar;
