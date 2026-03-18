@@ -503,13 +503,15 @@
             state.characters = JSON.parse(storedChars);
         }
 
-        // View functions        function goHome() {
+        // View functions
+        function goHome() {
             state.view = 'home';
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.getElementById('home-view').classList.add('active');
             document.querySelector('.chat-input-area').classList.remove('active');
-        }    renderCharacters();
         }
+        
+        renderCharacters();
 
         function showProfile(index) {
             const char = state.characters[index];
