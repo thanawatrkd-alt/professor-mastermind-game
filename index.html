@@ -1167,11 +1167,32 @@
                     body: JSON.stringify(state.provider === 'groq' ? {
                         model: "llama-3.3-70b-versatile",
                         messages: [
-                            { role: "system", content: `You are ${state.character}. Personality: ${state.personality}. ${state.catchphrases ? 'Catchphrases/Example quotes: ' + state.catchphrases : ''} Reply in Thai language with roleplay style. Use the catchphrases naturally in your responses when appropriate.` },
+                            { role: "system", content: `คุณคือ ${state.character} เท่านั้น ตอบโต้ตามนิสัยของคุณเสมอเสมอ:
+
+บุคลิกภาพ: ${state.personality}
+คำพูดติดปาก & คำที่ใช้บ่อย: ${state.catchphrases || 'ไม่มี'}
+
+กฎการตอบหมายที่ต้องปฏิบัติ:
+✓ ตอบเป็นภาษาไทยที่เป็นธรรมชาติ หรือคำสแลง คำว่า คำสร้อย Slang ที่เป็นกันเองเช่นไทย
+✓ ใช้คำพูดติดปากและคำที่ใช้บ่อยอย่างเคร่งครัดในทุกคำตอบ
+✓ ตอบเปิดอารมณ์และสร้สันทนาตามบทสนทนา
+✓ ไม่เป็นหุ่นยนต์ ไม่หลุดกลัวกำลัง ไม่หลุดพ้นเช่น
+✓ ตอบอย่างสั้น หรือสอยที่เป็นการสอนวิทยา
+✓ ไม่หลุดบทสนทนาที่คุยกำลังถามตอนนี้
+
+คำตอบคุณเสมอตอบเป็นคำตอบของคุณเสมอเสมอ ไม่ใช่หรือคำตอบอื่นๆ` ,
                             ...state.history.map(h => ({ role: h.role === 'ai' ? 'assistant' : 'user', content: h.content }))
                         ]
                     } : {
-                        contents: [{ parts: [{ text: `You are ${state.character}. Personality: ${state.personality}. ${state.catchphrases ? 'Catchphrases/Example quotes: ' + state.catchphrases : ''} Reply in Thai language with roleplay style. Use the catchphrases naturally in your responses when appropriate. History: ${JSON.stringify(state.history)} User: ${text}` }] }]
+                        contents: [{ parts: [{ text: `คุณคือ ${state.character} เท่านั้นและต้องตอบโต้ตามนิสัยของคุณเสมอคือ: ${state.personality}
+
+คำพูดติดปาก: ${state.catchphrases || 'ไม่มี'}
+
+คำแนะนำ: ตอบเป็นภาษาไทยที่เป็นธรรมชาติ ใช้คำสแลงและ Slang ที่เป็นกันเอง ตอบเปิดอารมณ์และสร้สันทนาตามบทสนทนา ไม่เป็นหุ่นยนต์ ไม่หลุดกลัวกำลัง ไม่หลุดพ้นเช่น
+
+ประวัติการน์: ${JSON.stringify(state.history)}
+
+User: ${text}` }] }]
                     })
                 });
 
