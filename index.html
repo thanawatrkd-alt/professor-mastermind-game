@@ -340,6 +340,86 @@
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Affinity Bar */
+        .affinity-bar-wrap {
+            background: #0f172a;
+            border-radius: 99px;
+            height: 8px;
+            overflow: hidden;
+            width: 100%;
+        }
+        .affinity-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #ec4899, #f472b6);
+            transition: width 0.6s ease;
+        }
+        .affinity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(236,72,153,0.15);
+            border: 1px solid rgba(236,72,153,0.3);
+            color: #f472b6;
+            border-radius: 99px;
+            padding: 2px 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        /* Shared badge on card */
+        .shared-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(99,102,241,0.85);
+            color: #fff;
+            font-size: 0.6rem;
+            padding: 2px 7px;
+            border-radius: 99px;
+            font-weight: 600;
+            z-index: 10;
+            letter-spacing: 0.05em;
+        }
+        /* Chat history save button */
+        .save-chat-btn {
+            background: rgba(236,72,153,0.15);
+            border: 1px solid rgba(236,72,153,0.3);
+            color: #f472b6;
+            border-radius: 99px;
+            padding: 4px 14px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .save-chat-btn:hover { background: rgba(236,72,153,0.3); }
+        /* Saved chats list */
+        .saved-chat-item {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.2s;
+        }
+        .saved-chat-item:hover { border-color: #ec4899; }
+        /* Tab buttons */
+        .tab-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #94a3b8;
+            background: transparent;
+        }
+        .tab-btn.active {
+            background: #ec4899;
+            color: #fff;
+            border-color: #ec4899;
+        }
     </style>
 </head>
 <body>
@@ -370,11 +450,21 @@
     <main class="main-content">
         <!-- Home View -->
         <section id="home-view" class="view-container active">
-            <header class="p-4 border-b border-slate-800 flex items-center justify-between flex-shrink-0">
-                <h2 class="text-xl font-bold">เลือกเพื่อนคุยของคุณ</h2>
-                <button onclick="openCreatorModal()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition">
-                    <i class="fas fa-plus mr-2"></i> สร้างใหม่
-                </button>
+            <header class="p-4 border-b border-slate-800 flex-shrink-0">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xl font-bold">เลือกเพื่อนคุยของคุณ</h2>
+                    <button onclick="openCreatorModal()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition">
+                        <i class="fas fa-plus mr-2"></i> สร้างใหม่
+                    </button>
+                </div>
+                <div class="flex gap-2">
+                    <button id="tab-local" class="tab-btn active" onclick="switchTab('local')">
+                        <i class="fas fa-user mr-1"></i> ตัวละครของคุณ
+                    </button>
+                    <button id="tab-shared" class="tab-btn" onclick="switchTab('shared')">
+                        <i class="fas fa-globe mr-1"></i> ตัวละครส่วนกลาง
+                    </button>
+                </div>
             </header>
             <div class="scroll-area">
                 <div id="character-grid" class="char-grid"></div>
@@ -390,6 +480,15 @@
             <h2 id="profile-name" class="text-3xl font-bold text-white mb-2"></h2>
             <p id="profile-tag" class="text-pink-400 text-sm mb-4"></p>
             <p id="profile-desc" class="text-slate-300 max-w-prose text-center mb-6"></p>
+            <!-- Affinity display in profile -->
+            <div id="profile-affinity" class="flex flex-col items-center gap-2 mb-4 w-full max-w-xs">
+                <div class="flex items-center gap-2 w-full">
+                    <span class="affinity-badge"><i class="fas fa-heart text-xs"></i> <span id="profile-affinity-label">0</span> คะแนนความสนิท</span>
+                </div>
+                <div class="affinity-bar-wrap w-full">
+                    <div id="profile-affinity-bar" class="affinity-bar-fill" style="width:0%"></div>
+                </div>
+            </div>
             <div class="flex gap-3 justify-center">
                 <button onclick="startChat()" class="bg-pink-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-pink-700 transition shadow-lg">
                     <i class="fas fa-comment-dots mr-2"></i> เริ่มคุยกันเลย!
@@ -397,6 +496,11 @@
                 <button onclick="openTrainingModal(state.characterIndex)" class="bg-blue-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transition shadow-lg">
                     <i class="fas fa-graduation-cap mr-2"></i> เทรน
                 </button>
+            </div>
+            <!-- Saved chats section -->
+            <div id="saved-chats-section" class="mt-6 w-full max-w-xs">
+                <h3 class="text-sm font-semibold text-slate-400 mb-2"><i class="fas fa-history mr-1"></i> ประวัติการสนทนาที่บันทึกไว้</h3>
+                <div id="saved-chats-list"></div>
             </div>
         </section>
 
@@ -407,7 +511,18 @@
                     <i class="fas fa-arrow-left text-xl"></i>
                 </button>
                 <img id="chat-avatar-img" src="" alt="Avatar" class="chat-avatar-img">
-                <h2 id="chat-name" class="text-lg font-semibold"></h2>
+                <div class="flex-1 min-w-0">
+                    <h2 id="chat-name" class="text-lg font-semibold leading-tight"></h2>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span id="affinity-badge" class="affinity-badge"><i class="fas fa-heart text-xs"></i> <span id="affinity-label">0</span></span>
+                        <div class="affinity-bar-wrap flex-1" style="max-width:80px">
+                            <div id="affinity-bar" class="affinity-bar-fill" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="saveChatHistory()" class="save-chat-btn ml-auto flex-shrink-0" title="บันทึกการสนทนา">
+                    <i class="fas fa-save mr-1"></i>บันทึก
+                </button>
             </header>
             <div id="chat-messages" class="chat-messages"></div>
             <div id="chat-input-area">
@@ -437,6 +552,13 @@
                 <div class="mb-4">
                     <label for="api-key" class="block text-sm font-medium text-slate-300 mb-2">API Key</label>
                     <input type="password" id="api-key" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                </div>
+                <div class="mb-4 border-t border-slate-600 pt-4">
+                    <label for="gh-token" class="block text-sm font-medium text-slate-300 mb-1">
+                        <i class="fab fa-github mr-1"></i> GitHub Token <span class="text-indigo-400 text-xs">(สำหรับตัวละครส่วนกลาง)</span>
+                    </label>
+                    <input type="password" id="gh-token" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-indigo-500 focus:border-indigo-500" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                    <p class="text-xs text-slate-500 mt-1">ใส่ token เพื่อแชร์ตัวละครให้ทุกคนเห็นได้</p>
                 </div>
                 <div class="flex justify-end gap-3">
                     <button onclick="closeApiModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
@@ -485,6 +607,10 @@
                 <div class="mb-4">
                     <label for="custom-catchphrases" class="block text-sm font-medium text-slate-300 mb-2">ตัวอย่างคำพูด (Catchphrases)</label>
                     <textarea id="custom-catchphrases" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500 h-24 resize-none" placeholder="เช่น 'กูจะตบมึงให้คว่ำเลย!' หรือ 'ฮ่า ฮ่า ฮ่า!' (แยกประโยคด้วย | เช่น ประโยค1 | ประโยค2)"></textarea>
+                </div>
+                <div class="flex items-center gap-2 mb-4">
+                    <input type="checkbox" id="share-on-create" class="w-4 h-4 accent-indigo-500">
+                    <label for="share-on-create" class="text-sm text-slate-300">แชร์ตัวละครนี้ให้ทุกคนเห็นด้วย <span class="text-indigo-400">(ส่วนกลาง)</span></label>
                 </div>
                 <div class="flex justify-end gap-3">
                     <button onclick="closeCreatorModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
@@ -553,7 +679,217 @@
     </main>
 
     <script>
-        // Global state
+        // ===== CONFIG =====
+        // เพิ่ม GitHub Token ของคุณในกล่อง Settings เพื่อใช้ระบบตัวละครส่วนกลาง
+        const GITHUB_TOKEN = localStorage.getItem('khuiai_gh_token') || '';
+        const REPO = 'thanawatrkd-alt/professor-mastermind-game';
+        const SHARED_FILE = 'shared_characters.json';
+        const GITHUB_API = 'https://api.github.com';
+
+        // ===== AFFINITY SYSTEM =====
+        function getAffinityKey(charName) { return 'affinity_' + charName; }
+        function getAffinity(charName) { return parseInt(localStorage.getItem(getAffinityKey(charName)) || '0'); }
+        function addAffinity(charName, pts) {
+            const cur = getAffinity(charName);
+            const next = Math.min(cur + pts, 1000);
+            localStorage.setItem(getAffinityKey(charName), next);
+            updateAffinityUI(charName);
+            return next;
+        }
+        function updateAffinityUI(charName) {
+            const pts = getAffinity(charName);
+            const pct = Math.min((pts / 1000) * 100, 100);
+            const label = pts >= 800 ? '♥ ซี้มาก' : pts >= 500 ? '♥ สนิท' : pts >= 200 ? '♥ รู้จัก' : '♥ แปลกหน้า';
+            const el = document.getElementById('affinity-label');
+            const bar = document.getElementById('affinity-bar');
+            const pLabel = document.getElementById('profile-affinity-label');
+            const pBar = document.getElementById('profile-affinity-bar');
+            if (el) el.textContent = pts + ' — ' + label;
+            if (bar) bar.style.width = pct + '%';
+            if (pLabel) pLabel.textContent = pts;
+            if (pBar) pBar.style.width = pct + '%';
+        }
+
+        // ===== SAVE CHAT HISTORY =====
+        function getChatHistoryKey(charName) { return 'chat_history_' + charName; }
+        function saveChatHistory() {
+            if (!state.character || state.history.length === 0) { alert('ไม่มีข้อความที่จะบันทึก'); return; }
+            const key = getChatHistoryKey(state.character);
+            const existing = JSON.parse(localStorage.getItem(key) || '[]');
+            const entry = {
+                id: Date.now(),
+                date: new Date().toLocaleString('th-TH'),
+                messages: [...state.history]
+            };
+            existing.unshift(entry);
+            if (existing.length > 10) existing.splice(10);
+            localStorage.setItem(key, JSON.stringify(existing));
+            showToast('✅ บันทึกการสนทนาเรียบร้อยแล้ว!');
+        }
+        function loadSavedChats(charName) {
+            const key = getChatHistoryKey(charName);
+            return JSON.parse(localStorage.getItem(key) || '[]');
+        }
+        function renderSavedChats(charName) {
+            const list = document.getElementById('saved-chats-list');
+            if (!list) return;
+            const chats = loadSavedChats(charName);
+            if (chats.length === 0) {
+                list.innerHTML = '<p class="text-xs text-slate-500">ยังไม่มีการสนทนาที่บันทึกไว้</p>';
+                return;
+            }
+            list.innerHTML = chats.map((c, i) => `
+                <div class="saved-chat-item" onclick="restoreChat(${i})">
+                    <div class="text-xs text-slate-400">${c.date}</div>
+                    <div class="text-sm text-slate-200">${c.messages.length} ข้อความ</div>
+                </div>
+            `).join('');
+        }
+        function restoreChat(index) {
+            const chats = loadSavedChats(state.character);
+            if (!chats[index]) return;
+            state.history = chats[index].messages;
+            startChat(true);
+        }
+
+        // ===== TOAST =====
+        function showToast(msg) {
+            let t = document.getElementById('toast-msg');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'toast-msg';
+                t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f1f5f9;padding:10px 20px;border-radius:99px;z-index:9999;font-size:0.9rem;border:1px solid rgba(236,72,153,0.4);box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:opacity 0.3s';
+                document.body.appendChild(t);
+            }
+            t.textContent = msg;
+            t.style.opacity = '1';
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+        }
+
+        // ===== SHARED CHARACTERS (GitHub API) =====
+        let sharedCharsSHA = null;
+        let sharedCharsCache = [];
+        let currentTab = 'local';
+
+        async function fetchSharedCharacters() {
+            try {
+                const token = localStorage.getItem('khuiai_gh_token') || GITHUB_TOKEN;
+                const headers = { 'Accept': 'application/vnd.github.v3+json' };
+                if (token) headers['Authorization'] = 'token ' + token;
+                const res = await fetch(`${GITHUB_API}/repos/${REPO}/contents/${SHARED_FILE}`, { headers });
+                if (res.status === 404) { sharedCharsSHA = null; sharedCharsCache = []; return []; }
+                const data = await res.json();
+                sharedCharsSHA = data.sha;
+                const content = atob(data.content.replace(/\n/g, ''));
+                sharedCharsCache = JSON.parse(content);
+                return sharedCharsCache;
+            } catch(e) { console.error('fetchSharedCharacters:', e); return []; }
+        }
+
+        async function pushSharedCharacters(chars) {
+            try {
+                const token = localStorage.getItem('khuiai_gh_token') || GITHUB_TOKEN;
+                if (!token) { showToast('⚠️ กรุณาตั้งค่า GitHub Token ใน Settings ก่อน'); return false; }
+                const content = btoa(unescape(encodeURIComponent(JSON.stringify(chars, null, 2))));
+                const body = { message: 'Update shared characters', content };
+                if (sharedCharsSHA) body.sha = sharedCharsSHA;
+                const res = await fetch(`${GITHUB_API}/repos/${REPO}/contents/${SHARED_FILE}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (data.content) sharedCharsSHA = data.content.sha;
+                return res.ok;
+            } catch(e) { console.error('pushSharedCharacters:', e); return false; }
+        }
+
+        async function shareCharacter(index) {
+            const char = state.characters[index];
+            showToast('⏳ กำลังแชร์ตัวละคร...');
+            const existing = await fetchSharedCharacters();
+            const alreadyExists = existing.some(c => c.name === char.name && c.sharedBy === (localStorage.getItem('khuiai_username') || 'ผู้ใช้ไม่ระบุชื่อ'));
+            if (alreadyExists) { showToast('⚠️ ตัวละครนี้ถูกแชร์ไปแล้ว'); return; }
+            const newChar = { ...char, sharedBy: localStorage.getItem('khuiai_username') || 'ผู้ใช้ไม่ระบุชื่อ', sharedAt: new Date().toISOString(), isShared: true };
+            existing.push(newChar);
+            const ok = await pushSharedCharacters(existing);
+            if (ok) { sharedCharsCache = existing; showToast('✅ แชร์ตัวละครสำเร็จ! ทุกคนจะเห็นตัวละครนี้'); }
+            else showToast('❌ แชร์ไม่สำเร็จ กรุณาลองใหม่');
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-local').classList.toggle('active', tab === 'local');
+            document.getElementById('tab-shared').classList.toggle('active', tab === 'shared');
+            if (tab === 'shared') {
+                renderSharedCharacters();
+            } else {
+                renderCharacters();
+            }
+        }
+
+        async function renderSharedCharacters() {
+            const grid = document.getElementById('character-grid');
+            grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-8"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>กำลังโหลดตัวละครส่วนกลาง...</div>';
+            const chars = await fetchSharedCharacters();
+            grid.innerHTML = '';
+            if (chars.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8">ยังไม่มีตัวละครส่วนกลาง<br><small>แชร์ตัวละครของคุณเพื่อให้ทุกคนเห็น!</small></div>';
+                return;
+            }
+            chars.forEach((char, index) => {
+                const card = document.createElement('div');
+                card.className = 'char-card';
+                const initial = char.name.charAt(0).toUpperCase();
+                card.innerHTML = `
+                    <div class="char-img-box">
+                        <img src="${char.avatar}" alt="${char.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="fallback-avatar" style="display:none; width:100%; height:100%; background:#ec4899; color:white; align-items:center; justify-content:center; font-size:3rem; font-weight:bold;">${initial}</div>
+                        <div class="char-status"></div>
+                        <div class="shared-badge"><i class="fas fa-globe"></i> ส่วนกลาง</div>
+                    </div>
+                    <div class="char-info">
+                        <div class="char-name">${char.name}</div>
+                        <div class="char-desc">${char.tag || 'ตัวละครส่วนกลาง'}</div>
+                        <div class="text-[10px] text-indigo-400 mt-1">โดย: ${char.sharedBy || 'ไม่ระบุ'}</div>
+                    </div>
+                `;
+                card.onclick = () => showSharedProfile(index);
+                grid.appendChild(card);
+            });
+        }
+
+        function showSharedProfile(index) {
+            const char = sharedCharsCache[index];
+            state.character = char.name;
+            state.avatar = char.avatar;
+            state.personality = char.desc;
+            state.catchphrases = char.catchphrases || '';
+            state.characterIndex = -999;
+
+            document.getElementById('profile-name').textContent = char.name;
+            const profileImg = document.getElementById('profile-img');
+            profileImg.src = char.avatar;
+            profileImg.style.display = 'block';
+            profileImg.onerror = function() { this.src = 'https://api.dicebear.com/7.x/initials/svg?seed=' + char.name; };
+            document.getElementById('profile-tag').textContent = (char.tag || 'ตัวละครส่วนกลาง') + ' — โดย: ' + (char.sharedBy || 'ไม่ระบุ');
+            document.getElementById('profile-desc').textContent = char.desc;
+            updateAffinityUI(char.name);
+            renderSavedChats(char.name);
+
+            // ซ่อนปุ่มแชร์ (ตัวละครส่วนกลางไม่ต้องแชร์ซ้ำ)
+            const shareBtn = document.getElementById('share-char-btn');
+            if (shareBtn) shareBtn.style.display = 'none';
+
+            state.view = 'profile';
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+            document.getElementById('profile-view').classList.add('active');
+            document.getElementById('chat-input-area').classList.remove('show');
+            document.getElementById('chat-input-area').style.display = 'none';
+        }
+
+        // ===== Global state
         const state = {
             view: 'home',
             character: null,
@@ -590,10 +926,13 @@
             document.getElementById('home-view').classList.add('active');
             document.getElementById('chat-input-area').classList.remove('show');
             document.getElementById('chat-input-area').style.display = 'none';
+            // รีเซ็ต tab เป็น local
+            currentTab = 'local';
+            document.getElementById('tab-local').classList.add('active');
+            document.getElementById('tab-shared').classList.remove('active');
+            renderCharacters();
         }
         
-        renderCharacters();
-
         function showProfile(index) {
             const char = state.characters[index];
             state.character = char.name;
@@ -611,7 +950,21 @@
             };
             document.getElementById('profile-tag').textContent = char.tag || 'ตัวละครที่คุณเลือก';
             document.getElementById('profile-desc').textContent = char.desc;
-            
+            updateAffinityUI(char.name);
+            renderSavedChats(char.name);
+
+            // เพิ่มปุ่มแชร์ตัวละคร
+            let shareBtn = document.getElementById('share-char-btn');
+            if (!shareBtn) {
+                shareBtn = document.createElement('button');
+                shareBtn.id = 'share-char-btn';
+                shareBtn.className = 'bg-indigo-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-indigo-700 transition shadow-lg';
+                shareBtn.innerHTML = '<i class="fas fa-share-alt mr-2"></i> แชร์ตัวละคร';
+                document.querySelector('#profile-view .flex.gap-3').appendChild(shareBtn);
+            }
+            shareBtn.onclick = () => shareCharacter(state.characterIndex);
+            shareBtn.style.display = '';
+
             state.view = 'profile';
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.getElementById('profile-view').classList.add('active');
@@ -619,7 +972,7 @@
             document.getElementById('chat-input-area').style.display = 'none';
         }
 
-        function startChat() {
+        function startChat(restore = false) {
             state.view = 'chat';
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.getElementById('chat-view').classList.add('active');
@@ -633,9 +986,24 @@
                 this.src = 'https://api.dicebear.com/7.x/initials/svg?seed=' + state.character;
             };
             
-            document.getElementById('chat-messages').innerHTML = '';
-            
-            addMessage('ai', `สวัสดี! ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ วันนี้อยากคุยเรื่องอะไรดีล่ะ?`);
+            updateAffinityUI(state.character);
+
+            const msgContainer = document.getElementById('chat-messages');
+            msgContainer.innerHTML = '';
+
+            if (restore && state.history.length > 0) {
+                state.history.forEach(h => {
+                    const div = document.createElement('div');
+                    div.className = 'bubble ' + (h.role === 'ai' ? 'ai' : 'user');
+                    div.textContent = h.content;
+                    msgContainer.appendChild(div);
+                });
+                msgContainer.scrollTop = msgContainer.scrollHeight;
+                showToast('✅ โหลดประวัติการสนทนาแล้ว');
+            } else {
+                state.history = [];
+                addMessage('ai', `สวัสดี! ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ วันนี้อยากคุยเรื่องอะไรดีล่ะ?`);
+            }
         }
 
         function addMessage(role, text) {
@@ -678,6 +1046,8 @@
                 const data = await response.json();
                 const aiText = state.provider === 'groq' ? data.choices[0].message.content : data.candidates[0].content.parts[0].text;
                 addMessage('ai', aiText);
+                // เพิ่ม affinity ทุกครั้งที่คุยสำเร็จ
+                addAffinity(state.character, 5);
             } catch (e) {
                 addMessage('ai', 'ขออภัย ระบบขัดข้อง กรุณาตรวจสอบ API Key ของคุณ');
             }
@@ -691,6 +1061,8 @@
                 const card = document.createElement('div');
                 card.className = 'char-card';
                 const initial = char.name.charAt(0).toUpperCase();
+                const affPts = getAffinity(char.name);
+                const affLabel = affPts >= 800 ? '♥♥♥' : affPts >= 500 ? '♥♥' : affPts >= 200 ? '♥' : '';
                 card.innerHTML = `
                     <div class="char-img-box">
                         <img src="${char.avatar}" alt="${char.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -701,7 +1073,7 @@
                         </button>
                     </div>
                     <div class="char-info">
-                        <div class="char-name">${char.name}</div>
+                        <div class="char-name">${char.name} <span style="color:#f472b6;font-size:0.75rem">${affLabel}</span></div>
                         <div class="char-desc">${char.tag || 'ตัวละครที่คุณสร้าง'}</div>
                     </div>
                 `;
@@ -735,6 +1107,8 @@
             document.getElementById('creator-modal').classList.remove('active'); 
             document.getElementById('search-results-creator').innerHTML = '';
             document.getElementById('search-img-input-creator').value = '';
+            const shareChk = document.getElementById('share-on-create');
+            if (shareChk) shareChk.checked = false;
         }
 
         function saveCharacter() {
@@ -743,6 +1117,7 @@
             const desc = document.getElementById('custom-personality').value.trim();
             const catchphrases = document.getElementById('custom-catchphrases').value.trim();
             const editIndex = parseInt(document.getElementById('edit-index').value);
+            const shareNow = document.getElementById('share-on-create') && document.getElementById('share-on-create').checked;
 
             if (!name || !desc) { alert('กรุณากรอกชื่อและนิสัยตัวละคร'); return; }
 
@@ -757,7 +1132,13 @@
             localStorage.setItem('khuiai_chars', JSON.stringify(state.characters));
             closeCreatorModal();
             renderCharacters();
-            
+
+            const newIndex = editIndex === -1 ? state.characters.length - 1 : editIndex;
+
+            if (shareNow) {
+                shareCharacter(newIndex);
+            }
+
             if (editIndex === -1) {
                 showProfile(state.characters.length - 1);
             } else {
@@ -1000,7 +1381,7 @@
 
             if (!personality) { alert('กรุณากรอกนิสัยตัวละคร'); return; }
 
-            state.characters[index] = { ...state.characters[index], name, avatar: img, desc: personality, catchphrases: catchphrases || '' };ty;
+            state.characters[index] = { ...state.characters[index], name, avatar: img, desc: personality, catchphrases: catchphrases || '' };
 
             localStorage.setItem('khuiai_chars', JSON.stringify(state.characters));
             closeTrainingModal();
@@ -1008,16 +1389,27 @@
             showProfile(index);
         }
 
-        function openApiModal() { document.getElementById('api-modal').classList.add('active'); }
+        function openApiModal() {
+            document.getElementById('api-modal').classList.add('active');
+            // โหลดค่าที่บันทึกไว้
+            const savedKey = localStorage.getItem('khuiai_key') || '';
+            const savedProvider = localStorage.getItem('khuiai_provider') || 'groq';
+            const savedGhToken = localStorage.getItem('khuiai_gh_token') || '';
+            if (savedKey) document.getElementById('api-key').value = savedKey;
+            document.getElementById('api-provider').value = savedProvider;
+            if (savedGhToken) document.getElementById('gh-token').value = savedGhToken;
+        }
         function closeApiModal() { document.getElementById('api-modal').classList.remove('active'); }
         function saveApiKey() {
             const key = document.getElementById('api-key').value.trim();
             const provider = document.getElementById('api-provider').value;
+            const ghToken = document.getElementById('gh-token').value.trim();
             if (!key) return;
             state.apiKey = key;
             state.provider = provider;
             localStorage.setItem('khuiai_key', key);
             localStorage.setItem('khuiai_provider', provider);
+            if (ghToken) localStorage.setItem('khuiai_gh_token', ghToken);
             closeApiModal();
             alert('บันทึก API Key เรียบร้อย!');
         }
