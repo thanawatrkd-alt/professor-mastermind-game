@@ -740,16 +740,22 @@
         function saveChatHistory() {
             if (!state.character || state.history.length === 0) { alert('ไม่มีข้อความที่จะบันทึก'); return; }
             const key = getChatHistoryKey(state.character);
-            const existing = JSON.parse(localStorage.getItem(key) || '[]');
-            const entry = {
-                id: Date.now(),
-                date: new Date().toLocaleString('th-TH'),
-                messages: [...state.history]
-            };
-            existing.unshift(entry);
-            if (existing.length > 10) existing.splice(10);
-            localStorage.setItem(key, JSON.stringify(existing));
-            showToast('✅ บันทึกการสนทนาเรียบร้อยแล้ว!');
+            try {
+                const existing = JSON.parse(localStorage.getItem(key) || '[]');
+                const entry = {
+                    id: Date.now(),
+                    date: new Date().toLocaleString('th-TH'),
+                    messages: [...state.history]
+                };
+                existing.unshift(entry);
+                if (existing.length > 10) existing.splice(10);
+                localStorage.setItem(key, JSON.stringify(existing));
+                console.log('Chat saved:', key, existing);
+                showToast('✅ บันทึกการสนทนาเรียบร้อยแล้ว!');
+            } catch(e) {
+                console.error('Save chat error:', e);
+                showToast('❌ เกิดข้อผิดพลาดในการบันทึก');
+            }
         }
         function loadSavedChats(charName) {
             const key = getChatHistoryKey(charName);
@@ -759,6 +765,7 @@
             const list = document.getElementById('saved-chats-list');
             if (!list) return;
             const chats = loadSavedChats(charName);
+            console.log('Rendering chats for', charName, ':', chats);
             if (chats.length === 0) {
                 list.innerHTML = '<p class="text-xs text-slate-500">ยังไม่มีการสนทนาที่บันทึกไว้</p>';
                 return;
@@ -772,8 +779,10 @@
         }
         function restoreChat(index) {
             const chats = loadSavedChats(state.character);
-            if (!chats[index]) return;
+            console.log('Restoring chat index', index, 'from', chats);
+            if (!chats[index]) { alert('ไม่พบประวัติการสนทนา'); return; }
             state.history = chats[index].messages;
+            console.log('Restored history:', state.history);
             startChat(true);
         }
 
@@ -955,7 +964,10 @@
             document.getElementById('profile-tag').textContent = (char.tag || 'ตัวละครส่วนกลาง') + ' — โดย: ' + (char.sharedBy || 'ไม่ระบุ');
             document.getElementById('profile-desc').textContent = char.desc;
             updateAffinityUI(char.name);
+            console.log('Calling renderSavedChats for', char.name);
             renderSavedChats(char.name);
+            console.log('renderSavedChats completed');
+            console.log('localStorage key:', getChatHistoryKey(char.name), 'value:', localStorage.getItem(getChatHistoryKey(char.name)));
 
             // ซ่อนปุ่มแชร์ (ตัวละครส่วนกลางไม่ต้องแชร์ซ้ำ)
             const shareBtn = document.getElementById('share-char-btn');
@@ -1030,7 +1042,10 @@
             document.getElementById('profile-tag').textContent = char.tag || 'ตัวละครที่คุณเลือก';
             document.getElementById('profile-desc').textContent = char.desc;
             updateAffinityUI(char.name);
+            console.log('Calling renderSavedChats for', char.name);
             renderSavedChats(char.name);
+            console.log('renderSavedChats completed');
+            console.log('localStorage key:', getChatHistoryKey(char.name), 'value:', localStorage.getItem(getChatHistoryKey(char.name)));
 
             // เพิ่มปุ่มแชร์ตัวละคร
             let shareBtn = document.getElementById('share-char-btn');
