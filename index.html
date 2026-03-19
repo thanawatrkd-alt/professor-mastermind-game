@@ -553,13 +553,7 @@
                     <label for="api-key" class="block text-sm font-medium text-slate-300 mb-2">API Key</label>
                     <input type="password" id="api-key" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
                 </div>
-                <div class="mb-4 border-t border-slate-600 pt-4">
-                    <label for="gh-token" class="block text-sm font-medium text-slate-300 mb-1">
-                        <i class="fab fa-github mr-1"></i> GitHub Token <span class="text-indigo-400 text-xs">(สำหรับตัวละครส่วนกลาง)</span>
-                    </label>
-                    <input type="password" id="gh-token" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-indigo-500 focus:border-indigo-500" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-                    <p class="text-xs text-slate-500 mt-1">ใส่ token เพื่อแชร์ตัวละครให้ทุกคนเห็นได้</p>
-                </div>
+                <!-- GitHub Token field removed as we moved to Firebase -->
                 <div class="flex justify-end gap-3">
                     <button onclick="closeApiModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
                     <button onclick="saveApiKey()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition">บันทึก</button>
@@ -678,13 +672,23 @@
         </nav>
     </main>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <script>
         // ===== CONFIG =====
-        // เพิ่ม GitHub Token ของคุณในกล่อง Settings เพื่อใช้ระบบตัวละครส่วนกลาง
-        const GITHUB_TOKEN = localStorage.getItem('khuiai_gh_token') || '';
-        const REPO = 'thanawatrkd-alt/professor-mastermind-game';
-        const SHARED_FILE = 'shared_characters.json';
-        const GITHUB_API = 'https://api.github.com';
+        // Firebase Configuration (Publicly safe for Realtime Database with proper rules)
+        const firebaseConfig = {
+            databaseURL: "https://professor-mastermind-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const sharedCharsRef = db.ref('shared_characters');
+
+        // GitHub config removed as we moved to Firebase for shared characters
 
         // ===== AFFINITY SYSTEM =====
         function getAffinityKey(charName) { return 'affinity_' + charName; }
@@ -767,55 +771,59 @@
             t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
         }
 
-        // ===== SHARED CHARACTERS (GitHub API) =====
-        let sharedCharsSHA = null;
+        // ===== SHARED CHARACTERS (Firebase Realtime Database) =====
         let sharedCharsCache = [];
         let currentTab = 'local';
 
         async function fetchSharedCharacters() {
             try {
-                const token = localStorage.getItem('khuiai_gh_token') || GITHUB_TOKEN;
-                const headers = { 'Accept': 'application/vnd.github.v3+json' };
-                if (token) headers['Authorization'] = 'token ' + token;
-                const res = await fetch(`${GITHUB_API}/repos/${REPO}/contents/${SHARED_FILE}`, { headers });
-                if (res.status === 404) { sharedCharsSHA = null; sharedCharsCache = []; return []; }
-                const data = await res.json();
-                sharedCharsSHA = data.sha;
-                const content = atob(data.content.replace(/\n/g, ''));
-                sharedCharsCache = JSON.parse(content);
+                const snapshot = await sharedCharsRef.once('value');
+                const data = snapshot.val();
+                if (!data) { sharedCharsCache = []; return []; }
+                // Convert object to array
+                sharedCharsCache = Object.keys(data).map(key => ({
+                    ...data[key],
+                    firebaseKey: key
+                }));
                 return sharedCharsCache;
-            } catch(e) { console.error('fetchSharedCharacters:', e); return []; }
-        }
-
-        async function pushSharedCharacters(chars) {
-            try {
-                const token = localStorage.getItem('khuiai_gh_token') || GITHUB_TOKEN;
-                if (!token) { showToast('⚠️ กรุณาตั้งค่า GitHub Token ใน Settings ก่อน'); return false; }
-                const content = btoa(unescape(encodeURIComponent(JSON.stringify(chars, null, 2))));
-                const body = { message: 'Update shared characters', content };
-                if (sharedCharsSHA) body.sha = sharedCharsSHA;
-                const res = await fetch(`${GITHUB_API}/repos/${REPO}/contents/${SHARED_FILE}`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-                if (data.content) sharedCharsSHA = data.content.sha;
-                return res.ok;
-            } catch(e) { console.error('pushSharedCharacters:', e); return false; }
+            } catch(e) { 
+                console.error('fetchSharedCharacters:', e); 
+                showToast('❌ โหลดตัวละครส่วนกลางไม่สำเร็จ');
+                return []; 
+            }
         }
 
         async function shareCharacter(index) {
             const char = state.characters[index];
             showToast('⏳ กำลังแชร์ตัวละคร...');
-            const existing = await fetchSharedCharacters();
-            const alreadyExists = existing.some(c => c.name === char.name && c.sharedBy === (localStorage.getItem('khuiai_username') || 'ผู้ใช้ไม่ระบุชื่อ'));
-            if (alreadyExists) { showToast('⚠️ ตัวละครนี้ถูกแชร์ไปแล้ว'); return; }
-            const newChar = { ...char, sharedBy: localStorage.getItem('khuiai_username') || 'ผู้ใช้ไม่ระบุชื่อ', sharedAt: new Date().toISOString(), isShared: true };
-            existing.push(newChar);
-            const ok = await pushSharedCharacters(existing);
-            if (ok) { sharedCharsCache = existing; showToast('✅ แชร์ตัวละครสำเร็จ! ทุกคนจะเห็นตัวละครนี้'); }
-            else showToast('❌ แชร์ไม่สำเร็จ กรุณาลองใหม่');
+            
+            try {
+                const snapshot = await sharedCharsRef.once('value');
+                const data = snapshot.val() || {};
+                const existing = Object.values(data);
+                
+                const username = localStorage.getItem('khuiai_username') || 'ผู้ใช้ไม่ระบุชื่อ';
+                const alreadyExists = existing.some(c => c.name === char.name && c.sharedBy === username);
+                
+                if (alreadyExists) { 
+                    showToast('⚠️ ตัวละครนี้ถูกแชร์ไปแล้ว'); 
+                    return; 
+                }
+
+                const newChar = { 
+                    ...char, 
+                    sharedBy: username, 
+                    sharedAt: new Date().toISOString(), 
+                    isShared: true 
+                };
+
+                await sharedCharsRef.push(newChar);
+                showToast('✅ แชร์ตัวละครสำเร็จ! ทุกคนจะเห็นตัวละครนี้');
+                if (currentTab === 'shared') renderSharedCharacters();
+            } catch(e) {
+                console.error('shareCharacter:', e);
+                showToast('❌ แชร์ไม่สำเร็จ กรุณาลองใหม่');
+            }
         }
 
         function switchTab(tab) {
@@ -838,10 +846,13 @@
                 grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8">ยังไม่มีตัวละครส่วนกลาง<br><small>แชร์ตัวละครของคุณเพื่อให้ทุกคนเห็น!</small></div>';
                 return;
             }
-            chars.forEach((char, index) => {
+              chars.forEach((char, index) => {
                 const card = document.createElement('div');
                 card.className = 'char-card';
                 const initial = char.name.charAt(0).toUpperCase();
+                const affPts = getAffinity(char.name);
+                const affLabel = affPts >= 800 ? '♥♥♥' : affPts >= 500 ? '♥♥' : affPts >= 200 ? '♥' : '';
+                
                 card.innerHTML = `
                     <div class="char-img-box">
                         <img src="${char.avatar}" alt="${char.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -850,9 +861,9 @@
                         <div class="shared-badge"><i class="fas fa-globe"></i> ส่วนกลาง</div>
                     </div>
                     <div class="char-info">
-                        <div class="char-name">${char.name}</div>
+                        <div class="char-name">${char.name} <span style="color:#f472b6;font-size:0.75rem">${affLabel}</span></div>
                         <div class="char-desc">${char.tag || 'ตัวละครส่วนกลาง'}</div>
-                        <div class="text-[10px] text-indigo-400 mt-1">โดย: ${char.sharedBy || 'ไม่ระบุ'}</div>
+                        <div class="text-[10px] text-slate-500 mt-1">โดย: ${char.sharedBy || 'ไม่ระบุ'}</div>
                     </div>
                 `;
                 card.onclick = () => showSharedProfile(index);
@@ -1394,22 +1405,18 @@
             // โหลดค่าที่บันทึกไว้
             const savedKey = localStorage.getItem('khuiai_key') || '';
             const savedProvider = localStorage.getItem('khuiai_provider') || 'groq';
-            const savedGhToken = localStorage.getItem('khuiai_gh_token') || '';
             if (savedKey) document.getElementById('api-key').value = savedKey;
             document.getElementById('api-provider').value = savedProvider;
-            if (savedGhToken) document.getElementById('gh-token').value = savedGhToken;
         }
         function closeApiModal() { document.getElementById('api-modal').classList.remove('active'); }
         function saveApiKey() {
             const key = document.getElementById('api-key').value.trim();
             const provider = document.getElementById('api-provider').value;
-            const ghToken = document.getElementById('gh-token').value.trim();
             if (!key) return;
             state.apiKey = key;
             state.provider = provider;
             localStorage.setItem('khuiai_key', key);
             localStorage.setItem('khuiai_provider', provider);
-            if (ghToken) localStorage.setItem('khuiai_gh_token', ghToken);
             closeApiModal();
             alert('บันทึก API Key เรียบร้อย!');
         }
