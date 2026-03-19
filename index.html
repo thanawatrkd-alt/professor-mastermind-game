@@ -461,6 +461,9 @@
                     <button id="tab-local" class="tab-btn active" onclick="switchTab('local')">
                         <i class="fas fa-user mr-1"></i> ตัวละครของคุณ
                     </button>
+                    <button id="tab-chats" class="tab-btn" onclick="switchTab('chats')">
+                        <i class="fas fa-comments mr-1"></i> แชทล่าสุด
+                    </button>
                     <button id="tab-shared" class="tab-btn" onclick="switchTab('shared')">
                         <i class="fas fa-globe mr-1"></i> ตัวละครส่วนกลาง
                     </button>
@@ -477,6 +480,7 @@
             </header>
             <div class="scroll-area">
                 <div id="character-grid" class="char-grid"></div>
+                <div id="chat-list" style="display:none;" class="space-y-2 p-4"></div>
             </div>
         </section>
 
@@ -859,12 +863,18 @@
         function switchTab(tab) {
             currentTab = tab;
             document.getElementById('tab-local').classList.toggle('active', tab === 'local');
+            document.getElementById('tab-chats').classList.toggle('active', tab === 'chats');
             document.getElementById('tab-shared').classList.toggle('active', tab === 'shared');
             document.getElementById('search-filter-bar').style.display = tab === 'shared' ? 'flex' : 'none';
+            document.getElementById('character-grid').style.display = (tab === 'local' || tab === 'shared') ? 'grid' : 'none';
+            document.getElementById('chat-list').style.display = tab === 'chats' ? 'block' : 'none';
+            
             if (tab === 'shared') {
                 document.getElementById('search-shared-input').value = '';
                 document.getElementById('sort-shared-select').value = 'newest';
                 renderSharedCharacters();
+            } else if (tab === 'chats') {
+                renderChatList();
             } else {
                 renderCharacters();
             }
@@ -1085,7 +1095,22 @@
             const msgContainer = document.getElementById('chat-messages');
             msgContainer.innerHTML = '';
 
-            if (restore && state.history.length > 0) {
+            // โหลดประวัติแชทจาก localStorage อัตโนมัติ (Auto-Load)
+            const persistentKey = 'persistent_chat_' + state.character;
+            const savedHistory = localStorage.getItem(persistentKey);
+            if (savedHistory) {
+                try {
+                    state.history = JSON.parse(savedHistory);
+                    console.log('Loaded persistent chat:', state.history);
+                } catch(e) {
+                    console.error('Failed to load:', e);
+                    state.history = [];
+                }
+            } else {
+                state.history = [];
+            }
+
+            if (state.history.length > 0) {
                 state.history.forEach(h => {
                     const div = document.createElement('div');
                     div.className = 'bubble ' + (h.role === 'ai' ? 'ai' : 'user');
@@ -1108,6 +1133,19 @@
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
             state.history.push({ role, content: text });
+            // บันทึกประวัติแชทอัตโนมัติ (Auto-Save)
+            savePersistentChat();
+        }
+        
+        function savePersistentChat() {
+            if (!state.character) return;
+            const key = 'persistent_chat_' + state.character;
+            try {
+                localStorage.setItem(key, JSON.stringify(state.history));
+                console.log('Chat saved to localStorage:', key);
+            } catch(e) {
+                console.error('Failed to save chat:', e);
+            }
         }
 
         async function sendMessage() {
@@ -1145,6 +1183,63 @@
             } catch (e) {
                 addMessage('ai', 'ขออภัย ระบบขัดข้อง กรุณาตรวจสอบ API Key ของคุณ');
             }
+        }
+
+        // ===== CHAT LIST (LINE Style) =====
+        function renderChatList() {
+            const listContainer = document.getElementById('chat-list');
+            listContainer.innerHTML = '';
+            
+            // สร้างรายการแชทจากประวัติที่บันทึก
+            const chatList = [];
+            state.characters.forEach((char, index) => {
+                const persistentKey = 'persistent_chat_' + char.name;
+                const savedHistory = localStorage.getItem(persistentKey);
+                if (savedHistory) {
+                    try {
+                        const history = JSON.parse(savedHistory);
+                        if (history.length > 0) {
+                            const lastMsg = history[history.length - 1];
+                            chatList.push({
+                                index,
+                                name: char.name,
+                                avatar: char.avatar,
+                                lastMessage: lastMsg.content.substring(0, 50) + (lastMsg.content.length > 50 ? '...' : ''),
+                                lastRole: lastMsg.role,
+                                messageCount: history.length
+                            });
+                        }
+                    } catch(e) {
+                        console.error('Error loading chat:', e);
+                    }
+                }
+            });
+            
+            if (chatList.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-slate-500 py-8">ยังไม่มีการแชทใดๆ</p>';
+                return;
+            }
+            
+            chatList.forEach(chat => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-3 p-3 bg-slate-800 rounded-lg cursor-pointer hover:bg-slate-700 transition';
+                div.onclick = () => {
+                    state.characterIndex = chat.index;
+                    showProfile(chat.index);
+                    setTimeout(() => startChat(false), 100);
+                };
+                div.innerHTML = `
+                    <img src="${chat.avatar}" alt="${chat.name}" class="w-12 h-12 rounded-full object-cover" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${chat.name}'">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-white truncate">${chat.name}</h3>
+                        <p class="text-xs text-slate-400 truncate">${chat.lastMessage}</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <span class="text-xs text-slate-500">${chat.messageCount} ข้อความ</span>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
         }
 
         // Modal Handlers
