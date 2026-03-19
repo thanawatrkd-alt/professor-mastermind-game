@@ -1220,16 +1220,8 @@
             loadingEl.style.display = 'flex';
             
             try {
-                const prompt = `คุณเป็นผู้เชี่ยวชาญด้านอนิเมะและตัวละคร
-หน้าที่ของคุณคือ วิเคระห์บุคลิก สไตล์การพูด และคำอธิบายของตัวละคร "ตัวละครชื่อ: ${charName}"
-
-ตอบเป็น JSON ดังนี้:
-{
-  "personality": "คำอธิบายบุคลิก (2-3 ประโยค)",
-  "catchphrases": "คำพูดตัวอย่าง (แยกด้วย | เช่น คำพูด 1 | คำพูด 2)"
-}
-
-ตอบเป็นภาษไทยเท่านั้น และไม่ต้องมีคำนำหน้า เช่น "ตัวละครนี้คือ..." ให้เริ่มที่เนื้อหาเลย`;
+                const prompt = `วิเคระห์ตัวละคร "${charName}" ในหน้า 2-3 ประโยค และ 3 คำพูดตัวอย่าง ใน JSON:
+{"personality": "คำอธิบาย", "catchphrases": "คำพูด | คำพูด | คำพูด"}`;
 
                 let responseText = '';
                 if (state.provider === 'groq') {
@@ -1237,7 +1229,7 @@
                         method: 'POST',
                         headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            model: 'llama-3.3-70b-versatile',
+                            model: 'llama-3.1-8b-instant',
                             messages: [{ role: 'user', content: prompt }]
                         })
                     });
@@ -1275,10 +1267,10 @@
                 document.getElementById('custom-personality').value = charData.personality || '';
                 document.getElementById('custom-catchphrases').value = charData.catchphrases || '';
                 
-                // Search for image automatically
+                // Search for image automatically (non-blocking)
                 document.getElementById('search-img-input-creator').value = charName;
-                await searchImages('creator', false, charName);
-                showToast('✅ AI วิเคระห์เสร็จ! กำลังค้นหารูปภาพที่ตัวสมควร');
+                searchImages('creator', false, charName).catch(e => console.log('Image search skipped'));
+                showToast('✅ AI วิเคระห์เสร็จ! กำลังค้นหารูปภาพ...');
             } catch(e) {
                 console.error('generateCharacterWithAI:', e);
                 showToast('❌ เกิดข้อผิดพลาด กรุณาลองใหม่');
@@ -1459,7 +1451,7 @@
                         method: 'POST',
                         headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            model: 'llama-3.3-70b-versatile',
+                            model: 'llama-3.1-8b-instant',
                             messages: [{ role: 'user', content: prompt }]
                         })
                     });
