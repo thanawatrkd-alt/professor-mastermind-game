@@ -1159,7 +1159,9 @@
                 card.onclick = () => showProfile(index);
                 grid.appendChild(card);
             });
-              function openCreatorModal(index = -1) {
+        }
+
+        function openCreatorModal(index = -1) {
             clearCreatorForm();
             if (index === -1) {
                 document.getElementById('modal-title').textContent = '✨ สร้างเพื่อนคุยใหม่';
@@ -1218,16 +1220,16 @@
             loadingEl.style.display = 'flex';
             
             try {
-                const prompt = `คุณเป็นผู้เชี่ยวชาญด้านอนิเมะและตัวละครชื่อ "ตัวละครชื่อ" 
-หน้าที่ของคุณคือ วิเคระห์บุคลิก สไตล์การพูด และคำอธิบายของตัวละครชื่อ "ตัวละครชื่อ"
+                const prompt = `คุณเป็นผู้เชี่ยวชาญด้านอนิเมะและตัวละคร
+หน้าที่ของคุณคือ วิเคระห์บุคลิก สไตล์การพูด และคำอธิบายของตัวละคร "ตัวละครชื่อ: ${charName}"
 
-ตอนออกเป็น JSON ดังนี้:
+ตอบเป็น JSON ดังนี้:
 {
-  "personality": "คำอธิบายบุคลิก (ประมาณ 2-3 ประโยค)",
-  "catchphrases": "ตัวอย่างคำพูด (แยกด้วย | เช่น คำพูด 1 | คำพูด 2)"
+  "personality": "คำอธิบายบุคลิก (2-3 ประโยค)",
+  "catchphrases": "คำพูดตัวอย่าง (แยกด้วย | เช่น คำพูด 1 | คำพูด 2)"
 }
 
-ตอบเป็นภาษไทยเท่านั้น`;
+ตอบเป็นภาษไทยเท่านั้น และไม่ต้องมีคำนำหน้า เช่น "ตัวละครนี้คือ..." ให้เริ่มที่เนื้อหาเลย`;
 
                 let responseText = '';
                 if (state.provider === 'groq') {
