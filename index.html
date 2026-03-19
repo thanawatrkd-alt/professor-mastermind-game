@@ -457,13 +457,22 @@
                         <i class="fas fa-plus mr-2"></i> สร้างใหม่
                     </button>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-2 mb-3">
                     <button id="tab-local" class="tab-btn active" onclick="switchTab('local')">
                         <i class="fas fa-user mr-1"></i> ตัวละครของคุณ
                     </button>
                     <button id="tab-shared" class="tab-btn" onclick="switchTab('shared')">
                         <i class="fas fa-globe mr-1"></i> ตัวละครส่วนกลาง
                     </button>
+                </div>
+                <!-- Search & Filter Bar (Shared Characters Only) -->
+                <div id="search-filter-bar" style="display:none;" class="flex gap-2 mb-3">
+                    <input type="text" id="search-shared-input" class="flex-1 p-2 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500 text-sm" placeholder="ค้นหาตัวละคร..." oninput="filterSharedCharacters()">
+                    <select id="sort-shared-select" class="p-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm focus:ring-pink-500 focus:border-pink-500" onchange="filterSharedCharacters()">
+                        <option value="newest">ใหม่ล่าสุด</option>
+                        <option value="popular">ยอดนิยม</option>
+                        <option value="name">ชื่อ (A-Z)</option>
+                    </select>
                 </div>
             </header>
             <div class="scroll-area">
@@ -842,23 +851,56 @@
             currentTab = tab;
             document.getElementById('tab-local').classList.toggle('active', tab === 'local');
             document.getElementById('tab-shared').classList.toggle('active', tab === 'shared');
+            document.getElementById('search-filter-bar').style.display = tab === 'shared' ? 'flex' : 'none';
             if (tab === 'shared') {
+                document.getElementById('search-shared-input').value = '';
+                document.getElementById('sort-shared-select').value = 'newest';
                 renderSharedCharacters();
             } else {
                 renderCharacters();
             }
         }
 
-        async function renderSharedCharacters() {
+        let filteredSharedChars = [];
+        async function filterSharedCharacters() {
+            const searchTerm = document.getElementById('search-shared-input').value.toLowerCase();
+            const sortBy = document.getElementById('sort-shared-select').value;
+            
+            // Get all shared characters
+            let chars = [...sharedCharsCache];
+            
+            // Filter by search term
+            if (searchTerm) {
+                chars = chars.filter(c => 
+                    c.name.toLowerCase().includes(searchTerm) || 
+                    (c.tag && c.tag.toLowerCase().includes(searchTerm)) ||
+                    (c.sharedBy && c.sharedBy.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            // Sort
+            if (sortBy === 'newest') {
+                chars.sort((a, b) => new Date(b.sharedAt || 0) - new Date(a.sharedAt || 0));
+            } else if (sortBy === 'popular') {
+                chars.sort((a, b) => (getAffinity(b.name) || 0) - (getAffinity(a.name) || 0));
+            } else if (sortBy === 'name') {
+                chars.sort((a, b) => a.name.localeCompare(b.name, 'th'));
+            }
+            
+            filteredSharedChars = chars;
+            renderFilteredSharedCharacters();
+        }
+
+        function renderFilteredSharedCharacters() {
             const grid = document.getElementById('character-grid');
-            grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-8"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>กำลังโหลดตัวละครส่วนกลาง...</div>';
-            const chars = await fetchSharedCharacters();
             grid.innerHTML = '';
-            if (chars.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8">ยังไม่มีตัวละครส่วนกลาง<br><small>แชร์ตัวละครของคุณเพื่อให้ทุกคนเห็น!</small></div>';
+            
+            if (filteredSharedChars.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8">ไม่พบตัวละครที่ตรงกับการค้นหา</div>';
                 return;
             }
-              chars.forEach((char, index) => {
+            
+            filteredSharedChars.forEach((char, index) => {
                 const card = document.createElement('div');
                 card.className = 'char-card';
                 const initial = char.name.charAt(0).toUpperCase();
@@ -878,9 +920,23 @@
                         <div class="text-[10px] text-slate-500 mt-1">โดย: ${char.sharedBy || 'ไม่ระบุ'}</div>
                     </div>
                 `;
-                card.onclick = () => showSharedProfile(index);
+                card.onclick = () => showSharedProfile(sharedCharsCache.indexOf(char));
                 grid.appendChild(card);
             });
+        }
+
+        async function renderSharedCharacters() {
+            const grid = document.getElementById('character-grid');
+            grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-8"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>กำลังโหลดตัวละครส่วนกลาง...</div>';
+            const chars = await fetchSharedCharacters();
+            if (chars.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8">ยังไม่มีตัวละครส่วนกลาง<br><small>แชร์ตัวละครของคุณเพื่อให้ทุกคนเห็น!</small></div>';
+                return;
+            }
+            // Reset filter and sort to defaults
+            document.getElementById('search-shared-input').value = '';
+            document.getElementById('sort-shared-select').value = 'newest';
+            filterSharedCharacters();
         }
 
         function showSharedProfile(index) {
