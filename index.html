@@ -1021,6 +1021,16 @@
         }
 
         // View functions
+        function saveModes(charName) {
+            const modes = {
+                profanity: document.getElementById('mode-profanity')?.checked || false,
+                chunibyo: document.getElementById('mode-chunibyo')?.checked || false,
+                nsfw: document.getElementById('mode-nsfw')?.checked || false
+            };
+            localStorage.setItem('char_modes_' + charName, JSON.stringify(modes));
+            console.log('Saved modes for', charName, modes);
+        }
+
         function goHome() {
             state.view = 'home';
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
@@ -1068,6 +1078,40 @@
             }
             shareBtn.onclick = () => shareCharacter(state.characterIndex);
             shareBtn.style.display = '';
+
+            // เพิ่มแผงควบคุมโหมดการสนทนา
+            let modePanel = document.getElementById('mode-panel');
+            if (!modePanel) {
+                modePanel = document.createElement('div');
+                modePanel.id = 'mode-panel';
+                modePanel.className = 'bg-gray-800 p-4 rounded-lg mt-4 space-y-3';
+                document.getElementById('profile-view').appendChild(modePanel);
+            }
+            
+            // โหลดค่าโหมดจาก localStorage
+            const modeKey = 'char_modes_' + char.name;
+            const modes = JSON.parse(localStorage.getItem(modeKey) || '{"profanity": false, "chunibyo": false, "nsfw": false}');
+            
+            modePanel.innerHTML = `
+                <div class="text-white font-semibold mb-2">⚙️ ปรับโหมดการสนทนา:</div>
+                <label class="flex items-center text-white cursor-pointer">
+                    <input type="checkbox" id="mode-profanity" ${modes.profanity ? 'checked' : ''} class="mr-2">
+                    <span>🔥 อนุญาตคำหยาบ (Profanity)</span>
+                </label>
+                <label class="flex items-center text-white cursor-pointer">
+                    <input type="checkbox" id="mode-chunibyo" ${modes.chunibyo ? 'checked' : ''} class="mr-2">
+                    <span>✨ โหมดเบียว (Chunibyo)</span>
+                </label>
+                <label class="flex items-center text-white cursor-pointer">
+                    <input type="checkbox" id="mode-nsfw" ${modes.nsfw ? 'checked' : ''} class="mr-2">
+                    <span>🔞 เนื้อหาผู้ใหญ่ (NSFW 18+)</span>
+                </label>
+            `;
+            
+            // บันทึกค่าโหมดเมื่อเปลี่ยน
+            document.getElementById('mode-profanity').onchange = () => saveModes(char.name);
+            document.getElementById('mode-chunibyo').onchange = () => saveModes(char.name);
+            document.getElementById('mode-nsfw').onchange = () => saveModes(char.name);
 
             state.view = 'profile';
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
@@ -1156,6 +1200,15 @@
 
             addMessage('user', text);
             input.value = '';
+            
+            const modeKey = 'char_modes_' + state.character;
+            const modes = JSON.parse(localStorage.getItem(modeKey) || '{"profanity": false, "chunibyo": false, "nsfw": false}');
+            let modeInstructions = '';
+            if (modes.profanity) modeInstructions += 'ปลดล็อกการใช้คำหยาบและภาษาดิบ\n';
+            else modeInstructions += 'ใช้ภาษาสุภาพ\n';
+            if (modes.chunibyo) modeInstructions += 'โหมดเบียว: พูดจาเพ้อฝัน มีพลังวิเศษ\n';
+            if (modes.nsfw) modeInstructions += 'อนุญาตเนื้อหาผู้ใหญ่ (18+)\n';
+            else modeInstructions += 'หลีกเลี่ยงเนื้อหาผู้ใหญ่\n';
 
             try {
                 const response = await fetch(state.provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + state.apiKey, {
@@ -1174,7 +1227,8 @@
 
 กฎการตอบหมายที่ต้องปฏิบัติ:
 ✓ ตอบเป็นภาษาไทยที่เป็นธรรมชาติ ใช้คำสแลง คำว่า คำสร้อย Slang ที่เป็นกันเองเช่นไทย
-✓ อนุญาตให้ใช้คำหยาบคาย (Profanity) ตามความเหมาะสมของคาแรคเตอร์ (เช่น ตัวละครก้าวร้าว ปากร้าย นักเลง ให้ใช้คำหยาบได้ตามธรรมชาติ)
+✓ ${modeInstructions}
+✓ ตามความเหมาะสมของคาแรคเตอร์ (เช่น ตัวละครก้าวร้าว ปากร้าย นักเลง ให้ใช้คำหยาบได้ตามธรรมชาติ)
 ✓ ใช้คำพูดติดปากและคำที่ใช้บ่อยอย่างเคร่งครัดในทุกคำตอบ
 ✓ ตอบเปิดอารมณ์และสร้สันทนาตามบทสนทนา ถ้าผู้ใช้ใช้คำหยาบ ให้ตอบโต้กลับด้วยอารมณ์ที่สอดคล้อง
 ✓ ไม่เป็นหุ่นยนต์ ไม่หลุดกลัวกำลัง ไม่หลุดพ้นเช่น
