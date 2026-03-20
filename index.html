@@ -188,6 +188,11 @@
             overflow: hidden;
             position: relative;
         }
+        @media (max-width: 768px) {
+            #chat-view {
+                height: 100dvh; /* Use dynamic viewport height for mobile */
+            }
+        }
         .chat-header {
             background: rgba(30, 41, 59, 0.8);
             backdrop-filter: blur(12px);
@@ -214,8 +219,9 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
-            padding: 1.5rem 1.5rem 100px 1.5rem;
+            padding: 1.5rem 1.5rem 120px 1.5rem;
             display: flex;
             flex-direction: column;
             gap: 1.2rem;
@@ -257,7 +263,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             flex-shrink: 0;
             z-index: 100;
-            position: fixed;
+            position: absolute; /* Changed from fixed to absolute within relative parent */
             bottom: 0;
             left: 0;
             right: 0;
@@ -982,13 +988,22 @@
             localStorage.setItem('chat_history_' + state.character, JSON.stringify(state.history));
             
             const container = document.getElementById('chat-messages');
-            // ใช้ setTimeout เพื่อให้แน่ใจว่า DOM ถูกวาดเสร็จก่อนเลื่อนหน้าจอ
-            setTimeout(() => {
-                container.scrollTo({
-                    top: container.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }, 100);
+            // ใช้ฟังก์ชันเลื่อนหน้าจอที่เสถียรกว่า
+            const scrollToBottom = () => {
+                container.scrollTop = container.scrollHeight;
+                // ลองเลื่อนอีกครั้งหลังจากเวลาผ่านไปเล็กน้อย (เผื่อรูปภาพหรือฟอนต์ยังโหลดไม่เสร็จ)
+                setTimeout(() => {
+                    container.scrollTop = container.scrollHeight;
+                }, 50);
+                setTimeout(() => {
+                    container.scrollTo({
+                        top: container.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 150);
+            };
+            
+            scrollToBottom();
             
             // ถ้าเป็นข้อความจากผู้ใช้ ให้ทำการวิเคราะห์สไตล์การพิมพ์
             if (role === 'user') {
