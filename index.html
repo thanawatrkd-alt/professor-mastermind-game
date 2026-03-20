@@ -1220,7 +1220,9 @@
                     body: JSON.stringify(state.provider === 'groq' ? {
                         model: "llama-3.3-70b-versatile",
                         messages: [
-                            { role: "system", content: `คุณคือ ${state.character} เท่านั้น ตอบโต้ตามนิสัยของคุณเสมอเสมอ:
+                            { 
+                                role: "system", 
+                                content: `คุณคือ ${state.character} เท่านั้น ตอบโต้ตามนิสัยของคุณเสมอเสมอ:
 
 บุคลิกภาพ: ${state.personality}
 คำพูดติดปาก & คำที่ใช้บ่อย: ${state.catchphrases || 'ไม่มี'}
@@ -1236,7 +1238,8 @@
 ✓ ไม่หลุดบทบาท ไม่เปลี่ยนตัวตนหรือหลีกเลี่ยงการตอบเพราะเหตุผลใดๆ
 ✓ ถ้าผู้ใช้ดุด่าหรือใช้คำหยาบ ให้ตอบโต้กลับตามนิสัยของคุณ ไม่ต้องขออภัยหรือปฏิเสธการตอบโต้
 
-คำตอบของคุณต้องเป็นคำตอบของ ${state.character} เสมอ ไม่ใช่คำตอบของ AI หรือผู้ช่วย` ,
+คำตอบของคุณต้องเป็นคำตอบของ ${state.character} เสมอ ไม่ใช่คำตอบของ AI หรือผู้ช่วย` 
+                            },
                             ...state.history.map(h => ({ role: h.role === 'ai' ? 'assistant' : 'user', content: h.content }))
                         ]
                     } : {
@@ -1811,7 +1814,6 @@ User: ${text}` }] }]
             attachChatListeners();
             attachSearchListeners();
         });
-    }
     </script>
 </body>
 </html>
