@@ -431,16 +431,20 @@
             </div>
 
             <div id="shared-controls" class="px-6 mb-4 hidden">
-                <div class="flex flex-col md:flex-row gap-3">
-                    <div class="flex-1 relative">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                        <input type="text" id="search-shared-input" oninput="filterSharedCharacters()" class="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:ring-pink-500 focus:border-pink-500" placeholder="ค้นหาตัวละครส่วนกลาง...">
+                <div class="flex flex-col md:flex-row gap-3 items-center">
+                    <div class="flex-1">
+                        <p class="text-xs text-slate-500"><i class="fas fa-info-circle mr-1"></i> แสดงตัวละครที่ผู้ใช้คนอื่นแชร์ไว้</p>
                     </div>
-                    <select id="sort-shared-select" onchange="filterSharedCharacters()" class="bg-slate-800 border border-slate-700 text-sm text-white px-4 py-2 rounded-xl focus:ring-pink-500">
-                        <option value="newest">ใหม่ล่าสุด</option>
-                        <option value="oldest">เก่าที่สุด</option>
-                        <option value="name">ชื่อ (ก-ฮ)</option>
-                    </select>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button onclick="openSearchAndShareModal()" class="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 shadow-lg">
+                            <i class="fas fa-globe-asia"></i> ค้นหาแล้วแชร์
+                        </button>
+                        <select id="sort-shared-select" onchange="filterSharedCharacters()" class="bg-slate-800 border border-slate-700 text-sm text-white px-4 py-2 rounded-xl focus:ring-pink-500">
+                            <option value="newest">ใหม่ล่าสุด</option>
+                            <option value="oldest">เก่าที่สุด</option>
+                            <option value="name">ชื่อ (ก-ฮ)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -662,6 +666,47 @@
                 <div class="flex justify-end gap-3">
                     <button onclick="closeTrainingModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
                     <button onclick="saveTraining()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition">บันทึกการเทรน</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Share Modal -->
+        <div id="search-share-modal" class="modal">
+            <div class="modal-content">
+                <h3 class="text-xl font-bold mb-2">🌍 ค้นหาแล้วแชร์</h3>
+                <p class="text-sm text-slate-400 mb-4">ค้นหาตัวละครใหม่ๆ จากโลกอินเทอร์เน็ต แล้วนำมาแชร์ให้ทุกคนได้คุยกัน!</p>
+                
+                <div class="mb-4">
+                    <label for="search-share-input" class="block text-sm font-medium text-slate-300 mb-2">ชื่อตัวละครหรือเรื่องราวที่ต้องการค้นหา</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="search-share-input" class="flex-1 p-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:ring-pink-500 focus:border-pink-500" placeholder="เช่น Luffy One Piece, Iron Man...">
+                        <button onclick="searchAndPrepareCharacter()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+                            <i class="fas fa-search"></i> ค้นหา
+                        </button>
+                    </div>
+                </div>
+
+                <div id="search-share-result" class="hidden border border-slate-700 rounded-xl p-4 bg-slate-800/50 mb-4">
+                    <div class="flex items-center gap-4 mb-3">
+                        <img id="ss-result-img" src="" class="w-16 h-16 rounded-full object-cover border-2 border-pink-500">
+                        <div>
+                            <h4 id="ss-result-name" class="font-bold text-white"></h4>
+                            <p id="ss-result-tag" class="text-xs text-pink-500"></p>
+                        </div>
+                    </div>
+                    <p id="ss-result-desc" class="text-xs text-slate-400 line-clamp-3 mb-3"></p>
+                    <button onclick="confirmAndShareCharacter()" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-lg text-sm font-bold transition">
+                        <i class="fas fa-share-alt mr-1"></i> แชร์ตัวละครนี้เข้าสู่ส่วนกลาง
+                    </button>
+                </div>
+
+                <div id="ss-loading" class="hidden text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-3xl text-indigo-500 mb-2"></i>
+                    <p class="text-sm text-slate-400">AI กำลังค้นหาและเตรียมข้อมูลตัวละคร...</p>
+                </div>
+
+                <div class="flex justify-end">
+                    <button onclick="closeSearchAndShareModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ปิด</button>
                 </div>
             </div>
         </div>
@@ -1171,6 +1216,79 @@ ${state.knowledge || 'ไม่มีข้อมูลเพิ่มเติ�
                 if (state.view === 'chat') {
                     addMessage('ai', `สวัสดี! ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ วันนี้อยากคุยเรื่องอะไรดีล่ะ?`);
                 }
+            }
+        }
+
+        let searchShareData = null;
+
+        function openSearchAndShareModal() {
+            document.getElementById('search-share-modal').classList.add('active');
+            document.getElementById('search-share-input').value = '';
+            document.getElementById('search-share-result').classList.add('hidden');
+            document.getElementById('ss-loading').classList.add('hidden');
+            searchShareData = null;
+        }
+
+        function closeSearchAndShareModal() {
+            document.getElementById('search-share-modal').classList.remove('active');
+        }
+
+        async function searchAndPrepareCharacter() {
+            const query = document.getElementById('search-share-input').value.trim();
+            if (!query) { alert('กรุณาระบุชื่อตัวละครที่ต้องการค้นหา'); return; }
+            if (!state.apiKey) { showToast('❌ กรุณาตั้งค่า API Key'); openApiModal(); return; }
+
+            const loading = document.getElementById('ss-loading');
+            const resultDiv = document.getElementById('search-share-result');
+            
+            loading.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
+
+            try {
+                const prompt = `ค้นหาข้อมูลตัวละคร "${query}" และสรุปข้อมูลในรูปแบบ JSON: {"name": "ชื่อตัวละคร", "tag": "คำอธิบายสั้นๆ เช่น จากเรื่อง...", "desc": "นิสัยและประวัติโดยละเอียด 3-4 ประโยค", "catchphrases": "คำพูดติดปาก 2-3 อย่าง", "knowledge": "ข้อมูลเชิงลึกที่ควรรู้"}`;
+                const isGroq = state.provider === 'groq';
+                const response = await fetch(isGroq ? 'https://api.groq.com/openai/v1/chat/completions' : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...(isGroq && { 'Authorization': `Bearer ${state.apiKey}` }) },
+                    body: JSON.stringify(isGroq ? { model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: prompt }] } : { contents: [{ parts: [{ text: prompt }] }] })
+                });
+                const data = await response.json();
+                const text = isGroq ? data.choices[0].message.content : data.candidates[0].content.parts[0].text;
+                const json = JSON.parse(text.match(/\{.*\}/s)[0]);
+                
+                searchShareData = {
+                    ...json,
+                    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${json.name}${Math.random()}`,
+                    sharedBy: 'ระบบค้นหาอัตโนมัติ',
+                    timestamp: Date.now()
+                };
+
+                document.getElementById('ss-result-name').textContent = searchShareData.name;
+                document.getElementById('ss-result-tag').textContent = searchShareData.tag;
+                document.getElementById('ss-result-desc').textContent = searchShareData.desc;
+                document.getElementById('ss-result-img').src = searchShareData.avatar;
+
+                resultDiv.classList.remove('hidden');
+            } catch (e) {
+                console.error(e);
+                showToast('❌ ค้นหาข้อมูลล้มเหลว');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        async function confirmAndShareCharacter() {
+            if (!searchShareData) return;
+            
+            try {
+                const newRef = sharedCharsRef.push();
+                await newRef.set(searchShareData);
+                showToast('🚀 แชร์ตัวละครเข้าสู่ส่วนกลางเรียบร้อยแล้ว!');
+                closeSearchAndShareModal();
+                renderSharedCharacters();
+            } catch (e) {
+                console.error(e);
+                showToast('❌ แชร์ไม่สำเร็จ กรุณาลองใหม่');
             }
         }
 
