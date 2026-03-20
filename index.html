@@ -162,6 +162,22 @@
             margin-bottom: 1.5rem;
             box-shadow: 0 0 30px rgba(236, 72, 153, 0.3);
         }
+        .toggle-btn {
+            background: #334155;
+            color: #94a3b8;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toggle-btn.active {
+            background: #ec4899;
+            color: white;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+            border-color: #f472b6;
+        }
 
         /* Chat View */
         #chat-view {
@@ -477,7 +493,19 @@
                         </div>
                     </div>
 
-                    <p id="profile-desc" class="text-slate-300 leading-relaxed mb-8 text-center"></p>
+                    <p id="profile-desc" class="text-slate-300 leading-relaxed mb-6 text-center"></p>
+
+                    <div class="flex gap-2 flex-wrap justify-center mb-8">
+                        <button id="mode-profanity" onclick="toggleMode('profanity')" class="toggle-btn">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> คำหยาบ
+                        </button>
+                        <button id="mode-chunibyo" onclick="toggleMode('chunibyo')" class="toggle-btn">
+                            <i class="fas fa-magic mr-1"></i> โหมดเบียว
+                        </button>
+                        <button id="mode-nsfw" onclick="toggleMode('nsfw')" class="toggle-btn">
+                            <i class="fas fa-venus-mars mr-1"></i> 18+ (NSFW)
+                        </button>
+                    </div>
 
                     <div class="flex gap-3 flex-wrap justify-center">
                         <button onclick="startChat()" class="bg-pink-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-pink-700 transition shadow-lg shadow-pink-900/40">
@@ -896,6 +924,7 @@
             document.getElementById('profile-tag').textContent = char.tag || 'ตัวละครที่คุณเลือก';
             document.getElementById('profile-desc').textContent = char.desc;
             updateAffinityUI(char.name);
+            updateModeUI(char.name);
             
             const shareBtn = document.getElementById('share-char-btn');
             if (shareBtn) shareBtn.style.display = 'block';
@@ -919,6 +948,7 @@
             document.getElementById('profile-tag').textContent = (char.tag || 'ตัวละครส่วนกลาง') + ' — โดย: ' + (char.sharedBy || 'ไม่ระบุ');
             document.getElementById('profile-desc').textContent = char.desc;
             updateAffinityUI(char.name);
+            updateModeUI(char.name);
 
             state.view = 'profile';
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
@@ -1087,6 +1117,23 @@
             if (document.getElementById('affinity-bar')) document.getElementById('affinity-bar').style.width = pct + '%';
             if (document.getElementById('profile-affinity-label')) document.getElementById('profile-affinity-label').textContent = pts;
             if (document.getElementById('profile-affinity-bar')) document.getElementById('profile-affinity-bar').style.width = pct + '%';
+        }
+
+        function toggleMode(mode) {
+            const key = 'char_modes_' + state.character;
+            const modes = JSON.parse(localStorage.getItem(key) || '{"profanity": false, "chunibyo": false, "nsfw": false}');
+            modes[mode] = !modes[mode];
+            localStorage.setItem(key, JSON.stringify(modes));
+            updateModeUI(state.character);
+            showToast(`✨ ${mode === 'profanity' ? 'โหมดคำหยาบ' : mode === 'chunibyo' ? 'โหมดเบียว' : 'โหมด 18+'} ${modes[mode] ? 'เปิด' : 'ปิด'}แล้ว`);
+        }
+
+        function updateModeUI(charName) {
+            const key = 'char_modes_' + charName;
+            const modes = JSON.parse(localStorage.getItem(key) || '{"profanity": false, "chunibyo": false, "nsfw": false}');
+            if (document.getElementById('mode-profanity')) document.getElementById('mode-profanity').classList.toggle('active', modes.profanity);
+            if (document.getElementById('mode-chunibyo')) document.getElementById('mode-chunibyo').classList.toggle('active', modes.chunibyo);
+            if (document.getElementById('mode-nsfw')) document.getElementById('mode-nsfw').classList.toggle('active', modes.nsfw);
         }
 
         // ===== MODAL FUNCTIONS =====
