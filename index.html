@@ -214,6 +214,7 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
+            scroll-behavior: smooth;
             padding: 1.5rem 1.5rem 100px 1.5rem;
             display: flex;
             flex-direction: column;
@@ -979,8 +980,15 @@
             state.history.push({ role, content });
             renderMessages();
             localStorage.setItem('chat_history_' + state.character, JSON.stringify(state.history));
+            
             const container = document.getElementById('chat-messages');
-            container.scrollTop = container.scrollHeight;
+            // ใช้ setTimeout เพื่อให้แน่ใจว่า DOM ถูกวาดเสร็จก่อนเลื่อนหน้าจอ
+            setTimeout(() => {
+                container.scrollTo({
+                    top: container.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 100);
             
             // ถ้าเป็นข้อความจากผู้ใช้ ให้ทำการวิเคราะห์สไตล์การพิมพ์
             if (role === 'user') {
