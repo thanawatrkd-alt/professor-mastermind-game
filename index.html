@@ -1127,19 +1127,37 @@
 
         // ===== AFFINITY SYSTEM =====
         function getAffinity(charName) { return parseInt(localStorage.getItem('affinity_' + charName) || '0'); }
+        function getAffinityStatus(pts) {
+            if (pts >= 800) return { label: '♥ ซี้มาก', status: 'lover', color: '#ff1493' };
+            if (pts >= 500) return { label: '♥ สนิท', status: 'close', color: '#ff69b4' };
+            if (pts >= 200) return { label: '♥ รู้จัก', status: 'acquaint', color: '#ffa500' };
+            if (pts >= 50) return { label: '♥ แปลกหน้า', status: 'stranger', color: '#808080' };
+            if (pts >= -100) return { label: '💔 เฟรนด์โซน', status: 'friendzone', color: '#4169e1' };
+            if (pts >= -300) return { label: '💔 หักอก', status: 'heartbroken', color: '#dc143c' };
+            return { label: '😠 เกลียด', status: 'hate', color: '#8b0000' };
+        }
         function addAffinity(charName, pts) {
-            const next = Math.min(getAffinity(charName) + pts, 1000);
+            const current = getAffinity(charName);
+            const next = Math.max(Math.min(current + pts, 1000), -500);
             localStorage.setItem('affinity_' + charName, next);
             updateAffinityUI(charName);
+            return getAffinityStatus(next);
         }
         function updateAffinityUI(charName) {
             const pts = getAffinity(charName);
-            const pct = (pts / 1000) * 100;
-            const label = pts >= 800 ? '♥ ซี้มาก' : pts >= 500 ? '♥ สนิท' : pts >= 200 ? '♥ รู้จัก' : '♥ แปลกหน้า';
-            if (document.getElementById('affinity-label')) document.getElementById('affinity-label').textContent = pts + ' — ' + label;
-            if (document.getElementById('affinity-bar')) document.getElementById('affinity-bar').style.width = pct + '%';
-            if (document.getElementById('profile-affinity-label')) document.getElementById('profile-affinity-label').textContent = pts;
-            if (document.getElementById('profile-affinity-bar')) document.getElementById('profile-affinity-bar').style.width = pct + '%';
+            const status = getAffinityStatus(pts);
+            const displayPts = Math.max(0, pts);
+            const pct = Math.max(0, (pts / 1000) * 100);
+            if (document.getElementById('affinity-label')) document.getElementById('affinity-label').textContent = displayPts + ' — ' + status.label;
+            if (document.getElementById('affinity-bar')) {
+                document.getElementById('affinity-bar').style.width = pct + '%';
+                document.getElementById('affinity-bar').style.backgroundColor = status.color;
+            }
+            if (document.getElementById('profile-affinity-label')) document.getElementById('profile-affinity-label').textContent = displayPts + ' — ' + status.label;
+            if (document.getElementById('profile-affinity-bar')) {
+                document.getElementById('profile-affinity-bar').style.width = pct + '%';
+                document.getElementById('profile-affinity-bar').style.backgroundColor = status.color;
+            }
         }
 
         function toggleMode(mode) {
