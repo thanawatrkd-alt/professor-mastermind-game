@@ -772,13 +772,10 @@
         // ===== GLOBAL STATE =====
         const state = {
             view: 'home',
-            character: null,
-            characterIndex: -1,
-            avatar: null,
-            personality: null,
-            catchphrases: '',
-            knowledge: '',
+            profile: null,
             history: [],
+            affinity: JSON.parse(localStorage.getItem('khuiai_affinity') || '{}'),
+            relationshipStatus: JSON.parse(localStorage.getItem('khuiai_relationship') || '{}'),
             userStyle: localStorage.getItem('user_style_analysis') || 'ยังไม่มีข้อมูลสไตล์การพิมพ์',
             apiKey: localStorage.getItem('khuiai_key') || '',
             provider: localStorage.getItem('khuiai_provider') || 'groq',
@@ -1175,6 +1172,84 @@
             if (document.getElementById('mode-profanity')) document.getElementById('mode-profanity').classList.toggle('active', modes.profanity);
             if (document.getElementById('mode-chunibyo')) document.getElementById('mode-chunibyo').classList.toggle('active', modes.chunibyo);
             if (document.getElementById('mode-nsfw')) document.getElementById('mode-nsfw').classList.toggle('active', modes.nsfw);
+        }
+
+        // ===== FLIRTING & RELATIONSHIP SYSTEM =====
+        function getRelationshipStatus(charName) {
+            const affinity = getAffinity(charName);
+            if (affinity >= 800) return { status: 'แฟน', emoji: 'คนรักแฟน' };
+            if (affinity >= 500) return { status: 'สนใจ', emoji: 'คนรัก' };
+            if (affinity >= 200) return { status: 'คนคุยดี', emoji: 'คนดี' };
+            if (affinity >= 50) return { status: 'เพื่อน', emoji: 'คนคุย' };
+            if (affinity >= -100) return { status: 'เพื่อนเท่านั้น', emoji: 'โสชั' };
+            if (affinity >= -300) return { status: 'หักอก', emoji: 'ปริหริ่ม' };
+            return { status: 'เกลียด', emoji: 'คนเกลียด' };
+        }
+
+        async function flirt() {
+            if (!state.character) return;
+            
+            const charName = state.character;
+            const currentAffinity = getAffinity(charName);
+            const currentStatus = getRelationshipStatus(charName);
+            
+            const flirtPrompt = `คนกำลังจีบคุณ สถานะความสัมพันธ์ปัจจุบัน: ${currentStatus.status} (${currentAffinity}/1000)
+
+คนจีบคุณด้วยคำพูดหวานดี หรือคำพูดหรือกริยาวาว่าคุณรูสึกหรือไม่สนใจ ตอบแต่ว่าคุณจิบคุณด้วยหรือไม่สนใจ`;
+            
+            try {
+                const response = await fetch(state.provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + state.apiKey, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(state.provider === 'groq' && { 'Authorization': `Bearer ${state.apiKey}` })
+                    },
+                    body: JSON.stringify(state.provider === 'groq' ? {
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            { role: "system", content: `คุณคือ ${charName} ตอบโต้ตามคำขอบของคุณ ตอบแต่ว่าคุณรูสึกหรือไม่สนใจ หากคนจีบคุณด้วยคำพูดหวานดี คนจีบคุณที่สนใจจะตอบหรือไม่ตอบด้วยหรือไม่สนใจ` },
+                            ...state.history.map(h => ({ role: h.role === 'ai' ? 'assistant' : 'user', content: h.content }))
+                        ]
+                    } : {
+                        contents: [
+                            { role: 'user', parts: [{ text: flirtPrompt }] },
+                            ...state.history.map(h => ({ role: h.role === 'ai' ? 'model' : 'user', parts: [{ text: h.content }] }))
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                const aiResponse = state.provider === 'groq' ? data.choices[0].message.content : data.candidates[0].content.parts[0].text;
+                
+                const successKeywords = ['สนใจ', 'ดี', 'รูสึก', 'จิบ', 'ครับ', 'หาม', 'สักหรอหัก', 'ไหว', 'ครับคุณ', 'หลัง'];
+                const failureKeywords = ['ไม่สนใจ', 'หลุด', 'ไม่ได', 'ไม่สนใจหาก', 'ไม่เหมาะ', 'ไม่สนใจคน', 'หลุดคน', 'ไม่สนใจแหน'];
+                
+                const lowerResponse = aiResponse.toLowerCase();
+                const isSuccess = successKeywords.some(keyword => lowerResponse.includes(keyword));
+                const isFailure = failureKeywords.some(keyword => lowerResponse.includes(keyword));
+                
+                let affinityChange = 0;
+                let resultMessage = '';
+                
+                if (isSuccess && !isFailure) {
+                    affinityChange = 100;
+                    resultMessage = 'จีบสำเร็จ! คนที่สนใจหาคุณจิบคุณด้วยคำพูดหวานดี';
+                } else if (isFailure) {
+                    affinityChange = -50;
+                    resultMessage = 'อกหักแล้ว! คนที่สนใจไม่สนใจคุณ';
+                } else {
+                    affinityChange = 20;
+                    resultMessage = 'คนที่สนใจดูเหมืองความรูสึก';
+                }
+                
+                addMessage('ai', aiResponse);
+                const newStatus = addAffinity(charName, affinityChange);
+                showToast(resultMessage + ' (' + newStatus.label + ')');
+                updateAffinityUI(charName);
+            } catch (e) {
+                console.error(e);
+                addMessage('ai', 'ขออภัย ระบบขัดข้อง กรุณาตรวจสอบ API Key ของคุณ');
+            }
         }
 
         // ===== MODAL FUNCTIONS =====
