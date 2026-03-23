@@ -1006,7 +1006,7 @@
             state.history = saved ? JSON.parse(saved) : [];
             renderMessages();
             if (state.history.length === 0) {
-                addMessage('ai', `สวัสดี! ฉันคือ ${state.character} ยินดีที่ได้รู้จักนะ วันนี้อยากคุยเรื่องอะไรดีล่ะ?`);
+                addMessage('ai', `👋 **สวัสดีครับ! ผมคือ ${state.character} ยินดีที่ได้รู้จักนะ!**\n\n💡 *คำแนะนำการใช้งานเบื้องต้น:*\n• พิมพ์คุยได้ตามปกติ (เปิดโหมดคำหยาบ/จีบ ได้ที่หน้าโปรไฟล์)\n• พิมพ์ **/help** เพื่อดูคำสั่งที่ใช้งานได้ทั้งหมด\n• ลองจีบผมดูสิครับ ผมรอนะ! 😉`);
             }
         }
 
@@ -1232,23 +1232,83 @@
                     }
                     break;
                 case '/help':
-                    addMessage('ai', "📜 รายการคำสั่งทั้งหมด:\n" +
-                        "--- จัดการสถานะ ---\n" +
-                        "/status - ดูสถานะทั้งหมด\n" +
-                        "/set_mood [ค่า] - เปลี่ยนอารมณ์\n" +
-                        "/set_location [ค่า] - เปลี่ยนสถานที่\n" +
-                        "/set_outfit [ค่า] - เปลี่ยนชุด\n" +
-                        "/set_hunger [ค่า] - เปลี่ยนความหิว\n" +
-                        "/set_energy [ค่า] - เปลี่ยนพลังงาน\n" +
-                        "/set_status [ค่า] - เปลี่ยนสถานะพิเศษ\n" +
-                        "--- จัดการความสัมพันธ์ ---\n" +
-                        "/set_affinity [แต้ม] - ตั้งค่าความสนิท (0-100)\n" +
-                        "/marry - แต่งงานกัน\n" +
-                        "/divorce - เลิกรากัน\n" +
-                        "/gift [ชื่อของ] - มอบของขวัญ\n" +
-                        "--- อื่นๆ ---\n" +
-                        "/reset_all - รีเซ็ตทุกอย่าง\n" +
-                        "/help - ดูคำสั่งนี้");
+                    addMessage('ai', "📜 **รายการคำสั่งที่ใช้งานได้:**\n\n" +
+                        "**--- จัดการสถานะ ---**\n" +
+                        "• `/status` - ดูสถานะปัจจุบัน\n" +
+                        "• `/set_mood [ค่า]` - เปลี่ยนอารมณ์\n" +
+                        "• `/set_location [ค่า]` - เปลี่ยนสถานที่\n" +
+                        "• `/set_outfit [ค่า]` - เปลี่ยนชุดที่ใส่\n\n" +
+                        "**--- กิจกรรม & อารมณ์ ---**\n" +
+                        "• `/eat` - กินข้าว\n" +
+                        "• `/sleep` - ไปนอน\n" +
+                        "• `/work` - ไปทำงาน\n" +
+                        "• `/hug` - กอดตัวละคร\n" +
+                        "• `/kiss` - จูบตัวละคร\n" +
+                        "• `/slap` - ตบหน้า (ระวังโกรธนะ!)\n\n" +
+                        "**--- จัดการความสัมพันธ์ ---**\n" +
+                        "• `/marry` - ขอแต่งงาน\n" +
+                        "• `/divorce` - เลิกรากัน\n" +
+                        "• `/gift [ชื่อของ]` - มอบของขวัญ\n\n" +
+                        "**--- อื่นๆ ---**\n" +
+                        "• `/reset_all` - เริ่มต้นใหม่ทั้งหมด\n" +
+                        "• `/help` - ดูรายการคำสั่งนี้");
+                    break;
+                
+                // USER ACTIVITIES
+                case '/eat':
+                    status.hunger = 'อิ่มแปล้';
+                    status.mood = 'มีความสุข';
+                    addMessage('ai', `🍴 *${state.character} กำลังกินอาหารอย่างเอร็ดอร่อย* "ขอบคุณสำหรับอาหารนะ! อร่อยมากเลย"`);
+                    break;
+                case '/sleep':
+                    status.energy = 'เต็มเปี่ยม';
+                    status.mood = 'สดชื่น';
+                    addMessage('ai', `💤 *${state.character} กำลังนอนหลับปุ๋ย...* "ราตรีสวัสดิ์นะ ฝันดีล่ะ"`);
+                    break;
+                case '/work':
+                    status.energy = 'เหนื่อย';
+                    status.mood = 'จริงจัง';
+                    addMessage('ai', `💼 *${state.character} กำลังตั้งใจทำงาน* "ช่วงนี้งานยุ่งนิดหน่อยนะ แต่เพื่ออนาคตของเรา!"`);
+                    break;
+                case '/hug':
+                    status.mood = 'เขินอาย';
+                    addMessage('ai', `🫂 *${state.character} กอดคุณกลับแน่นๆ* "อุ่นจังเลย... ขอบคุณที่กอดนะ"`);
+                    break;
+                case '/kiss':
+                    status.mood = 'เขินหน้าแดง';
+                    addMessage('ai', `💋 *${state.character} หน้าแดงฉ่า* "ทะ...ทำอะไรน่ะ! ตกใจหมดเลย... (แต่ก็ชอบนะ)"`);
+                    break;
+                case '/slap':
+                    status.mood = 'โกรธจัด';
+                    addMessage('ai', `💢 *${state.character} เอามือกุมแก้มด้วยความตกใจ* "ทำแบบนี้ทำไม! นิสัยไม่ดีเลยนะ!"`);
+                    break;
+
+                // ADMIN COMMANDS (Hidden from /help)
+                case '/admin_help':
+                    addMessage('ai', "🛡️ **ADMIN COMMAND CENTER** 🛡️\n\n" +
+                        "• `/set_affinity [0-100]` - ปรับความสนิทโดยตรง\n" +
+                        "• `/set_hunger [ค่า]` - ปรับระดับความหิว\n" +
+                        "• `/set_energy [ค่า]` - ปรับระดับพลังงาน\n" +
+                        "• `/set_status [ค่า]` - ปรับสถานะพิเศษ\n" +
+                        "• `/force_say [ข้อความ]` - บังคับให้ AI พูดตามสั่ง\n" +
+                        "• `/set_all_max` - ปรับสถานะทุกอย่างให้เต็มแม็กซ์\n" +
+                        "• `/clear_all_storage` - ล้างข้อมูลทั้งหมดในเครื่อง (อันตราย)");
+                    break;
+                case '/force_say':
+                    addMessage('ai', value || "คุณไม่ได้ใส่ข้อความที่ต้องการให้ผมพูดครับ");
+                    break;
+                case '/set_all_max':
+                    status = {"mood":"มีความสุขที่สุด","hunger":"อิ่มมาก","energy":"เต็มเปี่ยม","custom":"สถานะเทพ","location":"สวรรค์","outfit":"ชุดทองคำ"};
+                    const affMaxKey = 'affinity_' + state.character;
+                    localStorage.setItem(affMaxKey, 100);
+                    updateAffinityUI();
+                    showToast('🔥 ADMIN: ปรับสถานะทุกอย่างสูงสุดแล้ว');
+                    break;
+                case '/clear_all_storage':
+                    if(confirm('⚠️ คำเตือน: การกระทำนี้จะล้างข้อมูลทั้งหมดในเว็บ (รวมถึง API Key และตัวละครที่สร้างไว้) คุณแน่ใจหรือไม่?')) {
+                        localStorage.clear();
+                        location.reload();
+                    }
                     break;
                 default:
                     addMessage('ai', "❌ ไม่พบคำสั่งนี้ ลองพิมพ์ /help เพื่อดูรายการคำสั่งทั้งหมด");
