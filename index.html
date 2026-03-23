@@ -559,6 +559,26 @@
                 </div>
             </header>
 
+            <!-- Status Dashboard -->
+            <div id="status-dashboard" class="bg-slate-800/50 backdrop-blur-md border-b border-white/5 px-4 py-2 flex gap-4 overflow-x-auto text-[10px] uppercase tracking-widest font-bold">
+                <div class="flex items-center gap-2 whitespace-nowrap">
+                    <span class="text-slate-400">อารมณ์:</span>
+                    <span id="status-mood" class="text-indigo-400">ปกติ</span>
+                </div>
+                <div class="flex items-center gap-2 whitespace-nowrap">
+                    <span class="text-slate-400">ความหิว:</span>
+                    <span id="status-hunger" class="text-amber-400">อิ่ม</span>
+                </div>
+                <div class="flex items-center gap-2 whitespace-nowrap">
+                    <span class="text-slate-400">พลังงาน:</span>
+                    <span id="status-energy" class="text-emerald-400">เต็ม</span>
+                </div>
+                <div class="flex items-center gap-2 whitespace-nowrap">
+                    <span class="text-slate-400">สถานะ:</span>
+                    <span id="status-custom" class="text-pink-400">โสด</span>
+                </div>
+            </div>
+
             <div id="chat-messages" class="chat-messages">
                 <!-- Messages will appear here -->
             </div>
@@ -1055,6 +1075,14 @@
             const input = document.getElementById('user-input');
             const text = input.value.trim();
             if (!text) return;
+
+            // Command System
+            if (text.startsWith('/')) {
+                handleCommand(text);
+                input.value = '';
+                return;
+            }
+
             if (!state.apiKey) { showToast('❌ กรุณาตั้งค่า API Key ก่อน'); openApiModal(); return; }
 
             addMessage('user', text);
@@ -1062,10 +1090,14 @@
 
             const modeKey = 'char_modes_' + state.character;
             const modes = JSON.parse(localStorage.getItem(modeKey) || '{"profanity": false, "chunibyo": false, "nsfw": false, "flirting": false}');
+            const statusKey = 'status_' + state.character;
+            const status = JSON.parse(localStorage.getItem(statusKey) || '{"mood":"ปกติ","hunger":"อิ่ม","energy":"เต็ม","custom":"โสด"}');
+            
             let modeInstructions = modes.profanity ? 'ปลดล็อกการใช้คำหยาบและภาษาดิบ (กู, มึง, สัด, เชี่ย ได้ตามความเหมาะสมของความสนิทสนม)\n' : 'ใช้ภาษาสุภาพ\n';
             if (modes.chunibyo) modeInstructions += 'โหมดเบียว: พูดจาเพ้อฝัน มีพลังวิเศษ\n';
             modeInstructions += modes.nsfw ? 'อนุญาตเนื้อหาผู้ใหญ่ (18+) และการคุยเชิงลึกได้อย่างอิสระ\n' : 'หลีกเลี่ยงเนื้อหาผู้ใหญ่\n';
             if (modes.flirting) modeInstructions += 'โหมดจีบ: พูดจาแพรวพราว หยอดเก่ง รุกหนัก และแสดงความใกล้ชิดเหมือนเป็นคนรัก\n';
+            modeInstructions += `สถานะปัจจุบันของตัวละคร (จงตอบโต้ให้สอดคล้องกับสถานะนี้):\n- อารมณ์: ${status.mood}\n- ความหิว: ${status.hunger}\n- พลังงาน: ${status.energy}\n- สถานะพิเศษ: ${status.custom}\n`;
 
             try {
                 const isGroq = state.provider === 'groq';
@@ -1125,6 +1157,62 @@
                 addMessage('ai', `ประวัติการแชทถูกล้างแล้ว เริ่มต้นคุยใหม่กับ ${state.character} ได้เลย!`);
             }
         }
+
+        // ===== COMMAND & STATUS SYSTEM =====
+        function handleCommand(cmdText) {
+            const args = cmdText.split(' ');
+            const command = args[0].toLowerCase();
+            const value = args.slice(1).join(' ');
+            const charKey = 'status_' + state.character;
+            let status = JSON.parse(localStorage.getItem(charKey) || '{"mood":"ปกติ","hunger":"อิ่ม","energy":"เต็ม","custom":"โสด"}');
+
+            switch(command) {
+                case '/status':
+                    addMessage('ai', `📊 สถานะปัจจุบันของ ${state.character}:\n- อารมณ์: ${status.mood}\n- ความหิว: ${status.hunger}\n- พลังงาน: ${status.energy}\n- สถานะพิเศษ: ${status.custom}`);
+                    break;
+                case '/set_mood':
+                    status.mood = value || 'ปกติ';
+                    showToast('✨ อัปเดตอารมณ์แล้ว');
+                    break;
+                case '/set_hunger':
+                    status.hunger = value || 'อิ่ม';
+                    showToast('🍖 อัปเดตความหิวแล้ว');
+                    break;
+                case '/set_energy':
+                    status.energy = value || 'เต็ม';
+                    showToast('⚡ อัปเดตพลังงานแล้ว');
+                    break;
+                case '/set_status':
+                    status.custom = value || 'ไม่มี';
+                    showToast('🏷️ อัปเดตสถานะพิเศษแล้ว');
+                    break;
+                case '/help':
+                    addMessage('ai', "📜 รายการคำสั่ง:\n/status - ดูสถานะทั้งหมด\n/set_mood [ค่า] - เปลี่ยนอารมณ์\n/set_hunger [ค่า] - เปลี่ยนความหิว\n/set_energy [ค่า] - เปลี่ยนพลังงาน\n/set_status [ค่า] - เปลี่ยนสถานะพิเศษ");
+                    break;
+                default:
+                    addMessage('ai', "❌ ไม่พบคำสั่งนี้ ลองพิมพ์ /help เพื่อดูรายการคำสั่งทั้งหมด");
+                    return;
+            }
+
+            localStorage.setItem(charKey, JSON.stringify(status));
+            updateStatusUI();
+        }
+
+        function updateStatusUI() {
+            const charKey = 'status_' + state.character;
+            const status = JSON.parse(localStorage.getItem(charKey) || '{"mood":"ปกติ","hunger":"อิ่ม","energy":"เต็ม","custom":"โสด"}');
+            if (document.getElementById('status-mood')) document.getElementById('status-mood').textContent = status.mood;
+            if (document.getElementById('status-hunger')) document.getElementById('status-hunger').textContent = status.hunger;
+            if (document.getElementById('status-energy')) document.getElementById('status-energy').textContent = status.energy;
+            if (document.getElementById('status-custom')) document.getElementById('status-custom').textContent = status.custom;
+        }
+
+        // เพิ่มการเรียก updateStatusUI ใน startChat
+        const originalStartChat = window.startChat;
+        window.startChat = function(index) {
+            if (originalStartChat) originalStartChat(index);
+            setTimeout(updateStatusUI, 100);
+        };
 
         // ===== AFFINITY SYSTEM =====
         function getAffinity(charName) { return parseInt(localStorage.getItem('affinity_' + charName) || '0'); }
