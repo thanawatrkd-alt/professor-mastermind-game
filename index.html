@@ -512,6 +512,9 @@
                         <button id="mode-nsfw" onclick="toggleMode('nsfw')" class="toggle-btn">
                             <i class="fas fa-venus-mars mr-1"></i> 18+ (NSFW)
                         </button>
+                        <button id="mode-flirting" onclick="toggleMode('flirting')" class="toggle-btn">
+                            <i class="fas fa-heart mr-1"></i> โหมดจีบ
+                        </button>
                     </div>
 
                     <div class="flex gap-3 flex-wrap justify-center">
@@ -1058,10 +1061,11 @@
             input.value = '';
 
             const modeKey = 'char_modes_' + state.character;
-            const modes = JSON.parse(localStorage.getItem(modeKey) || '{"profanity": false, "chunibyo": false, "nsfw": false}');
-            let modeInstructions = modes.profanity ? 'ปลดล็อกการใช้คำหยาบและภาษาดิบ\n' : 'ใช้ภาษาสุภาพ\n';
+            const modes = JSON.parse(localStorage.getItem(modeKey) || '{"profanity": false, "chunibyo": false, "nsfw": false, "flirting": false}');
+            let modeInstructions = modes.profanity ? 'ปลดล็อกการใช้คำหยาบและภาษาดิบ (กู, มึง, สัด, เชี่ย ได้ตามความเหมาะสมของความสนิทสนม)\n' : 'ใช้ภาษาสุภาพ\n';
             if (modes.chunibyo) modeInstructions += 'โหมดเบียว: พูดจาเพ้อฝัน มีพลังวิเศษ\n';
-            modeInstructions += modes.nsfw ? 'อนุญาตเนื้อหาผู้ใหญ่ (18+)\n' : 'หลีกเลี่ยงเนื้อหาผู้ใหญ่\n';
+            modeInstructions += modes.nsfw ? 'อนุญาตเนื้อหาผู้ใหญ่ (18+) และการคุยเชิงลึกได้อย่างอิสระ\n' : 'หลีกเลี่ยงเนื้อหาผู้ใหญ่\n';
+            if (modes.flirting) modeInstructions += 'โหมดจีบ: พูดจาแพรวพราว หยอดเก่ง รุกหนัก และแสดงความใกล้ชิดเหมือนเป็นคนรัก\n';
 
             try {
                 const isGroq = state.provider === 'groq';
@@ -1159,19 +1163,26 @@
 
         function toggleMode(mode) {
             const key = 'char_modes_' + state.character;
-            const modes = JSON.parse(localStorage.getItem(key) || '{"profanity": false, "chunibyo": false, "nsfw": false}');
+            const modes = JSON.parse(localStorage.getItem(key) || '{"profanity": false, "chunibyo": false, "nsfw": false, "flirting": false}');
             modes[mode] = !modes[mode];
             localStorage.setItem(key, JSON.stringify(modes));
             updateModeUI(state.character);
-            showToast(`✨ ${mode === 'profanity' ? 'โหมดคำหยาบ' : mode === 'chunibyo' ? 'โหมดเบียว' : 'โหมด 18+'} ${modes[mode] ? 'เปิด' : 'ปิด'}แล้ว`);
+            const modeNames = {
+                'profanity': 'โหมดคำหยาบ',
+                'chunibyo': 'โหมดเบียว',
+                'nsfw': 'โหมด 18+',
+                'flirting': 'โหมดจีบ'
+            };
+            showToast(`✨ ${modeNames[mode]} ${modes[mode] ? 'เปิด' : 'ปิด'}แล้ว`);
         }
 
         function updateModeUI(charName) {
             const key = 'char_modes_' + charName;
-            const modes = JSON.parse(localStorage.getItem(key) || '{"profanity": false, "chunibyo": false, "nsfw": false}');
+            const modes = JSON.parse(localStorage.getItem(key) || '{"profanity": false, "chunibyo": false, "nsfw": false, "flirting": false}');
             if (document.getElementById('mode-profanity')) document.getElementById('mode-profanity').classList.toggle('active', modes.profanity);
             if (document.getElementById('mode-chunibyo')) document.getElementById('mode-chunibyo').classList.toggle('active', modes.chunibyo);
             if (document.getElementById('mode-nsfw')) document.getElementById('mode-nsfw').classList.toggle('active', modes.nsfw);
+            if (document.getElementById('mode-flirting')) document.getElementById('mode-flirting').classList.toggle('active', modes.flirting);
         }
 
         // ===== FLIRTING & RELATIONSHIP SYSTEM =====
