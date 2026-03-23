@@ -1232,56 +1232,64 @@
                     }
                     break;
                 case '/help':
-                    addMessage('ai', "📜 **รายการคำสั่งที่ใช้งานได้:**\n\n" +
-                        "**--- จัดการสถานะ ---**\n" +
-                        "• `/status` - ดูสถานะปัจจุบัน\n" +
-                        "• `/set_mood [ค่า]` - เปลี่ยนอารมณ์\n" +
-                        "• `/set_location [ค่า]` - เปลี่ยนสถานที่\n" +
-                        "• `/set_outfit [ค่า]` - เปลี่ยนชุดที่ใส่\n\n" +
-                        "**--- กิจกรรม & อารมณ์ ---**\n" +
-                        "• `/eat` - กินข้าว\n" +
-                        "• `/sleep` - ไปนอน\n" +
-                        "• `/work` - ไปทำงาน\n" +
-                        "• `/hug` - กอดตัวละคร\n" +
-                        "• `/kiss` - จูบตัวละคร\n" +
-                        "• `/slap` - ตบหน้า (ระวังโกรธนะ!)\n\n" +
-                        "**--- จัดการความสัมพันธ์ ---**\n" +
-                        "• `/marry` - ขอแต่งงาน\n" +
-                        "• `/divorce` - เลิกรากัน\n" +
-                        "• `/gift [ชื่อของ]` - มอบของขวัญ\n\n" +
-                        "**--- อื่นๆ ---**\n" +
-                        "• `/reset_all` - เริ่มต้นใหม่ทั้งหมด\n" +
-                        "• `/help` - ดูรายการคำสั่งนี้");
+                    addMessage('ai', "📜 **MEGA COMMAND LIST (แน่นๆ):**\n\n" +
+                        "**🏠 [กิจกรรมในบ้าน]**\n" +
+                        "• `/eat` / `/cook` / `/clean` / `/shower` / `/sleep` / `/watch_tv` / `/read_book` / `/play_game`\n\n" +
+                        "**🎭 [แสดงอารมณ์]**\n" +
+                        "• `/hug` / `/kiss` / `/slap` / `/cry` / `/laugh` / `/angry` / `/smile` / `/dance` / `/sing` / `/tickle` / `/punch` / `/pat`\n\n" +
+                        "**🗺️ [นอกบ้าน]**\n" +
+                        "• `/go_out` / `/shopping` / `/movie` / `/park` / `/dinner` / `/travel`\n\n" +
+                        "**💖 [ความสัมพันธ์]**\n" +
+                        "• `/marry` / `/divorce` / `/gift [ของ]` / `/flirt` / `/hold_hand` / `/cuddle` / `/propose`\n\n" +
+                        "**📊 [จัดการสถานะ]**\n" +
+                        "• `/status` / `/set_mood` / `/set_location` / `/set_outfit` / `/set_hunger` / `/set_energy` / `/set_status`\n\n" +
+                        "**🛠️ [อื่นๆ]**\n" +
+                        "• `/dice` / `/coin` / `/joke` / `/fact` / `/reset_all` / `/help` / `/admin_help` (ลับ)");
                     break;
                 
-                // USER ACTIVITIES
-                case '/eat':
-                    status.hunger = 'อิ่มแปล้';
-                    status.mood = 'มีความสุข';
-                    addMessage('ai', `🍴 *${state.character} กำลังกินอาหารอย่างเอร็ดอร่อย* "ขอบคุณสำหรับอาหารนะ! อร่อยมากเลย"`);
-                    break;
-                case '/sleep':
-                    status.energy = 'เต็มเปี่ยม';
-                    status.mood = 'สดชื่น';
-                    addMessage('ai', `💤 *${state.character} กำลังนอนหลับปุ๋ย...* "ราตรีสวัสดิ์นะ ฝันดีล่ะ"`);
-                    break;
-                case '/work':
-                    status.energy = 'เหนื่อย';
-                    status.mood = 'จริงจัง';
-                    addMessage('ai', `💼 *${state.character} กำลังตั้งใจทำงาน* "ช่วงนี้งานยุ่งนิดหน่อยนะ แต่เพื่ออนาคตของเรา!"`);
-                    break;
-                case '/hug':
-                    status.mood = 'เขินอาย';
-                    addMessage('ai', `🫂 *${state.character} กอดคุณกลับแน่นๆ* "อุ่นจังเลย... ขอบคุณที่กอดนะ"`);
-                    break;
-                case '/kiss':
-                    status.mood = 'เขินหน้าแดง';
-                    addMessage('ai', `💋 *${state.character} หน้าแดงฉ่า* "ทะ...ทำอะไรน่ะ! ตกใจหมดเลย... (แต่ก็ชอบนะ)"`);
-                    break;
-                case '/slap':
-                    status.mood = 'โกรธจัด';
-                    addMessage('ai', `💢 *${state.character} เอามือกุมแก้มด้วยความตกใจ* "ทำแบบนี้ทำไม! นิสัยไม่ดีเลยนะ!"`);
-                    break;
+                // --- MEGA USER ACTIVITIES ---
+                case '/eat': status.hunger = 'อิ่มแปล้'; status.mood = 'มีความสุข'; addMessage('ai', `🍴 *${state.character} กำลังกินอาหารอย่างเอร็ดอร่อย* "ขอบคุณสำหรับอาหารนะ! อร่อยมากเลย"`); break;
+                case '/cook': status.hunger = 'เริ่มหิว'; status.mood = 'สนุกสนาน'; addMessage('ai', `🍳 *${state.character} กำลังเข้าครัวทำอาหาร* "วันนี้อยากกินอะไรเป็นพิเศษไหม? เดี๋ยวผมจัดให้!"`); break;
+                case '/clean': status.energy = 'เหนื่อย'; status.mood = 'ภูมิใจ'; addMessage('ai', `🧹 *${state.character} กำลังทำความสะอาดบ้าน* "บ้านสะอาดแล้วน่าอยู่ขึ้นเยอะเลยเนอะ!"`); break;
+                case '/shower': status.mood = 'สดชื่น'; status.outfit = 'ชุดคลุมอาบน้ำ'; addMessage('ai', `🚿 *${state.character} กำลังอาบน้ำ* "สดชื่นจังเลย... อย่าแอบดูนะ!"`); break;
+                case '/sleep': status.energy = 'เต็มเปี่ยม'; status.mood = 'สดชื่น'; addMessage('ai', `💤 *${state.character} กำลังนอนหลับปุ๋ย...* "ราตรีสวัสดิ์นะ ฝันดีล่ะ"`); break;
+                case '/watch_tv': status.mood = 'ผ่อนคลาย'; addMessage('ai', `📺 *${state.character} กำลังดูทีวีกับคุณ* "รายการนี้สนุกดีนะว่าไหม?"`); break;
+                case '/read_book': status.mood = 'สงบ'; addMessage('ai', `📖 *${state.character} กำลังอ่านหนังสือ* "เล่มนี้เนื้อหาดีมากเลย ไว้จะเล่าให้ฟังนะ"`); break;
+                case '/play_game': status.energy = 'ตื่นเต้น'; status.mood = 'สนุกมาก'; addMessage('ai', `🎮 *${state.character} กำลังเล่นเกมอย่างเมามันส์* "มาเล่นด้วยกันสิ! รับรองผมไม่แพ้หรอก"`); break;
+
+                // --- MEGA EMOTIONS ---
+                case '/hug': status.mood = 'เขินอาย'; addMessage('ai', `🫂 *${state.character} กอดคุณกลับแน่นๆ* "อุ่นจังเลย... ขอบคุณที่กอดนะ"`); break;
+                case '/kiss': status.mood = 'เขินหน้าแดง'; addMessage('ai', `💋 *${state.character} หน้าแดงฉ่า* "ทะ...ทำอะไรน่ะ! ตกใจหมดเลย... (แต่ก็ชอบนะ)"`); break;
+                case '/slap': status.mood = 'โกรธจัด'; addMessage('ai', `💢 *${state.character} เอามือกุมแก้มด้วยความตกใจ* "ทำแบบนี้ทำไม! นิสัยไม่ดีเลยนะ!"`); break;
+                case '/cry': status.mood = 'เศร้า'; addMessage('ai', `😭 *${state.character} ร้องไห้ออกมา* "ฮือ... ขอกอดหน่อยได้ไหม... เสียใจจัง"`); break;
+                case '/laugh': status.mood = 'ตลก'; addMessage('ai', `😂 *${state.character} หัวเราะลั่น* "ฮ่าๆๆๆ ตลกชะมัดเลยมึง!"`); break;
+                case '/angry': status.mood = 'หงุดหงิด'; addMessage('ai', `💢 *${state.character} ทำหน้าบึ้ง* "ไม่ต้องมาคุยด้วยเลย! โกรธอยู่!"`); break;
+                case '/smile': status.mood = 'มีความสุข'; addMessage('ai', `😊 *${state.character} ยิ้มหวานให้คุณ* "เห็นคุณยิ้มได้ ผมก็มีความสุขแล้ว"`); break;
+                case '/dance': status.energy = 'เหนื่อย'; status.mood = 'ร่าเริง'; addMessage('ai', `💃 *${state.character} กำลังเต้นอย่างสนุกสนาน* "มาเต้นด้วยกันสิ! สนุกออกนะ"`); break;
+                case '/sing': status.mood = 'เพลิดเพลิน'; addMessage('ai', `🎤 *${state.character} กำลังร้องเพลงให้คุณฟัง* "ลา ลา ลา~ เพราะไหมล่ะ?"`); break;
+                case '/tickle': status.mood = 'ขำจนหยุดไม่ได้'; addMessage('ai', `🤣 *${state.character} ดิ้นไปมาเพราะโดนจี้เอว* "ฮ่าๆๆๆ พอแล้ว! ยอมแล้วจ้า!"`); break;
+                case '/punch': status.mood = 'เจ็บปวด'; addMessage('ai', `👊 *${state.character} โดนคุณต่อย* "โอ๊ย! เจ็บนะ! เล่นแรงไปแล้ว!"`); break;
+                case '/pat': status.mood = 'เคลิ้ม'; addMessage('ai', `✋ *${state.character} หลับตาพริ้มตอนคุณลูบหัว* "อืม... สบายจังเลย ลูบอีกสิ"`); break;
+
+                // --- MEGA OUTDOOR ---
+                case '/go_out': status.location = 'ข้างนอก'; addMessage('ai', `🚶 *${state.character} เดินออกไปข้างนอก* "อากาศดีจังเลยเนอะ"`); break;
+                case '/shopping': status.location = 'ห้างสรรพสินค้า'; status.mood = 'ตื่นเต้น'; addMessage('ai', `🛍️ *${state.character} กำลังเดินช้อปปิ้ง* "ของชิ้นนี้น่ารักจัง ซื้อให้หน่อยได้ไหม?"`); break;
+                case '/movie': status.location = 'โรงภาพยนตร์'; status.mood = 'ลุ้นระทึก'; addMessage('ai', `🍿 *${state.character} กำลังดูหนังกับคุณ* "หนังเรื่องนี้สนุกจังเลยเนอะ"`); break;
+                case '/park': status.location = 'สวนสาธารณะ'; status.mood = 'ผ่อนคลาย'; addMessage('ai', `🌳 *${state.character} กำลังเดินเล่นในสวน* "บรรยากาศร่มรื่นจังเลย ขอบคุณที่พามานะ"`); break;
+                case '/dinner': status.location = 'ร้านอาหารหรู'; status.mood = 'โรแมนติก'; addMessage('ai', `🍷 *${state.character} กำลังดินเนอร์กับคุณ* "มื้อนี้วิเศษที่สุดเลย เพราะมีคุณอยู่ด้วย"`); break;
+                case '/travel': status.location = 'ต่างจังหวัด/ต่างประเทศ'; status.mood = 'มีความสุขมาก'; addMessage('ai', `✈️ *${state.character} กำลังไปเที่ยวกับคุณ* "ไปเที่ยวด้วยกันแบบนี้บ่อยๆ นะ!"`); break;
+
+                // --- MEGA RELATIONSHIP ---
+                case '/flirt': status.mood = 'เขินจนทำตัวไม่ถูก'; addMessage('ai', `💖 *${state.character} โดนคุณหยอดคำหวาน* "พูดแบบนี้ผมก็เขินแย่สิ... รักนะ"`); break;
+                case '/hold_hand': status.mood = 'อบอุ่นหัวใจ'; addMessage('ai', `🤝 *${state.character} จับมือคุณแน่น* "สัญญาว่าจะไม่ปล่อยมือคุณไปไหนเลย"`); break;
+                case '/cuddle': status.mood = 'รักมาก'; addMessage('ai', `🤱 *${state.character} ซุกตัวอยู่ในอ้อมกอดคุณ* "อยากอยู่แบบนี้ไปนานๆ จัง"`); break;
+                case '/propose': status.mood = 'ซึ้งใจ'; addMessage('ai', `💍 *${state.character} คุกเข่าลง (หรือคุณคุกเข่า)* "แต่งงานกับผมนะ! ผมจะดูแลคุณให้ดีที่สุด"`); break;
+
+                // --- MEGA UTILITY ---
+                case '/dice': const d = Math.floor(Math.random() * 6) + 1; addMessage('ai', `🎲 *${state.character} ทอยเต๋าได้แต้ม:* **${d}**`); break;
+                case '/coin': const c = Math.random() > 0.5 ? 'หัว' : 'ก้อย'; addMessage('ai', `🪙 *${state.character} โยนเหรียญได้:* **${c}**`); break;
+                case '/joke': addMessage('ai', `🤡 *${state.character} เล่าเรื่องตลก:* "ทำไมปลาถึงไม่ไปโรงเรียน? เพราะมันเป็นปลาไหลไงล่ะ! ฮ่าๆๆๆ"`); break;
+                case '/fact': addMessage('ai', `💡 *${state.character} บอกข้อความจริง:* "รู้ไหมว่าหัวใจของกุ้งอยู่ที่หัวของมันล่ะ! แปลกดีเนอะ"`); break;
 
                 // ADMIN COMMANDS (Hidden from /help)
                 case '/admin_help':
