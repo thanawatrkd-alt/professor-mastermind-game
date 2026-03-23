@@ -566,6 +566,14 @@
                     <span id="status-mood" class="text-indigo-400">ปกติ</span>
                 </div>
                 <div class="flex items-center gap-2 whitespace-nowrap">
+                    <span class="text-slate-400">สถานที่:</span>
+                    <span id="status-location" class="text-sky-400">ห้องนั่งเล่น</span>
+                </div>
+                <div class="flex items-center gap-2 whitespace-nowrap">
+                    <span class="text-slate-400">ชุดที่ใส่:</span>
+                    <span id="status-outfit" class="text-purple-400">ชุดปกติ</span>
+                </div>
+                <div class="flex items-center gap-2 whitespace-nowrap">
                     <span class="text-slate-400">ความหิว:</span>
                     <span id="status-hunger" class="text-amber-400">อิ่ม</span>
                 </div>
@@ -1097,7 +1105,7 @@
             if (modes.chunibyo) modeInstructions += 'โหมดเบียว: พูดจาเพ้อฝัน มีพลังวิเศษ\n';
             modeInstructions += modes.nsfw ? 'อนุญาตเนื้อหาผู้ใหญ่ (18+) และการคุยเชิงลึกได้อย่างอิสระ\n' : 'หลีกเลี่ยงเนื้อหาผู้ใหญ่\n';
             if (modes.flirting) modeInstructions += 'โหมดจีบ: พูดจาแพรวพราว หยอดเก่ง รุกหนัก และแสดงความใกล้ชิดเหมือนเป็นคนรัก\n';
-            modeInstructions += `สถานะปัจจุบันของตัวละคร (จงตอบโต้ให้สอดคล้องกับสถานะนี้):\n- อารมณ์: ${status.mood}\n- ความหิว: ${status.hunger}\n- พลังงาน: ${status.energy}\n- สถานะพิเศษ: ${status.custom}\n`;
+            modeInstructions += `สถานะปัจจุบันของตัวละคร (จงตอบโต้ให้สอดคล้องกับสถานะนี้):\n- อารมณ์: ${status.mood}\n- สถานที่: ${status.location}\n- ชุดที่ใส่: ${status.outfit}\n- ความหิว: ${status.hunger}\n- พลังงาน: ${status.energy}\n- สถานะพิเศษ: ${status.custom}\n- ความสนิทสนม: ${getAffinity(state.character)}/100\n`;
 
             try {
                 const isGroq = state.provider === 'groq';
@@ -1164,15 +1172,23 @@
             const command = args[0].toLowerCase();
             const value = args.slice(1).join(' ');
             const charKey = 'status_' + state.character;
-            let status = JSON.parse(localStorage.getItem(charKey) || '{"mood":"ปกติ","hunger":"อิ่ม","energy":"เต็ม","custom":"โสด"}');
+            let status = JSON.parse(localStorage.getItem(charKey) || '{"mood":"ปกติ","hunger":"อิ่ม","energy":"เต็ม","custom":"โสด","location":"ห้องนั่งเล่น","outfit":"ชุดปกติ"}');
 
             switch(command) {
                 case '/status':
-                    addMessage('ai', `📊 สถานะปัจจุบันของ ${state.character}:\n- อารมณ์: ${status.mood}\n- ความหิว: ${status.hunger}\n- พลังงาน: ${status.energy}\n- สถานะพิเศษ: ${status.custom}`);
+                    addMessage('ai', `📊 สถานะปัจจุบันของ ${state.character}:\n- อารมณ์: ${status.mood}\n- สถานที่: ${status.location}\n- ชุดที่ใส่: ${status.outfit}\n- ความหิว: ${status.hunger}\n- พลังงาน: ${status.energy}\n- สถานะพิเศษ: ${status.custom}\n- ความสนิท: ${getAffinity(state.character)}`);
                     break;
                 case '/set_mood':
                     status.mood = value || 'ปกติ';
                     showToast('✨ อัปเดตอารมณ์แล้ว');
+                    break;
+                case '/set_location':
+                    status.location = value || 'ห้องนั่งเล่น';
+                    showToast('📍 เปลี่ยนสถานที่แล้ว');
+                    break;
+                case '/set_outfit':
+                    status.outfit = value || 'ชุดปกติ';
+                    showToast('👕 เปลี่ยนชุดแล้ว');
                     break;
                 case '/set_hunger':
                     status.hunger = value || 'อิ่ม';
@@ -1186,8 +1202,53 @@
                     status.custom = value || 'ไม่มี';
                     showToast('🏷️ อัปเดตสถานะพิเศษแล้ว');
                     break;
+                case '/set_affinity':
+                    const pts = parseInt(value) || 0;
+                    const affKey = 'affinity_' + state.character;
+                    localStorage.setItem(affKey, pts);
+                    updateAffinityUI();
+                    showToast('❤️ ปรับค่าความสนิทแล้ว');
+                    break;
+                case '/marry':
+                    status.custom = '💍 แต่งงานกับคุณแล้ว';
+                    status.mood = 'มีความสุขที่สุด';
+                    showToast('💍 ยินดีด้วย! คุณแต่งงานกันแล้ว');
+                    break;
+                case '/divorce':
+                    status.custom = '💔 เลิกรากันแล้ว';
+                    status.mood = 'เสียใจ';
+                    showToast('💔 คุณเลิกรากันแล้ว');
+                    break;
+                case '/gift':
+                    status.mood = 'ประทับใจ';
+                    addMessage('ai', `🎁 ${state.character} ได้รับของขวัญ "${value || 'ของขวัญพิเศษ'}" จากคุณแล้ว! ขอบคุณนะ!`);
+                    break;
+                case '/reset_all':
+                    if(confirm('รีเซ็ตสถานะทั้งหมดของตัวละครนี้?')) {
+                        status = {"mood":"ปกติ","hunger":"อิ่ม","energy":"เต็ม","custom":"โสด","location":"ห้องนั่งเล่น","outfit":"ชุดปกติ"};
+                        localStorage.setItem('affinity_' + state.character, 0);
+                        updateAffinityUI();
+                        showToast('🔄 รีเซ็ตสถานะทั้งหมดแล้ว');
+                    }
+                    break;
                 case '/help':
-                    addMessage('ai', "📜 รายการคำสั่ง:\n/status - ดูสถานะทั้งหมด\n/set_mood [ค่า] - เปลี่ยนอารมณ์\n/set_hunger [ค่า] - เปลี่ยนความหิว\n/set_energy [ค่า] - เปลี่ยนพลังงาน\n/set_status [ค่า] - เปลี่ยนสถานะพิเศษ");
+                    addMessage('ai', "📜 รายการคำสั่งทั้งหมด:\n" +
+                        "--- จัดการสถานะ ---\n" +
+                        "/status - ดูสถานะทั้งหมด\n" +
+                        "/set_mood [ค่า] - เปลี่ยนอารมณ์\n" +
+                        "/set_location [ค่า] - เปลี่ยนสถานที่\n" +
+                        "/set_outfit [ค่า] - เปลี่ยนชุด\n" +
+                        "/set_hunger [ค่า] - เปลี่ยนความหิว\n" +
+                        "/set_energy [ค่า] - เปลี่ยนพลังงาน\n" +
+                        "/set_status [ค่า] - เปลี่ยนสถานะพิเศษ\n" +
+                        "--- จัดการความสัมพันธ์ ---\n" +
+                        "/set_affinity [แต้ม] - ตั้งค่าความสนิท (0-100)\n" +
+                        "/marry - แต่งงานกัน\n" +
+                        "/divorce - เลิกรากัน\n" +
+                        "/gift [ชื่อของ] - มอบของขวัญ\n" +
+                        "--- อื่นๆ ---\n" +
+                        "/reset_all - รีเซ็ตทุกอย่าง\n" +
+                        "/help - ดูคำสั่งนี้");
                     break;
                 default:
                     addMessage('ai', "❌ ไม่พบคำสั่งนี้ ลองพิมพ์ /help เพื่อดูรายการคำสั่งทั้งหมด");
@@ -1200,8 +1261,10 @@
 
         function updateStatusUI() {
             const charKey = 'status_' + state.character;
-            const status = JSON.parse(localStorage.getItem(charKey) || '{"mood":"ปกติ","hunger":"อิ่ม","energy":"เต็ม","custom":"โสด"}');
+            const status = JSON.parse(localStorage.getItem(charKey) || '{"mood":"ปกติ","hunger":"อิ่ม","energy":"เต็ม","custom":"โสด","location":"ห้องนั่งเล่น","outfit":"ชุดปกติ"}');
             if (document.getElementById('status-mood')) document.getElementById('status-mood').textContent = status.mood;
+            if (document.getElementById('status-location')) document.getElementById('status-location').textContent = status.location;
+            if (document.getElementById('status-outfit')) document.getElementById('status-outfit').textContent = status.outfit;
             if (document.getElementById('status-hunger')) document.getElementById('status-hunger').textContent = status.hunger;
             if (document.getElementById('status-energy')) document.getElementById('status-energy').textContent = status.energy;
             if (document.getElementById('status-custom')) document.getElementById('status-custom').textContent = status.custom;
