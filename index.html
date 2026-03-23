@@ -1257,33 +1257,113 @@
                 case '/read_book': status.mood = 'สงบ'; addMessage('ai', `📖 *${state.character} กำลังอ่านหนังสือ* "เล่มนี้เนื้อหาดีมากเลย ไว้จะเล่าให้ฟังนะ"`); break;
                 case '/play_game': status.energy = 'ตื่นเต้น'; status.mood = 'สนุกมาก'; addMessage('ai', `🎮 *${state.character} กำลังเล่นเกมอย่างเมามันส์* "มาเล่นด้วยกันสิ! รับรองผมไม่แพ้หรอก"`); break;
 
-                // --- MEGA EMOTIONS ---
-                case '/hug': status.mood = 'เขินอาย'; addMessage('ai', `🫂 *${state.character} กอดคุณกลับแน่นๆ* "อุ่นจังเลย... ขอบคุณที่กอดนะ"`); break;
-                case '/kiss': status.mood = 'เขินหน้าแดง'; addMessage('ai', `💋 *${state.character} หน้าแดงฉ่า* "ทะ...ทำอะไรน่ะ! ตกใจหมดเลย... (แต่ก็ชอบนะ)"`); break;
-                case '/slap': status.mood = 'โกรธจัด'; addMessage('ai', `💢 *${state.character} เอามือกุมแก้มด้วยความตกใจ* "ทำแบบนี้ทำไม! นิสัยไม่ดีเลยนะ!"`); break;
+                // --- MEGA EMOTIONS (With Affinity Checks) ---
+                case '/hug': 
+                    if (status.affinity >= 30) {
+                        status.mood = 'เขินอาย'; addMessage('ai', `🫂 *${state.character} กอดคุณกลับแน่นๆ* "อุ่นจังเลย... ขอบคุณที่กอดนะ"`); 
+                    } else {
+                        addMessage('ai', `🙅 *${state.character} ถอยห่างออกไปเล็กน้อย* "เอ่อ... เรายังไม่สนิทกันขนาดนั้นนะ อย่าเพิ่งกอดเลย"`);
+                        showToast('💡 ต้องมีค่าความสนิท 30+ ถึงจะกอดได้');
+                    }
+                    break;
+                case '/kiss': 
+                    if (status.affinity >= 70) {
+                        status.mood = 'เขินหน้าแดง'; addMessage('ai', `💋 *${state.character} หน้าแดงฉ่า* "ทะ...ทำอะไรน่ะ! ตกใจหมดเลย... (แต่ก็ชอบนะ)"`); 
+                    } else {
+                        addMessage('ai', `😳 *${state.character} ผลักคุณออกเบาๆ* "ทะ...ทำอะไรน่ะ! เร็วไปหน่อยไหม? ผมยังไม่พร้อมนะ..."`);
+                        showToast('💡 ต้องมีค่าความสนิท 70+ ถึงจะจูบได้');
+                    }
+                    break;
+                case '/slap': status.mood = 'โกรธจัด'; status.affinity = Math.max(0, status.affinity - 10); addMessage('ai', `💢 *${state.character} เอามือกุมแก้มด้วยความตกใจ* "ทำแบบนี้ทำไม! นิสัยไม่ดีเลยนะ! (ความสนิทลดลง)"`); break;
                 case '/cry': status.mood = 'เศร้า'; addMessage('ai', `😭 *${state.character} ร้องไห้ออกมา* "ฮือ... ขอกอดหน่อยได้ไหม... เสียใจจัง"`); break;
                 case '/laugh': status.mood = 'ตลก'; addMessage('ai', `😂 *${state.character} หัวเราะลั่น* "ฮ่าๆๆๆ ตลกชะมัดเลยมึง!"`); break;
                 case '/angry': status.mood = 'หงุดหงิด'; addMessage('ai', `💢 *${state.character} ทำหน้าบึ้ง* "ไม่ต้องมาคุยด้วยเลย! โกรธอยู่!"`); break;
                 case '/smile': status.mood = 'มีความสุข'; addMessage('ai', `😊 *${state.character} ยิ้มหวานให้คุณ* "เห็นคุณยิ้มได้ ผมก็มีความสุขแล้ว"`); break;
                 case '/dance': status.energy = 'เหนื่อย'; status.mood = 'ร่าเริง'; addMessage('ai', `💃 *${state.character} กำลังเต้นอย่างสนุกสนาน* "มาเต้นด้วยกันสิ! สนุกออกนะ"`); break;
                 case '/sing': status.mood = 'เพลิดเพลิน'; addMessage('ai', `🎤 *${state.character} กำลังร้องเพลงให้คุณฟัง* "ลา ลา ลา~ เพราะไหมล่ะ?"`); break;
-                case '/tickle': status.mood = 'ขำจนหยุดไม่ได้'; addMessage('ai', `🤣 *${state.character} ดิ้นไปมาเพราะโดนจี้เอว* "ฮ่าๆๆๆ พอแล้ว! ยอมแล้วจ้า!"`); break;
-                case '/punch': status.mood = 'เจ็บปวด'; addMessage('ai', `👊 *${state.character} โดนคุณต่อย* "โอ๊ย! เจ็บนะ! เล่นแรงไปแล้ว!"`); break;
-                case '/pat': status.mood = 'เคลิ้ม'; addMessage('ai', `✋ *${state.character} หลับตาพริ้มตอนคุณลูบหัว* "อืม... สบายจังเลย ลูบอีกสิ"`); break;
+                case '/tickle': 
+                    if (status.affinity >= 20) {
+                        status.mood = 'ขำจนหยุดไม่ได้'; addMessage('ai', `🤣 *${state.character} ดิ้นไปมาเพราะโดนจี้เอว* "ฮ่าๆๆๆ พอแล้ว! ยอมแล้วจ้า!"`); 
+                    } else {
+                        addMessage('ai', `🤨 *${state.character} มองคุณนิ่งๆ* "เล่นอะไรน่ะ? ไม่เห็นตลกเลย อย่ามาจี้เอวนะ"`);
+                        showToast('💡 ต้องมีค่าความสนิท 20+ ถึงจะจี้เอวได้');
+                    }
+                    break;
+                case '/punch': status.mood = 'เจ็บปวด'; status.affinity = Math.max(0, status.affinity - 5); addMessage('ai', `👊 *${state.character} โดนคุณต่อย* "โอ๊ย! เจ็บนะ! เล่นแรงไปแล้ว! (ความสนิทลดลง)"`); break;
+                case '/pat': 
+                    if (status.affinity >= 15) {
+                        status.mood = 'เคลิ้ม'; addMessage('ai', `✋ *${state.character} หลับตาพริ้มตอนคุณลูบหัว* "อืม... สบายจังเลย ลูบอีกสิ"`); 
+                    } else {
+                        addMessage('ai', `😐 *${state.character} ขยับหัวหนี* "อย่ามาลูบหัวสิ ผมไม่ใช่เด็กนะ"`);
+                        showToast('💡 ต้องมีค่าความสนิท 15+ ถึงจะลูบหัวได้');
+                    }
+                    break;
 
                 // --- MEGA OUTDOOR ---
                 case '/go_out': status.location = 'ข้างนอก'; addMessage('ai', `🚶 *${state.character} เดินออกไปข้างนอก* "อากาศดีจังเลยเนอะ"`); break;
-                case '/shopping': status.location = 'ห้างสรรพสินค้า'; status.mood = 'ตื่นเต้น'; addMessage('ai', `🛍️ *${state.character} กำลังเดินช้อปปิ้ง* "ของชิ้นนี้น่ารักจัง ซื้อให้หน่อยได้ไหม?"`); break;
-                case '/movie': status.location = 'โรงภาพยนตร์'; status.mood = 'ลุ้นระทึก'; addMessage('ai', `🍿 *${state.character} กำลังดูหนังกับคุณ* "หนังเรื่องนี้สนุกจังเลยเนอะ"`); break;
+                case '/shopping': 
+                    if (status.affinity >= 25) {
+                        status.location = 'ห้างสรรพสินค้า'; status.mood = 'ตื่นเต้น'; addMessage('ai', `🛍️ *${state.character} กำลังเดินช้อปปิ้ง* "ของชิ้นนี้น่ารักจัง ซื้อให้หน่อยได้ไหม?"`); 
+                    } else {
+                        addMessage('ai', `🙄 *${state.character} ส่ายหน้า* "ขี้เกียจไปจังเลย ไว้คราวหลังละกันนะ"`);
+                        showToast('💡 ต้องมีค่าความสนิท 25+ ถึงจะพาไปช้อปปิ้งได้');
+                    }
+                    break;
+                case '/movie': 
+                    if (status.affinity >= 30) {
+                        status.location = 'โรงภาพยนตร์'; status.mood = 'ลุ้นระทึก'; addMessage('ai', `🍿 *${state.character} กำลังดูหนังกับคุณ* "หนังเรื่องนี้สนุกจังเลยเนอะ"`); 
+                    } else {
+                        addMessage('ai', `😑 *${state.character} บอกปัด* "ไม่อยากดูหนังเลยวันนี้ อยากอยู่บ้านมากกว่า"`);
+                        showToast('💡 ต้องมีค่าความสนิท 30+ ถึงจะพาไปดูหนังได้');
+                    }
+                    break;
                 case '/park': status.location = 'สวนสาธารณะ'; status.mood = 'ผ่อนคลาย'; addMessage('ai', `🌳 *${state.character} กำลังเดินเล่นในสวน* "บรรยากาศร่มรื่นจังเลย ขอบคุณที่พามานะ"`); break;
-                case '/dinner': status.location = 'ร้านอาหารหรู'; status.mood = 'โรแมนติก'; addMessage('ai', `🍷 *${state.character} กำลังดินเนอร์กับคุณ* "มื้อนี้วิเศษที่สุดเลย เพราะมีคุณอยู่ด้วย"`); break;
-                case '/travel': status.location = 'ต่างจังหวัด/ต่างประเทศ'; status.mood = 'มีความสุขมาก'; addMessage('ai', `✈️ *${state.character} กำลังไปเที่ยวกับคุณ* "ไปเที่ยวด้วยกันแบบนี้บ่อยๆ นะ!"`); break;
+                case '/dinner': 
+                    if (status.affinity >= 50) {
+                        status.location = 'ร้านอาหารหรู'; status.mood = 'โรแมนติก'; addMessage('ai', `🍷 *${state.character} กำลังดินเนอร์กับคุณ* "มื้อนี้วิเศษที่สุดเลย เพราะมีคุณอยู่ด้วย"`); 
+                    } else {
+                        addMessage('ai', `🍽️ *${state.character} มองคุณ* "ไปกินร้านอาหารหรูๆ เลยเหรอ? ผมว่าเรายังไม่สนิทกันขนาดนั้นนะ"`);
+                        showToast('💡 ต้องมีค่าความสนิท 50+ ถึงจะพาไปดินเนอร์หรูได้');
+                    }
+                    break;
+                case '/travel': 
+                    if (status.affinity >= 80) {
+                        status.location = 'ต่างจังหวัด/ต่างประเทศ'; status.mood = 'มีความสุขมาก'; addMessage('ai', `✈️ *${state.character} กำลังไปเที่ยวกับคุณ* "ไปเที่ยวด้วยกันแบบนี้บ่อยๆ นะ!"`); 
+                    } else {
+                        addMessage('ai', `🎒 *${state.character} ปฏิเสธ* "ไปเที่ยวไกลๆ กับคุณสองต่อสองเหรอ? ผมยังไม่กล้าไปหรอกนะ..."`);
+                        showToast('💡 ต้องมีค่าความสนิท 80+ ถึงจะพาไปเที่ยวไกลๆ ได้');
+                    }
+                    break;
 
-                // --- MEGA RELATIONSHIP ---
-                case '/flirt': status.mood = 'เขินจนทำตัวไม่ถูก'; addMessage('ai', `💖 *${state.character} โดนคุณหยอดคำหวาน* "พูดแบบนี้ผมก็เขินแย่สิ... รักนะ"`); break;
-                case '/hold_hand': status.mood = 'อบอุ่นหัวใจ'; addMessage('ai', `🤝 *${state.character} จับมือคุณแน่น* "สัญญาว่าจะไม่ปล่อยมือคุณไปไหนเลย"`); break;
-                case '/cuddle': status.mood = 'รักมาก'; addMessage('ai', `🤱 *${state.character} ซุกตัวอยู่ในอ้อมกอดคุณ* "อยากอยู่แบบนี้ไปนานๆ จัง"`); break;
-                case '/propose': status.mood = 'ซึ้งใจ'; addMessage('ai', `💍 *${state.character} คุกเข่าลง (หรือคุณคุกเข่า)* "แต่งงานกับผมนะ! ผมจะดูแลคุณให้ดีที่สุด"`); break;
+                // --- MEGA RELATIONSHIP (Strict Affinity Checks) ---
+                case '/flirt': 
+                    status.mood = 'เขินจนทำตัวไม่ถูก'; status.affinity += 2; addMessage('ai', `💖 *${state.character} โดนคุณหยอดคำหวาน* "พูดแบบนี้ผมก็เขินแย่สิ... รักนะ (ความสนิท +2)"`); 
+                    updateAffinityUI();
+                    break;
+                case '/hold_hand': 
+                    if (status.affinity >= 40) {
+                        status.mood = 'อบอุ่นหัวใจ'; addMessage('ai', `🤝 *${state.character} จับมือคุณแน่น* "สัญญาว่าจะไม่ปล่อยมือคุณไปไหนเลย"`); 
+                    } else {
+                        addMessage('ai', `👋 *${state.character} ดึงมือออก* "อย่าเพิ่งจับมือเลยนะ ผมยังเขินอยู่น่ะ..."`);
+                        showToast('💡 ต้องมีค่าความสนิท 40+ ถึงจะจับมือได้');
+                    }
+                    break;
+                case '/cuddle': 
+                    if (status.affinity >= 75) {
+                        status.mood = 'รักมาก'; addMessage('ai', `🤱 *${state.character} ซุกตัวอยู่ในอ้อมกอดคุณ* "อยากอยู่แบบนี้ไปนานๆ จัง"`); 
+                    } else {
+                        addMessage('ai', `🙅 *${state.character} ปฏิเสธ* "ขอนอนห่างๆ หน่อยนะ ผมยังไม่ชินน่ะ..."`);
+                        showToast('💡 ต้องมีค่าความสนิท 75+ ถึงจะนอนกอดได้');
+                    }
+                    break;
+                case '/propose': 
+                    if (status.affinity >= 95) {
+                        status.mood = 'ซึ้งใจ'; status.status = '💍 แต่งงานแล้ว'; addMessage('ai', `💍 *${state.character} คุกเข่าลง (หรือคุณคุกเข่า)* "แต่งงานกับผมนะ! ผมจะดูแลคุณให้ดีที่สุด"`); 
+                    } else {
+                        addMessage('ai', `😱 *${state.character} ตกใจจนตาค้าง* "ขอแต่งงานเลยเหรอ! เราเพิ่งรู้จักกันเองนะ ใจเย็นๆ ก่อนสิ!"`);
+                        showToast('💡 ต้องมีค่าความสนิท 95+ ถึงจะขอแต่งงานสำเร็จ');
+                    }
+                    break;
 
                 // --- MEGA UTILITY ---
                 case '/dice': const d = Math.floor(Math.random() * 6) + 1; addMessage('ai', `🎲 *${state.character} ทอยเต๋าได้แต้ม:* **${d}**`); break;
