@@ -610,15 +610,22 @@
 
         <!-- Import Character Modal -->
         <div id="import-modal" class="modal">
-            <div class="modal-content">
-                <h3 class="text-xl font-bold mb-4">นำเข้าตัวละครจาก ChatGPT</h3>
-                <p class="text-sm text-slate-400 mb-4">วางโค้ด JSON ที่ได้จาก ChatGPT ลงในช่องด้านล่างเพื่อเพิ่มตัวละครใหม่</p>
+            <div class="modal-content !max-w-2xl">
+                <h3 class="text-xl font-bold mb-2">📥 นำเข้าตัวละคร & สไตล์การพิมพ์</h3>
+                <div class="bg-indigo-900/30 border border-indigo-500/30 p-3 rounded-xl mb-4">
+                    <p class="text-xs text-indigo-300 font-bold mb-1"><i class="fas fa-lightbulb mr-1"></i> วิธีการใช้งาน:</p>
+                    <p class="text-[11px] text-slate-300 leading-relaxed">
+                        1. คัดลอกพรอมต์นี้ไปวางใน ChatGPT: <br>
+                        <code class="bg-black/40 p-1 rounded text-pink-400 select-all block mt-1">"ช่วยสรุปตัวละครที่เราโรลเพลย์กันอยู่ตอนนี้ในรูปแบบ JSON: {character, avatar, personality, catchphrases, knowledge, initialStatus: {mood, location, outfit, hunger, energy, custom}} โดยเน้นสไตล์การพิมพ์และคำพูดติดปากให้เหมือนที่สุด"</code>
+                        2. ก๊อปปี้ข้อความที่ ChatGPT ตอบกลับมาทั้งหมด (รวมคำพูดปกติด้วยก็ได้) มาวางที่นี่
+                    </p>
+                </div>
                 <div class="mb-4">
-                    <textarea id="import-json" class="w-full h-48 p-3 rounded-lg bg-slate-700 border border-slate-600 text-white font-mono text-xs focus:ring-indigo-500 focus:border-indigo-500" placeholder='{ "character": "...", ... }'></textarea>
+                    <textarea id="import-json" class="w-full h-64 p-3 rounded-lg bg-slate-700 border border-slate-600 text-white font-mono text-xs focus:ring-indigo-500 focus:border-indigo-500" placeholder="วางข้อความจาก ChatGPT ที่นี่..."></textarea>
                 </div>
                 <div class="flex justify-end gap-3">
                     <button onclick="closeImportModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
-                    <button onclick="processImport()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">นำเข้าตัวละคร</button>
+                    <button onclick="processImport()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">นำเข้าข้อมูล</button>
                 </div>
             </div>
         </div>
@@ -1646,27 +1653,43 @@
         }
 
         function processImport() {
-            const jsonText = document.getElementById('import-json').value.trim();
-            if (!jsonText) { alert('กรุณาวางโค้ด JSON จาก ChatGPT'); return; }
+            const inputText = document.getElementById('import-json').value.trim();
+            if (!inputText) { alert('กรุณาวางข้อความจาก ChatGPT'); return; }
 
             try {
-                // พยายามหา JSON ภายในข้อความ (เผื่อผู้ใช้ก๊อปปี้ติดคำพูดมาด้วย)
-                const jsonMatch = jsonText.match(/\{.*\}/s);
-                if (!jsonMatch) throw new Error('ไม่พบรูปแบบ JSON ที่ถูกต้อง');
+                let data = null;
                 
-                const data = JSON.parse(jsonMatch[0]);
-                
-                // ตรวจสอบฟิลด์ที่จำเป็น
-                if (!data.character || !data.personality) {
-                    throw new Error('ข้อมูล JSON ไม่ครบถ้วน (ต้องมี character และ personality)');
+                // 1. พยายามหา JSON ภายในข้อความ
+                const jsonMatch = inputText.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    try {
+                        data = JSON.parse(jsonMatch[0]);
+                    } catch (e) {
+                        console.log("JSON parse failed, trying manual extraction");
+                    }
                 }
+
+                // 2. ถ้าหา JSON ไม่ได้ หรือ Parse ไม่ผ่าน ให้พยายามดึงข้อมูลแบบ Manual (Heuristic)
+                if (!data) {
+                    data = {
+                        character: (inputText.match(/ชื่อตัวละคร[:\s]+([^\n]+)/i) || [null, "ตัวละครนิรนาม"])[1].trim(),
+                        personality: (inputText.match(/นิสัย[:\s]+([\s\S]+?)(?=\n\n|\n[A-Zก-ฮ]|$)/i) || [null, inputText.substring(0, 200)])[1].trim(),
+                        avatar: (inputText.match(/รูป[:\s]+(https?:\/\/[^\s\n]+)/i) || [null, ""])[1],
+                        catchphrases: (inputText.match(/คำพูดติดปาก[:\s]+([^\n]+)/i) || [null, ""])[1],
+                        knowledge: (inputText.match(/ความทรงจำ|ข้อมูล[:\s]+([\s\S]+)/i) || [null, ""])[1]
+                    };
+                }
+                
+                // ตรวจสอบฟิลด์ที่จำเป็น (อย่างน้อยต้องมีชื่อหรือนิสัย)
+                const charName = data.character || data.name || "ตัวละครนำเข้า";
+                const charDesc = data.personality || data.desc || "ไม่มีข้อมูลนิสัย";
 
                 // แปลงข้อมูลให้เข้ากับโครงสร้างของเว็บ
                 const newChar = {
-                    name: data.character,
-                    avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.character}${Math.random()}`,
+                    name: charName,
+                    avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${charName}${Math.random()}`,
                     tag: 'นำเข้าจาก ChatGPT',
-                    desc: data.personality,
+                    desc: charDesc,
                     catchphrases: data.catchphrases || '',
                     knowledge: data.knowledge || '',
                     imported: true
@@ -1678,10 +1701,10 @@
                 
                 // ถ้ามีสถานะเริ่มต้น ให้บันทึกไว้ด้วย
                 if (data.initialStatus) {
-                    localStorage.setItem('status_' + data.character, JSON.stringify(data.initialStatus));
+                    localStorage.setItem('status_' + charName, JSON.stringify(data.initialStatus));
                 }
 
-                showToast('✅ นำเข้าตัวละคร ' + data.character + ' สำเร็จ!');
+                showToast('✅ นำเข้าตัวละคร ' + charName + ' สำเร็จ!');
                 closeImportModal();
                 renderCharacters();
                 
@@ -1690,7 +1713,7 @@
 
             } catch (e) {
                 console.error(e);
-                alert('เกิดข้อผิดพลาดในการนำเข้า: ' + e.message);
+                alert('เกิดข้อผิดพลาดในการนำเข้า: ' + e.message + '\nกรุณาตรวจสอบว่ารูปแบบข้อความถูกต้อง');
             }
         }
         function clearCreatorForm() {
