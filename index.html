@@ -613,11 +613,11 @@
             <div class="modal-content !max-w-2xl">
                 <h3 class="text-xl font-bold mb-2">📥 นำเข้าตัวละคร & สไตล์การพิมพ์</h3>
                 <div class="bg-indigo-900/30 border border-indigo-500/30 p-3 rounded-xl mb-4">
-                    <p class="text-xs text-indigo-300 font-bold mb-1"><i class="fas fa-lightbulb mr-1"></i> วิธีการใช้งาน:</p>
+                    <p class="text-xs text-indigo-300 font-bold mb-1"><i class="fas fa-skull-crossbones mr-1 text-pink-500"></i> วิธีการคัดลอก DNA ตัวละคร (แบบโหด):</p>
                     <p class="text-[11px] text-slate-300 leading-relaxed">
-                        1. คัดลอกพรอมต์นี้ไปวางใน ChatGPT: <br>
-                        <code class="bg-black/40 p-1 rounded text-pink-400 select-all block mt-1">"ช่วยสรุปตัวละครที่เราโรลเพลย์กันอยู่ตอนนี้ในรูปแบบ JSON: {character, avatar, personality, catchphrases, knowledge, initialStatus: {mood, location, outfit, hunger, energy, custom}} โดยเน้นสไตล์การพิมพ์และคำพูดติดปากให้เหมือนที่สุด"</code>
-                        2. ก๊อปปี้ข้อความที่ ChatGPT ตอบกลับมาทั้งหมด (รวมคำพูดปกติด้วยก็ได้) มาวางที่นี่
+                        1. คัดลอกพรอมต์ "สกัด DNA" นี้ไปวางใน ChatGPT ที่คุณกำลังโรลเพลย์อยู่: <br>
+                        <code class="bg-black/40 p-2 rounded text-pink-400 select-all block mt-1 border border-pink-500/30">"วิเคราะห์การโรลเพลย์ของเราทั้งหมดที่ผ่านมา แล้วสรุปข้อมูลในรูปแบบ JSON: { \"character\": \"ชื่อ\", \"personality\": \"นิสัยและสันดานดิบแบบละเอียด\", \"writing_style\": \"สไตล์การพิมพ์เป๊ะๆ (เช่น พิมพ์สั้น/ยาว, การใช้คำหยาบ, การเว้นวรรค, อีโมจิที่ชอบใช้, จังหวะการตอบ)\", \"catchphrases\": \"คำพูดติดปากที่ใช้บ่อยที่สุด\", \"knowledge\": \"ความทรงจำและเหตุการณ์สำคัญล่าสุดที่เราคุยกัน\", \"initialStatus\": { \"mood\": \"อารมณ์ล่าสุด\", \"location\": \"สถานที่ล่าสุด\", \"outfit\": \"ชุดที่ใส่ล่าสุด\" } } **เน้นให้เหมือนตัวคุณในแชทนี้ที่สุด 100%**"</code>
+                        2. ก๊อปปี้สิ่งที่ ChatGPT ตอบกลับมาทั้งหมดมาวางที่นี่ ระบบจะสกัดข้อมูลให้เอง
                     </p>
                 </div>
                 <div class="mb-4">
@@ -1683,13 +1683,17 @@
                 // ตรวจสอบฟิลด์ที่จำเป็น (อย่างน้อยต้องมีชื่อหรือนิสัย)
                 const charName = data.character || data.name || "ตัวละครนำเข้า";
                 const charDesc = data.personality || data.desc || "ไม่มีข้อมูลนิสัย";
+                const writingStyle = data.writing_style || "";
+                
+                // รวมนิสัยกับสไตล์การพิมพ์เข้าด้วยกันเพื่อให้ AI เลียนแบบได้ดีที่สุด
+                const fullPersonality = `${charDesc}\n\n[สไตล์การพิมพ์ที่ต้องเลียนแบบแบบ 100%]:\n${writingStyle}`;
 
                 // แปลงข้อมูลให้เข้ากับโครงสร้างของเว็บ
                 const newChar = {
                     name: charName,
                     avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${charName}${Math.random()}`,
-                    tag: 'นำเข้าจาก ChatGPT',
-                    desc: charDesc,
+                    tag: 'DNA นำเข้าจาก ChatGPT',
+                    desc: fullPersonality,
                     catchphrases: data.catchphrases || '',
                     knowledge: data.knowledge || '',
                     imported: true
