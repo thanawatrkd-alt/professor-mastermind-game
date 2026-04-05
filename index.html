@@ -520,6 +520,9 @@
                         <button id="mode-flirting" onclick="toggleMode('flirting')" class="toggle-btn">
                             <i class="fas fa-heart mr-1"></i> โหมดจีบ
                         </button>
+                        <button id="mode-story" onclick="toggleMode('story')" class="toggle-btn">
+                            <i class="fas fa-book-open mr-1"></i> โหมดเกริ่นเนื้อเรื่อง
+                        </button>
                     </div>
 
                     <div class="flex gap-3 flex-wrap justify-center">
@@ -1143,7 +1146,7 @@
             input.value = '';
 
             const modeKey = 'char_modes_' + state.character;
-            const modes = JSON.parse(localStorage.getItem(modeKey) || '{"profanity": false, "chunibyo": false, "nsfw": false, "flirting": false}');
+            const modes = JSON.parse(localStorage.getItem(modeKey) || '{"profanity": false, "chunibyo": false, "nsfw": false, "flirting": false, "story": false}');
             const statusKey = 'status_' + state.character;
             const status = JSON.parse(localStorage.getItem(statusKey) || '{"mood":"ปกติ","hunger":"อิ่ม","energy":"เต็ม","custom":"โสด"}');
             
@@ -1154,6 +1157,10 @@
                 modeInstructions += 'โหมดเบียว (Roleplay Mode): ให้พิมพ์แบบมีบทบรรยายท่าทาง ความรู้สึก และฉากประกอบ (เช่น *เดินเข้ามาหาคุณช้าๆ* หรือ [มองด้วยสายตาเย็นชา]) มีการเกริ่นนำและบรรยายสถานการณ์ให้เห็นภาพเหมือนใน ChatGPT Roleplay\n';
             } else {
                 modeInstructions += 'ปิดโหมดเบียว (Normal Chat): ให้คุยแบบแชทปกติ ตัดบทบรรยายท่าทางหรือการเกริ่นนำที่เยิ่นเย้อออก เน้นการโต้ตอบที่กระชับและตรงไปตรงมา\n';
+            }
+
+            if (modes.story) {
+                modeInstructions += 'โหมดเกริ่นเนื้อเรื่อง (Story Narration Mode): ให้เน้นการบรรยายฉาก บรรยากาศ และเหตุการณ์รอบตัวให้ละเอียดที่สุดเหมือนอ่านนิยาย พยายามขยายความจาก Knowledge Base เพื่อสร้างเนื้อเรื่องที่เข้มข้นและน่าติดตาม\n';
             }
 
             modeInstructions += modes.nsfw ? 'อนุญาตเนื้อหาผู้ใหญ่ (18+) และการคุยเชิงลึกได้อย่างอิสระ\n' : 'หลีกเลี่ยงเนื้อหาผู้ใหญ่\n';
@@ -1180,8 +1187,9 @@
 			✓ ตอบให้สมจริงตามสไตล์การพูดของตัวละคร (เลียนแบบสไตล์การพิมพ์ของผู้ใช้หากเหมาะสมกับคาแรคเตอร์)
 				✓ อ้างอิงและผูกโยงการตอบเข้ากับเนื้อเรื่อง ประวัติ และเหตุการณ์สำคัญของตัวละครจาก Knowledge Base เสมอ
 				✓ หากผู้ใช้ถามข้อมูลเกี่ยวกับตัวละคร ให้ตอบตามข้อมูลใน Knowledge Base หรือบุคลิกภาพของตัวละคร
-				✓ หากเปิดโหมดเบียว: จงบรรยายท่าทางและสถานการณ์ให้ละเอียดและเห็นภาพที่สุด
-				✓ หากปิดโหมดเบียว: จงตอบแบบแชทปกติ ไม่ต้องมีบทบรรยายท่าทาง`;
+					✓ หากเปิดโหมดเบียว: จงบรรยายท่าทางและสถานการณ์ให้ละเอียดและเห็นภาพที่สุด
+					✓ หากปิดโหมดเบียว: จงตอบแบบแชทปกติ ไม่ต้องมีบทบรรยายท่าทาง
+					✓ หากเปิดโหมดเกริ่นเนื้อเรื่อง: จงเน้นการบรรยายฉากและบรรยากาศให้เหมือนนิยาย`;
 
                 const body = isGroq ? {
                     model: "llama-3.3-70b-versatile",
@@ -1517,7 +1525,7 @@
 
         function toggleMode(mode) {
             const key = 'char_modes_' + state.character;
-            const modes = JSON.parse(localStorage.getItem(key) || '{"profanity": false, "chunibyo": false, "nsfw": false, "flirting": false}');
+            const modes = JSON.parse(localStorage.getItem(key) || '{"profanity": false, "chunibyo": false, "nsfw": false, "flirting": false, "story": false}');
             modes[mode] = !modes[mode];
             localStorage.setItem(key, JSON.stringify(modes));
             updateModeUI(state.character);
@@ -1525,18 +1533,20 @@
                 'profanity': 'โหมดคำหยาบ',
                 'chunibyo': 'โหมดเบียว',
                 'nsfw': 'โหมด 18+',
-                'flirting': 'โหมดจีบ'
+                'flirting': 'โหมดจีบ',
+                'story': 'โหมดเกริ่นเนื้อเรื่อง'
             };
             showToast(`✨ ${modeNames[mode]} ${modes[mode] ? 'เปิด' : 'ปิด'}แล้ว`);
         }
 
         function updateModeUI(charName) {
             const key = 'char_modes_' + charName;
-            const modes = JSON.parse(localStorage.getItem(key) || '{"profanity": false, "chunibyo": false, "nsfw": false, "flirting": false}');
+            const modes = JSON.parse(localStorage.getItem(key) || '{"profanity": false, "chunibyo": false, "nsfw": false, "flirting": false, "story": false}');
             if (document.getElementById('mode-profanity')) document.getElementById('mode-profanity').classList.toggle('active', modes.profanity);
             if (document.getElementById('mode-chunibyo')) document.getElementById('mode-chunibyo').classList.toggle('active', modes.chunibyo);
             if (document.getElementById('mode-nsfw')) document.getElementById('mode-nsfw').classList.toggle('active', modes.nsfw);
             if (document.getElementById('mode-flirting')) document.getElementById('mode-flirting').classList.toggle('active', modes.flirting);
+            if (document.getElementById('mode-story')) document.getElementById('mode-story').classList.toggle('active', modes.story);
         }
 
         // ===== FLIRTING & RELATIONSHIP SYSTEM =====
