@@ -441,9 +441,14 @@
                     <h2 class="text-xl font-bold">เลือกเพื่อนคุยของคุณ</h2>
                     <p class="text-sm text-slate-400">มีตัวละครมากมายรอคุณอยู่</p>
                 </div>
-                <button onclick="openCreatorModal()" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2 shadow-lg shadow-pink-900/20">
-                    <i class="fas fa-plus"></i> สร้างใหม่
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="openImportModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2 shadow-lg shadow-indigo-900/20">
+                        <i class="fas fa-file-import"></i> นำเข้า (JSON)
+                    </button>
+                    <button onclick="openCreatorModal()" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2 shadow-lg shadow-pink-900/20">
+                        <i class="fas fa-plus"></i> สร้างใหม่
+                    </button>
+                </div>
             </header>
 
             <div class="px-6 mb-4">
@@ -599,6 +604,21 @@
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Character Modal -->
+        <div id="import-modal" class="modal">
+            <div class="modal-content">
+                <h3 class="text-xl font-bold mb-4">นำเข้าตัวละครจาก ChatGPT</h3>
+                <p class="text-sm text-slate-400 mb-4">วางโค้ด JSON ที่ได้จาก ChatGPT ลงในช่องด้านล่างเพื่อเพิ่มตัวละครใหม่</p>
+                <div class="mb-4">
+                    <textarea id="import-json" class="w-full h-48 p-3 rounded-lg bg-slate-700 border border-slate-600 text-white font-mono text-xs focus:ring-indigo-500 focus:border-indigo-500" placeholder='{ "character": "...", ... }'></textarea>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeImportModal()" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition">ยกเลิก</button>
+                    <button onclick="processImport()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">นำเข้าตัวละคร</button>
                 </div>
             </div>
         </div>
@@ -853,21 +873,40 @@
             if (tab === 'local') renderCharacters(); else renderSharedCharacters();
         }
 
+        function deleteCharacter(index) {
+            const char = state.characters[index];
+            if (confirm(`คุณต้องการลบตัวละคร "${char.name}" ใช่หรือไม่?\n(ข้อมูลทั้งหมดของตัวละครนี้จะหายไป)`)) {
+                state.characters.splice(index, 1);
+                localStorage.setItem('khuiai_chars', JSON.stringify(state.characters));
+                renderCharacters();
+                showToast('🗑️ ลบตัวละครเรียบร้อยแล้ว');
+            }
+        }
+
         function renderCharacters() {
             const grid = document.getElementById('character-grid');
             grid.innerHTML = '';
             state.characters.forEach((char, index) => {
                 const card = document.createElement('div');
-                card.className = 'char-card';
+                card.className = 'char-card group';
                 card.innerHTML = `
-                    <div class="edit-btn" onclick="event.stopPropagation(); openCreatorModal(${index})"><i class="fas fa-edit"></i></div>
+                    <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        ${index >= 0 ? `
+                            <button onclick="event.stopPropagation(); openCreatorModal(${index})" class="w-8 h-8 bg-black/50 hover:bg-indigo-600 text-white rounded-full flex items-center justify-center transition" title="แก้ไข">
+                                <i class="fas fa-edit text-xs"></i>
+                            </button>
+                            <button onclick="event.stopPropagation(); deleteCharacter(${index})" class="w-8 h-8 bg-black/50 hover:bg-rose-600 text-white rounded-full flex items-center justify-center transition" title="ลบ">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
+                        ` : ''}
+                    </div>
                     <div class="char-img-box">
-                        <img src="${char.avatar}" alt="${char.name}" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${char.name}'">
+                        <img src="${char.avatar}" alt="${char.name}">
                         <div class="char-status"></div>
                     </div>
                     <div class="char-info">
                         <div class="char-name">${char.name}</div>
-                        <div class="char-desc">${char.tag || 'เพื่อนคุย AI'}</div>
+                        <div class="char-desc line-clamp-2">${char.tag || char.desc}</div>
                     </div>
                 `;
                 card.onclick = () => showProfile(index);
@@ -1596,6 +1635,64 @@
         }
 
         function closeCreatorModal() { document.getElementById('creator-modal').classList.remove('active'); }
+        
+        function openImportModal() {
+            document.getElementById('import-json').value = '';
+            document.getElementById('import-modal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.remove('active');
+        }
+
+        function processImport() {
+            const jsonText = document.getElementById('import-json').value.trim();
+            if (!jsonText) { alert('กรุณาวางโค้ด JSON จาก ChatGPT'); return; }
+
+            try {
+                // พยายามหา JSON ภายในข้อความ (เผื่อผู้ใช้ก๊อปปี้ติดคำพูดมาด้วย)
+                const jsonMatch = jsonText.match(/\{.*\}/s);
+                if (!jsonMatch) throw new Error('ไม่พบรูปแบบ JSON ที่ถูกต้อง');
+                
+                const data = JSON.parse(jsonMatch[0]);
+                
+                // ตรวจสอบฟิลด์ที่จำเป็น
+                if (!data.character || !data.personality) {
+                    throw new Error('ข้อมูล JSON ไม่ครบถ้วน (ต้องมี character และ personality)');
+                }
+
+                // แปลงข้อมูลให้เข้ากับโครงสร้างของเว็บ
+                const newChar = {
+                    name: data.character,
+                    avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.character}${Math.random()}`,
+                    tag: 'นำเข้าจาก ChatGPT',
+                    desc: data.personality,
+                    catchphrases: data.catchphrases || '',
+                    knowledge: data.knowledge || '',
+                    imported: true
+                };
+
+                // เพิ่มลงในรายการตัวละคร
+                state.characters.push(newChar);
+                localStorage.setItem('khuiai_chars', JSON.stringify(state.characters));
+                
+                // ถ้ามีสถานะเริ่มต้น ให้บันทึกไว้ด้วย
+                if (data.initialStatus) {
+                    localStorage.setItem('status_' + data.character, JSON.stringify(data.initialStatus));
+                }
+
+                showToast('✅ นำเข้าตัวละคร ' + data.character + ' สำเร็จ!');
+                closeImportModal();
+                renderCharacters();
+                
+                // เปิดหน้าโปรไฟล์ของตัวละครที่เพิ่งนำเข้า
+                showProfile(state.characters.length - 1);
+
+            } catch (e) {
+                console.error(e);
+                alert('เกิดข้อผิดพลาดในการนำเข้า: ' + e.message);
+            }
+        }
         function clearCreatorForm() {
             document.getElementById('custom-name').value = '';
             document.getElementById('custom-img').value = '';
